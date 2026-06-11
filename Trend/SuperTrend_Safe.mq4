@@ -11,11 +11,11 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 input int InpATRPeriod=10;input double InpMultiplier=3.0;
 
-double upTrend[],downTrend[],trendLine[],buySignal[],sellSignal[];
+double upTrend[],downTrend[],trendLine[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,upTrend);SetIndexLabel(0,"Up Trend");
@@ -23,6 +23,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,trendLine);SetIndexLabel(2,"Trend Line");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexLabel(5,"Strong Buy");SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexLabel(6,"Strong Sell");SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("SuperTrend_Safe("+IntegerToString(InpATRPeriod)+")");return(0);
 }
 int deinit(){return(0);}
@@ -54,13 +56,20 @@ int start() {
       }
       prevClose=iClose(_Symbol,_Period,i);prevUpper=upperBand;prevLower=lowerBand;
       upTrend[i]=isUpTrend?trendLine[i]:EMPTY_VALUE;downTrend[i]=!isUpTrend?trendLine[i]:EMPTY_VALUE;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   // 信号：趋势转换确认(bar[1]+)
+   // 信号：趋势转换确认(bar[1]+) — 增强分级
    for(int i=limit;i>=1;i--) {
-      if(upTrend[i+1]==EMPTY_VALUE&&upTrend[i]!=EMPTY_VALUE)buySignal[i]=iLow(_Symbol,_Period,i)-10*Point;
-      if(downTrend[i+1]==EMPTY_VALUE&&downTrend[i]!=EMPTY_VALUE)sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;
+      double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      double dist=MathAbs((upTrend[i]!=EMPTY_VALUE?upTrend[i]:downTrend[i])-iClose(_Symbol,_Period,i));
+      bool strongBreak = (dist > atr * InpMultiplier * 0.8); // 价格远离趋势线=趋势强劲
+      // 强买：趋势转多 + 大幅突破
+      if(upTrend[i+1]==EMPTY_VALUE&&upTrend[i]!=EMPTY_VALUE&&strongBreak)strongBuy[i]=iLow(_Symbol,_Period,i)-15*Point;
+      else if(upTrend[i+1]==EMPTY_VALUE&&upTrend[i]!=EMPTY_VALUE)buySignal[i]=iLow(_Symbol,_Period,i)-10*Point;
+      // 强卖：趋势转空 + 大幅突破
+      if(downTrend[i+1]==EMPTY_VALUE&&downTrend[i]!=EMPTY_VALUE&&strongBreak)strongSell[i]=iHigh(_Symbol,_Period,i)+15*Point;
+      else if(downTrend[i+1]==EMPTY_VALUE&&downTrend[i]!=EMPTY_VALUE)sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;
    }
-   if(Bars>0){upTrend[0]=upTrend[1];downTrend[0]=downTrend[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){upTrend[0]=upTrend[1];downTrend[0]=downTrend[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

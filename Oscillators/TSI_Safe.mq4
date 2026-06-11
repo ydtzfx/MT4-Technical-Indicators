@@ -9,18 +9,20 @@
 #property copyright "Open Source - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_level1 0
 
 input int InpR=25;input int InpS=13;input int InpSig=7;
 
-double tsi[],signal[],buySignal[],sellSignal[];
+double tsi[],signal[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,tsi);SetIndexLabel(0,"TSI");
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signal);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,ARROW_BUY);SetIndexLabel(4,"Strong Buy");SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,ARROW_SELL);SetIndexLabel(5,"Strong Sell");SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("TSI_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -41,13 +43,20 @@ int start() {
       if(i>=Bars-120){e1[i]=ds1[i];e2[i]=ds2[i];}
       else{e1[i]=ds1[i]*aS+e1[i+1]*(1-aS);e2[i]=ds2[i]*aS+e2[i+1]*(1-aS);}
    }
-   for(int i=limit;i>=1;i--){tsi[i]=SafeDivide(100*e1[i],e2[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+   for(int i=limit;i>=1;i--){tsi[i]=SafeDivide(100*e1[i],e2[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    for(int i=limit;i>=1;i--){double e=tsi[i+10];for(int j=9;j>=0;j--)e=tsi[i+j]*aSig+e*(1-aSig);signal[i]=e;}
    for(int i=limit;i>=1;i--){
-      if(tsi[i+1]<=signal[i+1]&&tsi[i]>signal[i])buySignal[i]=tsi[i]-0.1;
-      if(tsi[i+1]>=signal[i+1]&&tsi[i]<signal[i])sellSignal[i]=tsi[i]+0.1;
-      if(tsi[i+1]<0&&tsi[i]>0)buySignal[i]=tsi[i]-0.1;
+      bool crossUp=(tsi[i+1]<=signal[i+1]&&tsi[i]>signal[i]);
+      bool crossDn=(tsi[i+1]>=signal[i+1]&&tsi[i]<signal[i]);
+      bool zeroUp=(tsi[i+1]<0&&tsi[i]>0);
+      double str=MathAbs(tsi[i]-tsi[i+5]); // 近期动量
+      // 强买：金叉 + 零轴上穿 + 强动量
+      if(crossUp&&zeroUp&&str>0.5)strongBuy[i]=tsi[i]-0.2;
+      else if(crossUp||zeroUp)buySignal[i]=tsi[i]-0.1;
+      // 强卖：死叉 + 零轴下穿 + 强动量
+      if(crossDn&&tsi[i+1]>0&&tsi[i]<0&&str>0.5)strongSell[i]=tsi[i]+0.2;
+      else if(crossDn)sellSignal[i]=tsi[i]+0.1;
    }
-   if(Bars>0){tsi[0]=tsi[1];signal[0]=signal[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){tsi[0]=tsi[1];signal[0]=signal[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

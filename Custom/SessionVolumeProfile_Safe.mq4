@@ -19,9 +19,9 @@ input int InpUSStart=14,InpUSEnd=22;      // 美盘
 double asianVWAP[],euVWAP[],usVWAP[],sessionPOC[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(0,asianVWAP);SetIndexLabel(0,"Asian VWAP");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(1,euVWAP);SetIndexLabel(1,"EU VWAP");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrMagenta);SetIndexBuffer(2,usVWAP);SetIndexLabel(2,"US VWAP");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(0,asianVWAP);SetIndexLabel(0,"Asian VWAP");SetIndexEmptyValue(0,EMPTY_VALUE);
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(1,euVWAP);SetIndexLabel(1,"EU VWAP");SetIndexEmptyValue(1,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrMagenta);SetIndexBuffer(2,usVWAP);SetIndexLabel(2,"US VWAP");SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,clrOrange);SetIndexBuffer(3,sessionPOC);SetIndexArrow(3,ARROW_DOT);SetIndexLabel(3,"Session POC");SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("SessionVP_Safe");return(0);
 }

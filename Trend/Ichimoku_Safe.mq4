@@ -19,7 +19,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 7
+#property indicator_buffers 9
 
 // 输入参数
 input int InpTenkan = 9;     // 转换线周期
@@ -39,6 +39,8 @@ double senkouBBuffer[];      // 先行B（前移）
 double chikouBuffer[];       // 滞后线（后移）
 double buySignal[];          // 买入信号
 double sellSignal[];         // 卖出信号
+double strongBuy[];          // 强买入
+double strongSell[];         // 强卖出
 
 //+------------------------------------------------------------------+
 int init()
@@ -75,6 +77,18 @@ int init()
    SetIndexArrow(6, ARROW_SELL);
    SetIndexEmptyValue(6, EMPTY_VALUE);
 
+   SetIndexStyle(7, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(7, strongBuy);
+   SetIndexArrow(7, ARROW_BUY);
+   SetIndexLabel(7, "Strong Buy");
+   SetIndexEmptyValue(7, EMPTY_VALUE);
+
+   SetIndexStyle(8, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(8, strongSell);
+   SetIndexArrow(8, ARROW_SELL);
+   SetIndexLabel(8, "Strong Sell");
+   SetIndexEmptyValue(8, EMPTY_VALUE);
+
    IndicatorDigits(4);
    IndicatorShortName("Ichimoku_Safe(" + IntegerToString(InpTenkan) + "," +
                       IntegerToString(InpKijun) + "," + IntegerToString(InpSenkou) + ")");
@@ -102,6 +116,8 @@ int start()
          chikouBuffer[i] = EMPTY_VALUE;
          buySignal[i]    = EMPTY_VALUE;
          sellSignal[i]   = EMPTY_VALUE;
+         strongBuy[i]    = EMPTY_VALUE;
+         strongSell[i]   = EMPTY_VALUE;
       }
       senkouABuffer[i + InpKijun] = EMPTY_VALUE;
       senkouBBuffer[i + InpKijun] = EMPTY_VALUE;
@@ -169,43 +185,38 @@ int start()
          chikouBuffer[chikouIndex] = iClose(_Symbol, _Period, chikouIndex);
    }
 
-   // === 信号判断（bar[1]+确认，不含未来函数） ===
+   // === 信号判断（bar[1]+确认）— 增强分级 ===
    for(int i = limit; i >= 1; i--)
    {
-      // 1. Tenkan/Kijun 交叉
-      // 金叉：Tenkan上穿Kijun
-      if(tenkanBuffer[i+1] <= kijunBuffer[i+1] && tenkanBuffer[i] > kijunBuffer[i])
-      {
-         // 确认价格在云上方 → 强买入信号
-         double priceAboveCloud = (iClose(_Symbol, _Period, i) > senkouABuffer[i] &&
-                                   iClose(_Symbol, _Period, i) > senkouBBuffer[i]);
-         if(priceAboveCloud)
-            buySignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
-      }
-
-      // 死叉：Tenkan下穿Kijun
-      if(tenkanBuffer[i+1] >= kijunBuffer[i+1] && tenkanBuffer[i] < kijunBuffer[i])
-      {
-         // 确认价格在云下方 → 强卖出信号
-         double priceBelowCloud = (iClose(_Symbol, _Period, i) < senkouABuffer[i] &&
-                                   iClose(_Symbol, _Period, i) < senkouBBuffer[i]);
-         if(priceBelowCloud)
-            sellSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
-      }
-
-      // 2. 价格穿越云层
+      bool crossUp   = (tenkanBuffer[i+1] <= kijunBuffer[i+1] && tenkanBuffer[i] > kijunBuffer[i]);
+      bool crossDown = (tenkanBuffer[i+1] >= kijunBuffer[i+1] && tenkanBuffer[i] < kijunBuffer[i]);
       double close_i  = iClose(_Symbol, _Period, i);
       double close_i1 = iClose(_Symbol, _Period, i + 1);
+      bool priceAboveCloud = (close_i > senkouABuffer[i] && close_i > senkouBBuffer[i]);
+      bool priceBelowCloud = (close_i < senkouABuffer[i] && close_i < senkouBBuffer[i]);
+      bool thickCloud = (MathAbs(senkouABuffer[i] - senkouBBuffer[i]) > iATR(_Symbol,_Period,14,i)*0.5);
 
-      // 价格上穿云层（从云下方到云上方）
-      bool belowCloudPrev = (close_i1 < senkouABuffer[i+1] || close_i1 < senkouBBuffer[i+1]);
-      bool aboveCloudCurr = (close_i > senkouABuffer[i] && close_i > senkouBBuffer[i]);
-      if(belowCloudPrev && aboveCloudCurr)
+      // 强买：Tenkan上穿Kijun + 价格在厚云上方（趋势确认充分）
+      if(crossUp && priceAboveCloud && thickCloud)
+         strongBuy[i] = iLow(_Symbol, _Period, i) - 15.0 * _Point;
+      // 普通买：Tenkan上穿Kijun + 价格在云上方
+      else if(crossUp && priceAboveCloud)
          buySignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
 
-      // 价格下穿云层
+      // 强卖：Tenkan下穿Kijun + 价格在厚云下方
+      if(crossDown && priceBelowCloud && thickCloud)
+         strongSell[i] = iHigh(_Symbol, _Period, i) + 15.0 * _Point;
+      else if(crossDown && priceBelowCloud)
+         sellSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
+
+      // 云层穿越信号
+      bool belowCloudPrev = (close_i1 < senkouABuffer[i+1] || close_i1 < senkouBBuffer[i+1]);
+      bool aboveCloudCurr = (close_i > senkouABuffer[i] && close_i > senkouBBuffer[i]);
       bool aboveCloudPrev = (close_i1 > senkouABuffer[i+1] || close_i1 > senkouBBuffer[i+1]);
       bool belowCloudCurr = (close_i < senkouABuffer[i] && close_i < senkouBBuffer[i]);
+
+      if(belowCloudPrev && aboveCloudCurr)
+         buySignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
       if(aboveCloudPrev && belowCloudCurr)
          sellSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
    }

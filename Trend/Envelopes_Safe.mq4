@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 // 输入参数
 input int    InpMAPeriod    = 14;         // MA周期
@@ -32,6 +32,8 @@ double upperBand[];
 double lowerBand[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -53,6 +55,18 @@ int init()
    SetIndexBuffer(3, sellSignal);
    SetIndexArrow(3, ARROW_SELL);
    SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(4, strongBuy);
+   SetIndexArrow(4, ARROW_BUY);
+   SetIndexLabel(4, "Strong Buy");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(5, strongSell);
+   SetIndexArrow(5, ARROW_SELL);
+   SetIndexLabel(5, "Strong Sell");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("Envelopes_Safe(" + IntegerToString(InpMAPeriod) + ")");
@@ -87,20 +101,29 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号：bar[1]+ 确认
+   // 信号：bar[1]+ 确认 — 增强分级
    for(int i = limit; i >= 1; i--)
    {
       double close_i    = iClose(_Symbol, _Period, i);
       double close_i1   = iClose(_Symbol, _Period, i + 1);
+      double bandWidth  = (upperBand[i] - lowerBand[i]) / _Point;
 
-      // 价格从下轨下方回升
-      if(close_i1 <= lowerBand[i+1] && close_i > lowerBand[i])
+      // 强买：价格深度跌破下轨后强势回升
+      if(close_i1 <= lowerBand[i+1] * 0.998 && close_i > lowerBand[i] && bandWidth > 100)
+         strongBuy[i] = iLow(_Symbol, _Period, i) - 8.0 * _Point;
+      // 普通买：价格从下轨下方回升
+      else if(close_i1 <= lowerBand[i+1] && close_i > lowerBand[i])
          buySignal[i] = iLow(_Symbol, _Period, i) - 5.0 * _Point;
 
-      // 价格从上轨上方回落
-      if(close_i1 >= upperBand[i+1] && close_i < upperBand[i])
+      // 强卖：价格深度突破上轨后急剧回落
+      if(close_i1 >= upperBand[i+1] * 1.002 && close_i < upperBand[i] && bandWidth > 100)
+         strongSell[i] = iHigh(_Symbol, _Period, i) + 8.0 * _Point;
+      // 普通卖：价格从上轨上方回落
+      else if(close_i1 >= upperBand[i+1] && close_i < upperBand[i])
          sellSignal[i] = iHigh(_Symbol, _Period, i) + 5.0 * _Point;
    }
 

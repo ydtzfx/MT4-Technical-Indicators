@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 输入参数
 input double InpStep     = 0.02;   // 步长(AF起始)
@@ -29,6 +29,8 @@ input int    InpSARWidth = 2;      // SAR宽度
 double sarBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -48,6 +50,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("SAR_Safe(" + DoubleToStr(InpStep,2) + "," + DoubleToStr(InpMaximum,2) + ")");
@@ -166,9 +180,11 @@ int start()
       // 信号（bar[1]+确认反转）
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号判断：SAR与价格的相对位置变化
+   // 信号判断：SAR与价格的相对位置变化 — 增强分级
    for(int i = limit; i >= 1; i--)
    {
       if(sarBuffer[i] == EMPTY_VALUE || sarBuffer[i+1] == EMPTY_VALUE)
@@ -178,13 +194,21 @@ int start()
       double low_i1   = iLow(_Symbol, _Period, i + 1);
       double high_i   = iHigh(_Symbol, _Period, i);
       double high_i1  = iHigh(_Symbol, _Period, i + 1);
+      double close_i  = iClose(_Symbol, _Period, i);
+      double af       = MathAbs(sarBuffer[i] - sarBuffer[i+1]) / MathMax(sarBuffer[i+1], _Point); // 加速因子
 
-      // SAR 从上方翻转到下方 = 趋势转多
-      if(sarBuffer[i+1] > high_i1 && sarBuffer[i] < low_i)
+      // 强买：SAR大幅翻转到下方 + 价格强势突破
+      if(sarBuffer[i+1] > high_i1 && sarBuffer[i] < low_i && af > InpStep * 3)
+         strongBuy[i] = low_i - 8.0 * _Point;
+      // 普通买：SAR翻转到下方
+      else if(sarBuffer[i+1] > high_i1 && sarBuffer[i] < low_i)
          buySignal[i] = low_i - 5.0 * _Point;
 
-      // SAR 从下方翻转到上方 = 趋势转空
-      if(sarBuffer[i+1] < low_i1 && sarBuffer[i] > high_i)
+      // 强卖：SAR大幅翻转到上方 + 价格强势跌破
+      if(sarBuffer[i+1] < low_i1 && sarBuffer[i] > high_i && af > InpStep * 3)
+         strongSell[i] = high_i + 8.0 * _Point;
+      // 普通卖：SAR翻转到上方
+      else if(sarBuffer[i+1] < low_i1 && sarBuffer[i] > high_i)
          sellSignal[i] = high_i + 5.0 * _Point;
    }
 

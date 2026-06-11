@@ -23,10 +23,10 @@ input int InpShort=5,InpMid=20,InpLong=50;
 double composite[],shortDiv[],midDiv[],longDiv[],signal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,composite);SetIndexLabel(0,"MDC");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,shortDiv);SetIndexLabel(1,"Short("+IntegerToString(InpShort)+")");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrOrange);SetIndexBuffer(2,midDiv);SetIndexLabel(2,"Mid("+IntegerToString(InpMid)+")");
-   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,1,clrMagenta);SetIndexBuffer(3,longDiv);SetIndexLabel(3,"Long("+IntegerToString(InpLong)+")");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,composite);SetIndexLabel(0,"MDC");SetIndexEmptyValue(0,EMPTY_VALUE);
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,shortDiv);SetIndexLabel(1,"Short("+IntegerToString(InpShort)+")");SetIndexEmptyValue(1,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrOrange);SetIndexBuffer(2,midDiv);SetIndexLabel(2,"Mid("+IntegerToString(InpMid)+")");SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,1,clrMagenta);SetIndexBuffer(3,longDiv);SetIndexLabel(3,"Long("+IntegerToString(InpLong)+")");SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,clrYellow);SetIndexBuffer(4,signal);SetIndexLabel(4,"Resonance Signal");SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("MDC_Safe");return(0);
 }

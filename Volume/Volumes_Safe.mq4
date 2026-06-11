@@ -38,11 +38,13 @@ int init()
    SetIndexStyle(0, DRAW_HISTOGRAM, STYLE_SOLID, 3, InpUpColor);
    SetIndexBuffer(0, volUpBuffer);
    SetIndexLabel(0, "Volume Up (Bull)");
+   SetIndexEmptyValue(0, 0);
 
    // 空方量柱
    SetIndexStyle(1, DRAW_HISTOGRAM, STYLE_SOLID, 3, InpDownColor);
    SetIndexBuffer(1, volDownBuffer);
    SetIndexLabel(1, "Volume Down (Bear)");
+   SetIndexEmptyValue(1, 0);
 
    // 巨量预警点
    SetIndexStyle(2, DRAW_ARROW, STYLE_SOLID, 2, clrYellow);

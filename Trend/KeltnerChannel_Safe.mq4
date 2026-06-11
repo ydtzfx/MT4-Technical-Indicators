@@ -11,7 +11,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 input int    InpMAPeriod   = 20;      // EMA周期
 input double InpMultiplier = 2.0;     // ATR倍数
@@ -19,7 +19,7 @@ input int    InpATRPeriod  = 10;      // ATR周期
 input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;
 input bool   InpShowSignals = true;
 
-double upper[],middle[],lower[],buySignal[],sellSignal[];
+double upper[],middle[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrRoyalBlue);SetIndexBuffer(0,upper);SetIndexLabel(0,"KC Upper");
@@ -27,6 +27,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrRoyalBlue);SetIndexBuffer(2,lower);SetIndexLabel(2,"KC Lower");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexLabel(5,"Strong Buy");SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexLabel(6,"Strong Sell");SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("KC_Safe("+IntegerToString(InpMAPeriod)+")");return(0);
 }
 int deinit(){return(0);}
@@ -47,13 +49,17 @@ int start() {
    }
    if(InpShowSignals) for(int i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      // 突破上轨
-      if(c1<=upper[i+1]&&c>upper[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
-      // 跌破下轨
-      if(c1>=lower[i+1]&&c<lower[i])sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
+      double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      bool wideChannel = (upper[i]-lower[i] > atr*3); // 宽通道=强趋势环境
+      // 强买：宽通道中突破上轨
+      if(c1<=upper[i+1]&&c>upper[i]&&wideChannel)strongBuy[i]=iLow(_Symbol,_Period,i)-8*Point;
+      else if(c1<=upper[i+1]&&c>upper[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
+      // 强卖：宽通道中跌破下轨
+      if(c1>=lower[i+1]&&c<lower[i]&&wideChannel)strongSell[i]=iHigh(_Symbol,_Period,i)+8*Point;
+      else if(c1>=lower[i+1]&&c<lower[i])sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
       // 中轨穿越
       if(c1<=middle[i+1]&&c>middle[i]&&middle[i]>middle[i+1])buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;
    }
-   if(Bars>0){upper[0]=upper[1];middle[0]=middle[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){upper[0]=upper[1];middle[0]=middle[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }
