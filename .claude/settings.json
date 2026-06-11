@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo:*)",
+      "Write(D:/MT4技术指标/**)",
+      "Edit(D:/MT4技术指标/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "path": "D:/MT4技术指标/**/*.mq4",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c \"file='D:/MT4技术指标/'$(echo '${CLAUDE_TOOL_INPUT:file_path}' | sed 's|.*/MT4技术指标/||'); if grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" 2>/dev/null | grep -qv EMPTY_VALUE; then echo 'WARNING: Potential bar[0] signal assignment detected in: $file'; echo 'Line(s):'; grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" | grep -v EMPTY_VALUE; else true; fi\""
+          }
+        ]
+      }
+    ]
+  }
+}
