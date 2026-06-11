@@ -16,7 +16,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 100
 #property indicator_level2 -100
 
@@ -28,6 +28,8 @@ input color InpCCIColor = clrDodgerBlue;
 double cciBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -45,6 +47,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("CCI_Safe(" + IntegerToString(InpCCIPeriod) + ")");
@@ -94,20 +108,25 @@ int start()
       sellSignal[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      // 从-100下方回升
-      if(cciBuffer[i+1] <= -100 && cciBuffer[i] > -100)
-         buySignal[i] = MathMin(cciBuffer[i] - 10, -110);
+      bool exitDeepOS  = (cciBuffer[i+1] <= -200 && cciBuffer[i] > -200);
+      bool exitOS      = (cciBuffer[i+1] <= -100 && cciBuffer[i] > -100);
+      bool exitOB      = (cciBuffer[i+1] >= 100 && cciBuffer[i] < 100);
+      bool exitDeepOB  = (cciBuffer[i+1] >= 200 && cciBuffer[i] < 200);
+      bool cciRising   = (cciBuffer[i] > cciBuffer[i+1]);
+      bool cciFalling  = (cciBuffer[i] < cciBuffer[i+1]);
 
-      // 从+100上方回落
-      if(cciBuffer[i+1] >= 100 && cciBuffer[i] < 100)
-         sellSignal[i] = MathMax(cciBuffer[i] + 10, 110);
+      // 强买：深度超卖(-200)回升 + CCI加速
+      if(exitDeepOS && cciRising) strongBuy[i] = MathMin(cciBuffer[i] - 15, -210);
+      // 普通买：超卖(-100)回升
+      else if(exitOS && cciRising) buySignal[i] = MathMin(cciBuffer[i] - 10, -110);
 
-      // 突破-100向上（强趋势跟随信号）
-      if(cciBuffer[i+1] <= -200 && cciBuffer[i] > -200)
-         buySignal[i] = MathMin(cciBuffer[i] - 10, -210);
+      // 强卖：深度超买(200)回落 + CCI加速
+      if(exitDeepOB && cciFalling) strongSell[i] = MathMax(cciBuffer[i] + 15, 210);
+      // 普通卖：超买(100)回落
+      else if(exitOB && cciFalling) sellSignal[i] = MathMax(cciBuffer[i] + 10, 110);
    }
 
    return(0);

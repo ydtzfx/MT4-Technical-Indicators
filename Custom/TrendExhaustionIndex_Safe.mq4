@@ -12,7 +12,7 @@
 #property copyright "Original Composite - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 60
@@ -20,7 +20,7 @@
 
 input int InpLookback=10;
 
-double exhaust[],momentum[],volume[],volatility[];
+double exhaust[],momentum[],volume[],volatility[],buySignal[],sellSignal[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrOrange);SetIndexBuffer(0,exhaust);SetIndexLabel(0,"Exhaustion");
@@ -28,6 +28,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrTomato);SetIndexBuffer(2,volume);SetIndexLabel(2,"Volume Div.");
    SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,1,clrGray);SetIndexBuffer(3,volatility);SetIndexLabel(3,"Volatility");
    SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(4,buySignal);SetIndexArrow(4,ARROW_BUY);SetIndexLabel(4,"Exhaustion Buy");SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(5,sellSignal);SetIndexArrow(5,ARROW_SELL);SetIndexLabel(5,"Exhaustion Sell");SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("TrendExhaust_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -67,7 +69,15 @@ int start() {
       // === 综合衰竭指数 ===
       exhaust[i]=0.4*momScore+0.3*volScore+0.3*volScore2;
       momentum[i]=momScore;volume[i]=volScore;volatility[i]=volScore2;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   if(Bars>0){exhaust[0]=exhaust[1];momentum[0]=momentum[1];volume[0]=volume[1];volatility[0]=volatility[1];}
+   // 信号：衰竭交叉 (bar[1]+确认)
+   for(int i=limit;i>=2;i--){
+      // 衰竭从高位回落至30以下 = 趋势恢复健康→买入
+      if(exhaust[i+1]>30&&exhaust[i]<=30)buySignal[i]=exhaust[i]-5;
+      // 衰竭从低位上升至60以上 = 趋势走向衰竭→卖出
+      if(exhaust[i+1]<60&&exhaust[i]>=60)sellSignal[i]=exhaust[i]+5;
+   }
+   if(Bars>0){exhaust[0]=exhaust[1];momentum[0]=momentum[1];volume[0]=volume[1];volatility[0]=volatility[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
    return(0);
 }

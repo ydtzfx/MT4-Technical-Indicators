@@ -18,7 +18,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 6
+#property indicator_buffers 8
 
 // 输入参数
 input int    InpBBPeriod    = 20;          // 布林带周期
@@ -36,6 +36,8 @@ double middleBand[];         // 中轨
 double buySignal[];          // 买入信号
 double sellSignal[];         // 卖出信号
 double bandwidthBuffer[];    // 带宽指示（收缩=小, 扩张=大）
+double strongBuy[];          // 强买入
+double strongSell[];         // 强卖出
 
 //+------------------------------------------------------------------+
 //| 指标初始化                                                         |
@@ -70,6 +72,18 @@ int init()
    SetIndexStyle(5, DRAW_NONE);
    SetIndexBuffer(5, bandwidthBuffer);
    SetIndexLabel(5, "Bandwidth (hidden)");
+
+   SetIndexStyle(6, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(6, strongBuy);
+   SetIndexArrow(6, ARROW_BUY);
+   SetIndexLabel(6, "Strong Buy");
+   SetIndexEmptyValue(6, EMPTY_VALUE);
+
+   SetIndexStyle(7, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(7, strongSell);
+   SetIndexArrow(7, ARROW_SELL);
+   SetIndexLabel(7, "Strong Sell");
+   SetIndexEmptyValue(7, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("BB_Safe(" + IntegerToString(InpBBPeriod) + ")");
@@ -125,9 +139,11 @@ int start()
       // 信号判断（仅 bar[1]+）
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号计算（仅在 bar >= 1 上产生信号，增强版：带宽收缩预警）
+   // 信号计算（仅在 bar >= 1 上产生信号，增强版：带宽收缩预警 + 信号分级）
    if(InpShowSignals)
    {
       for(int i = limit; i >= 3; i--)
@@ -139,26 +155,34 @@ int start()
          double close_i  = iClose(_Symbol, _Period, i);
          double close_i1 = iClose(_Symbol, _Period, i + 1);
 
-         // 买入信号：价格触碰下轨后回升
-         if(low_i1 <= lowerBand[i+1] && close_i > lowerBand[i])
-            buySignal[i] = low_i - 5.0 * _Point;
-
-         // 卖出信号：价格触碰上轨后回落
-         if(high_i1 >= upperBand[i+1] && close_i < upperBand[i])
-            sellSignal[i] = high_i + 5.0 * _Point;
-
-         // ===== 增强：带宽收缩预警（布林带挤压→突破前兆） =====
-         // 当前带宽为近20根最低 → 即将变盘
+         // 带宽挤压检测
          bool isSqueeze = true;
          for(int j=1;j<=20;j++) {
             if(bandwidthBuffer[i] > bandwidthBuffer[i+j]) { isSqueeze = false; break; }
          }
-         if(isSqueeze && bandwidthBuffer[i] < 2.0) {
-            // 在收缩后价格突破中轨方向即为信号方向
+         bool tightSqueeze = (isSqueeze && bandwidthBuffer[i] < 2.0);
+
+         // 强买：带宽极度收缩后中轨突破（高概率真突破）
+         if(tightSqueeze && close_i1 <= middleBand[i+1] && close_i > middleBand[i])
+            strongBuy[i] = low_i - 10.0 * _Point;
+         // 强卖：带宽极度收缩后中轨跌破
+         if(tightSqueeze && close_i1 >= middleBand[i+1] && close_i < middleBand[i])
+            strongSell[i] = high_i + 10.0 * _Point;
+
+         // 普通买：价格触碰下轨后回升
+         if(low_i1 <= lowerBand[i+1] && close_i > lowerBand[i])
+            buySignal[i] = low_i - 5.0 * _Point;
+
+         // 普通卖：价格触碰上轨后回落
+         if(high_i1 >= upperBand[i+1] && close_i < upperBand[i])
+            sellSignal[i] = high_i + 5.0 * _Point;
+
+         // 中等信号：普通带宽收缩（宽度不是历史极值但仍在收缩）
+         if(isSqueeze && !tightSqueeze) {
             if(close_i1 <= middleBand[i+1] && close_i > middleBand[i])
-               buySignal[i] = low_i - 8.0 * _Point;
+               buySignal[i] = low_i - 7.0 * _Point;
             if(close_i1 >= middleBand[i+1] && close_i < middleBand[i])
-               sellSignal[i] = high_i + 8.0 * _Point;
+               sellSignal[i] = high_i + 7.0 * _Point;
          }
       }
    }

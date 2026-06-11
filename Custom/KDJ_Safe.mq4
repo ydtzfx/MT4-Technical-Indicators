@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 80
@@ -33,6 +33,8 @@ double dBuffer[];
 double jBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -58,6 +60,18 @@ int init()
    SetIndexBuffer(4, sellSignal);
    SetIndexArrow(4, ARROW_SELL);
    SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(5, strongBuy);
+   SetIndexArrow(5, ARROW_BUY);
+   SetIndexLabel(5, "Strong Buy");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
+
+   SetIndexStyle(6, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(6, strongSell);
+   SetIndexArrow(6, ARROW_SELL);
+   SetIndexLabel(6, "Strong Sell");
+   SetIndexEmptyValue(6, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("KDJ_Safe(" + IntegerToString(InpKPeriod) + ")");
@@ -125,24 +139,27 @@ int start()
       sellSignal[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      // J从0下方回升
-      if(jBuffer[i+1] <= 0 && jBuffer[i] > 0)
-         buySignal[i] = 5.0;
+      bool jCrossUp0   = (jBuffer[i+1] <= 0 && jBuffer[i] > 0);
+      bool jCrossDn100 = (jBuffer[i+1] >= 100 && jBuffer[i] < 100);
+      bool kCrossUpD   = (kBuffer[i+1] <= dBuffer[i+1] && kBuffer[i] > dBuffer[i]);
+      bool kCrossDnD   = (kBuffer[i+1] >= dBuffer[i+1] && kBuffer[i] < dBuffer[i]);
+      bool deepOS = (kBuffer[i] < 10);
+      bool deepOB = (kBuffer[i] > 90);
+      bool jAccelUp  = (jBuffer[i] > jBuffer[i+1] + 5);   // J加速上升
+      bool jAccelDn  = (jBuffer[i] < jBuffer[i+1] - 5);   // J加速下降
 
-      // J从100上方回落
-      if(jBuffer[i+1] >= 100 && jBuffer[i] < 100)
-         sellSignal[i] = 95.0;
+      // 强买：J深跌反弹 + K金叉D + 超卖区
+      if(jCrossUp0 && kCrossUpD && deepOS) strongBuy[i] = 2.0;
+      // 普通买：J反弹或K金叉D
+      else if(jCrossUp0 || (kCrossUpD && kBuffer[i] < 20)) buySignal[i] = 5.0;
 
-      // K上穿D 在超卖区
-      if(kBuffer[i+1] <= dBuffer[i+1] && kBuffer[i] > dBuffer[i] && kBuffer[i] < 20)
-         buySignal[i] = 5.0;
-
-      // K下穿D 在超买区
-      if(kBuffer[i+1] >= dBuffer[i+1] && kBuffer[i] < dBuffer[i] && kBuffer[i] > 80)
-         sellSignal[i] = 95.0;
+      // 强卖：J深涨回落 + K死叉D + 超买区
+      if(jCrossDn100 && kCrossDnD && deepOB) strongSell[i] = 98.0;
+      // 普通卖：J回落或K死叉D
+      else if(jCrossDn100 || (kCrossDnD && kBuffer[i] > 80)) sellSignal[i] = 95.0;
    }
 
    return(0);

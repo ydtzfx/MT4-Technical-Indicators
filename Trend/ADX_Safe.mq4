@@ -21,7 +21,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_minimum 0
 #property indicator_maximum 100
 
@@ -37,6 +37,8 @@ double plusDIBuffer[];   // +DI 线
 double minusDIBuffer[];  // -DI 线
 double buySignal[];      // 买入信号
 double sellSignal[];     // 卖出信号
+double strongBuy[];      // 强买入
+double strongSell[];     // 强卖出
 
 //+------------------------------------------------------------------+
 int init()
@@ -62,6 +64,18 @@ int init()
    SetIndexBuffer(4, sellSignal);
    SetIndexArrow(4, ARROW_SELL);
    SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(5, strongBuy);
+   SetIndexArrow(5, ARROW_BUY);
+   SetIndexLabel(5, "Strong Buy");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
+
+   SetIndexStyle(6, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(6, strongSell);
+   SetIndexArrow(6, ARROW_SELL);
+   SetIndexLabel(6, "Strong Sell");
+   SetIndexEmptyValue(6, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("ADX_Safe(" + IntegerToString(InpADXPeriod) + ")");
@@ -153,6 +167,8 @@ int start()
       // 信号初始化
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // ADX平滑（对DX数组做EMA）
@@ -167,24 +183,28 @@ int start()
       adxBuffer[i] = ema;
    }
 
-   // 信号判断（bar[1]+确认）
+   // 信号判断（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      // +DI 上穿 -DI 且 ADX > 25 → 多头趋势确认
-      if(plusDIBuffer[i+1] <= minusDIBuffer[i+1] &&
-         plusDIBuffer[i] > minusDIBuffer[i] &&
-         adxBuffer[i] > 25.0)
-      {
-         buySignal[i] = 5.0;  // 在窗口底部显示
-      }
+      bool crossUp   = (plusDIBuffer[i+1] <= minusDIBuffer[i+1] && plusDIBuffer[i] > minusDIBuffer[i]);
+      bool crossDown = (minusDIBuffer[i+1] <= plusDIBuffer[i+1] && minusDIBuffer[i] > plusDIBuffer[i]);
+      bool strongTrend = (adxBuffer[i] > 40);     // ADX>40 强趋势
+      bool validTrend  = (adxBuffer[i] > 25);     // ADX>25 有效趋势
+      bool adxRising   = (adxBuffer[i] > adxBuffer[i+1]); // ADX上升=趋势加强
 
-      // -DI 上穿 +DI 且 ADX > 25 → 空头趋势确认
-      if(minusDIBuffer[i+1] <= plusDIBuffer[i+1] &&
-         minusDIBuffer[i] > plusDIBuffer[i] &&
-         adxBuffer[i] > 25.0)
-      {
-         sellSignal[i] = 95.0;  // 在窗口顶部显示
-      }
+      // 强买：+DI上穿-DI + ADX>40 + ADX上升（强趋势启动）
+      if(crossUp && strongTrend && adxRising)
+         strongBuy[i] = 3.0;
+      // 普通买：+DI上穿-DI + ADX>25
+      else if(crossUp && validTrend)
+         buySignal[i] = 5.0;
+
+      // 强卖：-DI上穿+DI + ADX>40 + ADX上升（强空头趋势启动）
+      if(crossDown && strongTrend && adxRising)
+         strongSell[i] = 97.0;
+      // 普通卖：-DI上穿+DI + ADX>25
+      else if(crossDown && validTrend)
+         sellSignal[i] = 95.0;
    }
 
    return(0);

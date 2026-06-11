@@ -16,7 +16,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 100
 
 // 输入参数
@@ -28,6 +28,8 @@ input bool InpUseRatio = false;  // false=差值, true=比率*100
 double momBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -45,6 +47,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("Mom_Safe(" + IntegerToString(InpMomPeriod) + ")");
@@ -76,24 +90,32 @@ int start()
       sellSignal[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
       if(InpUseRatio)
       {
-         // 比率模式：100线穿越
-         if(momBuffer[i+1] <= 100 && momBuffer[i] > 100)
-            buySignal[i] = momBuffer[i] - 0.1;
-         if(momBuffer[i+1] >= 100 && momBuffer[i] < 100)
-            sellSignal[i] = momBuffer[i] + 0.1;
+         bool momRising = (momBuffer[i] > momBuffer[i+1]);
+         // 强买：深度穿越(>105) + 加速
+         if(momBuffer[i+1] <= 100 && momBuffer[i] > 105) strongBuy[i] = momBuffer[i] - 0.2;
+         else if(momBuffer[i+1] <= 100 && momBuffer[i] > 100) buySignal[i] = momBuffer[i] - 0.1;
+         // 强卖：深度跌破(<95) + 加速
+         if(momBuffer[i+1] >= 100 && momBuffer[i] < 95) strongSell[i] = momBuffer[i] + 0.2;
+         else if(momBuffer[i+1] >= 100 && momBuffer[i] < 100) sellSignal[i] = momBuffer[i] + 0.1;
       }
       else
       {
          // 差值模式：0线穿越
          if(momBuffer[i+1] <= 0 && momBuffer[i] > 0)
-            buySignal[i] = momBuffer[i] - 0.0001;
+         {
+            if(momBuffer[i] > momBuffer[i+1] * 1.5) strongBuy[i] = momBuffer[i] - 0.0002;
+            else buySignal[i] = momBuffer[i] - 0.0001;
+         }
          if(momBuffer[i+1] >= 0 && momBuffer[i] < 0)
-            sellSignal[i] = momBuffer[i] + 0.0001;
+         {
+            if(momBuffer[i] < momBuffer[i+1] * 1.5) strongSell[i] = momBuffer[i] + 0.0002;
+            else sellSignal[i] = momBuffer[i] + 0.0001;
+         }
       }
    }
 

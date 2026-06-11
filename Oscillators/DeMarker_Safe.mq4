@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum 0
 #property indicator_maximum 1
 #property indicator_level1 0.7
@@ -31,6 +31,8 @@ input color InpDeMColor = clrDodgerBlue;
 double demBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -48,6 +50,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(3);
    IndicatorShortName("DeM_Safe(" + IntegerToString(InpDeMPeriod) + ")");
@@ -88,13 +102,25 @@ int start()
       sellSignal[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      if(demBuffer[i+1] <= 0.3 && demBuffer[i] > 0.3)
-         buySignal[i] = 0.25;
-      if(demBuffer[i+1] >= 0.7 && demBuffer[i] < 0.7)
-         sellSignal[i] = 0.75;
+      bool exitDeepOS  = (demBuffer[i+1] <= 0.15 && demBuffer[i] > 0.15);
+      bool exitOS      = (demBuffer[i+1] <= 0.3  && demBuffer[i] > 0.3);
+      bool exitOB      = (demBuffer[i+1] >= 0.7  && demBuffer[i] < 0.7);
+      bool exitDeepOB  = (demBuffer[i+1] >= 0.85 && demBuffer[i] < 0.85);
+      bool demRising   = (demBuffer[i] > demBuffer[i+1]);
+      bool demFalling  = (demBuffer[i] < demBuffer[i+1]);
+
+      // 强买：深度超卖(0.15)回升
+      if(exitDeepOS && demRising) strongBuy[i] = 0.10;
+      // 普通买：超卖(0.3)回升
+      else if(exitOS) buySignal[i] = 0.25;
+
+      // 强卖：深度超买(0.85)回落
+      if(exitDeepOB && demFalling) strongSell[i] = 0.90;
+      // 普通卖：超买(0.7)回落
+      else if(exitOB) sellSignal[i] = 0.75;
    }
 
    return(0);

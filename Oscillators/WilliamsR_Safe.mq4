@@ -15,7 +15,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum -100
 #property indicator_maximum 0
 #property indicator_level1 -20
@@ -29,6 +29,8 @@ input color InpWPRColor = clrDodgerBlue;
 double wprBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -46,6 +48,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("WPR_Safe(" + IntegerToString(InpWPRPeriod) + ")");
@@ -86,16 +100,25 @@ int start()
       sellSignal[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      // 从超卖区回升 → 买入
-      if(wprBuffer[i+1] <= -80 && wprBuffer[i] > -80)
-         buySignal[i] = -85.0;
+      bool exitDeepOS = (wprBuffer[i+1] <= -95 && wprBuffer[i] > -95);
+      bool exitOS     = (wprBuffer[i+1] <= -80 && wprBuffer[i] > -80);
+      bool exitOB     = (wprBuffer[i+1] >= -20 && wprBuffer[i] < -20);
+      bool exitDeepOB = (wprBuffer[i+1] >= -5  && wprBuffer[i] < -5);
+      bool wprRising  = (wprBuffer[i] > wprBuffer[i+1]);
+      bool wprFalling = (wprBuffer[i] < wprBuffer[i+1]);
 
-      // 从超买区回落 → 卖出
-      if(wprBuffer[i+1] >= -20 && wprBuffer[i] < -20)
-         sellSignal[i] = -15.0;
+      // 强买：深度超卖(<-95)回升 + 加速
+      if(exitDeepOS && wprRising) strongBuy[i] = -90.0;
+      // 普通买：超卖(<-80)回升
+      else if(exitOS && wprRising) buySignal[i] = -85.0;
+
+      // 强卖：深度超买(>-5)回落 + 加速
+      if(exitDeepOB && wprFalling) strongSell[i] = -10.0;
+      // 普通卖：超买(>-20)回落
+      else if(exitOB && wprFalling) sellSignal[i] = -15.0;
    }
 
    return(0);

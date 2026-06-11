@@ -15,7 +15,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 80
@@ -34,6 +34,8 @@ double kBuffer[];
 double dBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -55,6 +57,18 @@ int init()
    SetIndexBuffer(3, sellSignal);
    SetIndexArrow(3, ARROW_SELL);
    SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(4, strongBuy);
+   SetIndexArrow(4, ARROW_BUY);
+   SetIndexLabel(4, "Strong Buy");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(5, strongSell);
+   SetIndexArrow(5, ARROW_SELL);
+   SetIndexLabel(5, "Strong Sell");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("Stoch_Safe(" + IntegerToString(InpKPeriod) + "," +
@@ -118,27 +132,37 @@ int start()
       dBuffer[i] = CalculateMA(kPrices, InpDPeriod, InpMAMethod, 0);
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号判断（bar[1]+确认）
+   // 信号判断（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
-      // %K上穿%D 在超卖区
-      if(kBuffer[i+1] <= dBuffer[i+1] && kBuffer[i] > dBuffer[i] &&
-         kBuffer[i] < InpOversold)
+      bool crossUp   = (kBuffer[i+1] <= dBuffer[i+1] && kBuffer[i] > dBuffer[i]);
+      bool crossDown = (kBuffer[i+1] >= dBuffer[i+1] && kBuffer[i] < dBuffer[i]);
+      bool inOS = (kBuffer[i] < InpOversold);
+      bool inOB = (kBuffer[i] > InpOverbought);
+      bool deepOS = (kBuffer[i] < InpOversold * 0.5);      // 深度超卖 < 10
+      bool deepOB = (kBuffer[i] > 100 - (100-InpOverbought)*0.5); // 深度超买 > 90
+      bool kRising  = (kBuffer[i] > kBuffer[i+1]);
+      bool kFalling = (kBuffer[i] < kBuffer[i+1]);
+
+      // 强买：金叉 + 深度超卖 + K线加速上升
+      if(crossUp && deepOS && kRising) strongBuy[i] = 2.0;
+      // 普通买：金叉在超卖区
+      else if(crossUp && inOS) buySignal[i] = 5.0;
+
+      // 强卖：死叉 + 深度超买 + K线加速下降
+      if(crossDown && deepOB && kFalling) strongSell[i] = 98.0;
+      // 普通卖：死叉在超买区
+      else if(crossDown && inOB) sellSignal[i] = 95.0;
+
+      // 离开超卖区（二级买入信号）
+      if(!crossUp && kBuffer[i+1] <= InpOversold && kBuffer[i] > InpOversold)
          buySignal[i] = 5.0;
-
-      // %K下穿%D 在超买区
-      if(kBuffer[i+1] >= dBuffer[i+1] && kBuffer[i] < dBuffer[i] &&
-         kBuffer[i] > InpOverbought)
-         sellSignal[i] = 95.0;
-
-      // 离开超卖区
-      if(kBuffer[i+1] <= InpOversold && kBuffer[i] > InpOversold)
-         buySignal[i] = 5.0;
-
-      // 离开超买区
-      if(kBuffer[i+1] >= InpOverbought && kBuffer[i] < InpOverbought)
+      // 离开超买区（二级卖出信号）
+      if(!crossDown && kBuffer[i+1] >= InpOverbought && kBuffer[i] < InpOverbought)
          sellSignal[i] = 95.0;
    }
 

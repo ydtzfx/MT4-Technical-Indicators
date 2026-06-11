@@ -18,7 +18,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 // 输入参数
 input int InpJawPeriod   = 13;   // 下巴周期(SMMA)
@@ -37,6 +37,8 @@ double teethBuffer[];     // 牙齿（红线）- 中速
 double lipsBuffer[];      // 嘴唇（绿线）- 最快
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -62,6 +64,18 @@ int init()
    SetIndexBuffer(4, sellSignal);
    SetIndexArrow(4, ARROW_SELL);
    SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(5, strongBuy);
+   SetIndexArrow(5, ARROW_BUY);
+   SetIndexLabel(5, "Strong Buy");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
+
+   SetIndexStyle(6, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(6, strongSell);
+   SetIndexArrow(6, ARROW_SELL);
+   SetIndexLabel(6, "Strong Sell");
+   SetIndexEmptyValue(6, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("Alligator_Safe(" + IntegerToString(InpJawPeriod) + "," +
@@ -108,6 +122,8 @@ int start()
          lipsBuffer[i]  = 0.0;
          buySignal[i]   = EMPTY_VALUE;
          sellSignal[i]  = EMPTY_VALUE;
+         strongBuy[i]   = EMPTY_VALUE;
+         strongSell[i]  = EMPTY_VALUE;
       }
    }
 
@@ -131,7 +147,7 @@ int start()
       lipsBuffer[i] = CalcSMMA(medianPrices, InpLipsPeriod, InpLipsShift);
    }
 
-   // 信号判断（bar[1]+确认）
+   // 信号判断（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 1; i--)
    {
       double jaw_i    = jawBuffer[i];
@@ -144,28 +160,28 @@ int start()
       double close_i1 = iClose(_Symbol, _Period, i + 1);
 
       // === 鳄鱼苏醒信号 ===
-      // 三线缠绕→发散（鳄鱼张嘴）
       bool wasSleeping = (MathAbs(lips_i1 - jaw_i1) < MathAbs(lips_i - jaw_i) * 0.5);
-      bool isAwakeUp   = (lips_i > teeth_i && teeth_i > jaw_i);  // 三线向上排列
-      bool isAwakeDown = (lips_i < teeth_i && teeth_i < jaw_i);  // 三线向下排列
+      bool isAwakeUp   = (lips_i > teeth_i && teeth_i > jaw_i);
+      bool isAwakeDown = (lips_i < teeth_i && teeth_i < jaw_i);
+      bool lipsCrossUpTeeth   = (lips_i1 <= teeth_i1 && lips_i > teeth_i);
+      bool lipsCrossDownTeeth = (lips_i1 >= teeth_i1 && lips_i < teeth_i);
+      bool lipsCrossUpJaw     = (lips_i1 <= jaw_i1 && lips_i > jaw_i);
+      bool lipsCrossDownJaw   = (lips_i1 >= jaw_i1 && lips_i < jaw_i);
 
-      // 金叉：Lips上穿Teeth或Jaw，且价格在线上方
+      // 强买：沉睡后苏醒 + 向上张嘴 + 价格突破
       if(wasSleeping && isAwakeUp && close_i > lips_i && close_i > teeth_i)
-         buySignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
+         strongBuy[i] = iLow(_Symbol, _Period, i) - 12.0 * _Point;
 
-      // 死叉：Lips下穿Teeth或Jaw，且价格在线下方
+      // 强卖：沉睡后苏醒 + 向下张嘴 + 价格突破
       if(wasSleeping && isAwakeDown && close_i < lips_i && close_i < teeth_i)
-         sellSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
+         strongSell[i] = iHigh(_Symbol, _Period, i) + 12.0 * _Point;
 
-      // 标准交叉信号
-      // Lips 上穿 Teeth + Jaw（全部向上交叉）
-      if(lips_i1 <= teeth_i1 && lips_i > teeth_i &&
-         lips_i > jaw_i)
+      // 普通买：Lips 上穿 Teeth
+      if(lipsCrossUpTeeth && lips_i > jaw_i)
          buySignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
 
-      // Lips 下穿 Teeth + Jaw（全部向下交叉）
-      if(lips_i1 >= teeth_i1 && lips_i < teeth_i &&
-         lips_i < jaw_i)
+      // 普通卖：Lips 下穿 Teeth
+      if(lipsCrossDownTeeth && lips_i < jaw_i)
          sellSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
    }
 
