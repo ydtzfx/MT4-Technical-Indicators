@@ -18,7 +18,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 7
+#property indicator_buffers 9
 
 // 输入参数
 input int InpCRPeriod = 26;     // CR周期
@@ -40,34 +40,36 @@ double maC[];           // c均线
 double maD[];           // d均线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 1, InpCRColor);
    SetIndexBuffer(0, crBuffer);
-   SetIndexLabel(0, "CR");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "CR");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_DOT, 1, InpAColor);
    SetIndexBuffer(1, maA);
-   SetIndexLabel(1, "MA" + IntegerToString(InpMAa));
    SetIndexEmptyValue(1, 0.0);
+   SetIndexLabel(1, "MA" + IntegerToString(InpMAa));
 
    SetIndexStyle(2, DRAW_LINE, STYLE_DOT, 1, InpBColor);
    SetIndexBuffer(2, maB);
-   SetIndexLabel(2, "MA" + IntegerToString(InpMAb));
    SetIndexEmptyValue(2, 0.0);
+   SetIndexLabel(2, "MA" + IntegerToString(InpMAb));
 
    SetIndexStyle(3, DRAW_LINE, STYLE_DOT, 1, InpCColor);
    SetIndexBuffer(3, maC);
-   SetIndexLabel(3, "MA" + IntegerToString(InpMAc));
    SetIndexEmptyValue(3, 0.0);
+   SetIndexLabel(3, "MA" + IntegerToString(InpMAc));
 
    SetIndexStyle(4, DRAW_LINE, STYLE_DOT, 1, InpDColor);
    SetIndexBuffer(4, maD);
-   SetIndexLabel(4, "MA" + IntegerToString(InpMAd));
    SetIndexEmptyValue(4, 0.0);
+   SetIndexLabel(4, "MA" + IntegerToString(InpMAd));
 
    SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(5, buySignal);
@@ -80,6 +82,18 @@ int init()
    SetIndexArrow(6, ARROW_SELL);
    SetIndexLabel(6, "Sell Signal");
    SetIndexEmptyValue(6, EMPTY_VALUE);
+
+   SetIndexStyle(7, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(7, strongBuy);
+   SetIndexArrow(7, ARROW_BUY);
+   SetIndexLabel(7, "Strong Buy");
+   SetIndexEmptyValue(7, EMPTY_VALUE);
+
+   SetIndexStyle(8, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(8, strongSell);
+   SetIndexArrow(8, ARROW_SELL);
+   SetIndexLabel(8, "Strong Sell");
+   SetIndexEmptyValue(8, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("CR_Safe(" + IntegerToString(InpCRPeriod) + ")");
@@ -123,6 +137,8 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：计算四条均线 ---
@@ -151,8 +167,12 @@ int start()
       if(crBuffer[i + 1] <= maC[i + 1] && crBuffer[i] > maC[i]) upCross++;
       if(crBuffer[i + 1] <= maD[i + 1] && crBuffer[i] > maD[i]) upCross++;
 
-      // CR上穿2条以上均线 → 买入
-      if(upCross >= 2)
+      bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
+      // CR上穿3条以上均线 + 价格上涨 = Strong Buy
+      if(upCross >= 3 && priceUp)
+         strongBuy[i] = crBuffer[i] * 0.85;
+      // CR上穿2条均线 = Normal Buy
+      else if(upCross >= 2 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = crBuffer[i] * 0.9;
 
       // 统计CR下穿几条均线
@@ -162,7 +182,10 @@ int start()
       if(crBuffer[i + 1] >= maC[i + 1] && crBuffer[i] < maC[i]) dnCross++;
       if(crBuffer[i + 1] >= maD[i + 1] && crBuffer[i] < maD[i]) dnCross++;
 
-      if(dnCross >= 2)
+      bool priceDown = iClose(_Symbol, _Period, i) < iClose(_Symbol, _Period, i + 3);
+      if(dnCross >= 3 && priceDown)
+         strongSell[i] = crBuffer[i] * 1.15;
+      else if(dnCross >= 2 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = crBuffer[i] * 1.1;
    }
 
@@ -180,6 +203,8 @@ int start()
       maA[0] = maA[1]; maB[0] = maB[1]; maC[0] = maC[1]; maD[0] = maD[1];
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

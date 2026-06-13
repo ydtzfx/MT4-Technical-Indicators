@@ -21,8 +21,8 @@ input string InpPairSymbol="EURUSD";input int InpPeriod=20;input int InpRatioPer
 double ratioZ[],ratioRaw[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,ratioZ);SetIndexLabel(0,"Ratio Z-Score");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,ratioRaw);SetIndexLabel(1,"Raw Ratio");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,ratioZ);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Ratio Z-Score");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,ratioRaw);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Raw Ratio");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(2);IndicatorShortName("PairsRatio_Safe");return(0);

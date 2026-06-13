@@ -13,7 +13,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 27
 
 input int InpEMAPeriod = 9;
@@ -21,12 +21,14 @@ input int InpSumPeriod = 25;
 input double InpReversalTrigger = 26.5;
 input double InpReversalLine = 27.0;
 
-double massBuffer[],buySignal[],sellSignal[];
+double massBuffer[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,massBuffer);SetIndexLabel(0,"Mass Index");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,massBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Mass Index");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(3,strongBuy);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(4,strongSell);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(2);IndicatorShortName("MASS_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -49,15 +51,24 @@ int start() {
    }
    for(int i=limit;i>=1;i--) {
       double sum=0.0;for(int j=0;j<InpSumPeriod;j++)sum+=ratio[i+j];
-      massBuffer[i]=sum;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      massBuffer[i]=sum;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号：Mass从27上方回落到触发线以下 → 趋势反转前兆
    for(int i=limit;i>=2;i--) {
       if(massBuffer[i+1]>=InpReversalLine&&massBuffer[i]<InpReversalTrigger) {
          double c=iClose(_Symbol,_Period,i),pc=iClose(_Symbol,_Period,i+1);
-         if(c<pc)buySignal[i]=massBuffer[i]*0.5;else sellSignal[i]=massBuffer[i]*1.5;
+         if(c<pc) {
+            // Strong Buy: Mass超顶回落 + 价格已开始转跌(释放空头)
+            double range3=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
+            if(massBuffer[i+2]>=InpReversalLine)strongBuy[i]=massBuffer[i]*0.4;
+            else buySignal[i]=massBuffer[i]*0.5;
+         } else {
+            // Strong Sell: Mass超顶回落 + 价格已开始转涨(释放多头)
+            if(massBuffer[i+2]>=InpReversalLine)strongSell[i]=massBuffer[i]*1.6;
+            else sellSignal[i]=massBuffer[i]*1.5;
+         }
       }
    }
-   if(Bars>0){massBuffer[0]=massBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){massBuffer[0]=massBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

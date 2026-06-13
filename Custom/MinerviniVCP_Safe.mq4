@@ -18,7 +18,7 @@ input int InpSwingBars=10; // 摆动点检测窗口
 double vcpScore[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,vcpScore);SetIndexLabel(0,"VCP Score");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,vcpScore);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"VCP Score");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("VCP_Safe");return(0);

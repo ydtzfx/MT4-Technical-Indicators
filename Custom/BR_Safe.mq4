@@ -19,7 +19,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum 0
 #property indicator_level1 300
 #property indicator_level2 40
@@ -32,14 +32,16 @@ input color InpBRColor  = clrOrange; // BR线颜色
 double brBuffer[];      // BR主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpBRColor);
    SetIndexBuffer(0, brBuffer);
-   SetIndexLabel(0, "BR");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "BR");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(1, buySignal);
@@ -52,6 +54,20 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强买入信号（大号青色箭头）
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   // 强卖出信号（大号深粉箭头）
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("BR_Safe(" + IntegerToString(InpBRPeriod) + ")");
@@ -93,25 +109,35 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
+      bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
+      // Strong Buy: 极度超卖回升 + 价格上涨确认
+      if(brBuffer[i + 1] <= 40.0 && brBuffer[i] > 40.0 && priceUp)
+         strongBuy[i] = 28.0;
+      // Strong Sell: 极度超买回落 + 价格下跌确认
+      if(brBuffer[i + 1] >= 300.0 && brBuffer[i] < 300.0 && !priceUp)
+         strongSell[i] = 312.0;
+
       // 从极度超卖区回升 → 买入
-      if(brBuffer[i + 1] <= 40.0 && brBuffer[i] > 40.0)
+      if(brBuffer[i + 1] <= 40.0 && brBuffer[i] > 40.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 30.0;
 
       // 进入安全买入区域
-      if(brBuffer[i + 1] <= 40.0 && brBuffer[i] > 40.0 && brBuffer[i] < 70.0)
+      if(brBuffer[i + 1] <= 40.0 && brBuffer[i] > 40.0 && brBuffer[i] < 70.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 25.0;
 
       // 从极度超买区回落 → 卖出
-      if(brBuffer[i + 1] >= 300.0 && brBuffer[i] < 300.0)
+      if(brBuffer[i + 1] >= 300.0 && brBuffer[i] < 300.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 310.0;
 
       // 从强势区跌破150
-      if(brBuffer[i + 1] >= 150.0 && brBuffer[i] < 150.0)
+      if(brBuffer[i + 1] >= 150.0 && brBuffer[i] < 150.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 160.0;
    }
 
@@ -130,6 +156,8 @@ int start()
       brBuffer[0] = SafeDivide(100.0 * sH, sL, 100.0);
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

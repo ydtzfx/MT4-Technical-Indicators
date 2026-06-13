@@ -17,8 +17,8 @@ input int InpMaxPeriod=50;  // 最大检测周期
 double domCycle[],cycleStr[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,domCycle);SetIndexLabel(0,"Dominant Cycle");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(1,cycleStr);SetIndexLabel(1,"Cycle Strength");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,domCycle);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Dominant Cycle");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(1,cycleStr);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Cycle Strength");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("CycleDet_Safe");return(0);

@@ -18,7 +18,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 160
 #property indicator_level2 70
 
@@ -30,14 +30,16 @@ input color InpVRColor  = clrDodgerBlue; // VR线颜色
 double vrBuffer[];      // VR主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpVRColor);
    SetIndexBuffer(0, vrBuffer);
-   SetIndexLabel(0, "VR");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "VR");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(1, buySignal);
@@ -50,6 +52,20 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强买入信号（大号青色箭头）
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   // 强卖出信号（大号深粉箭头）
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("VR_Safe(" + IntegerToString(InpVRPeriod) + ")");
@@ -95,25 +111,35 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // 从安全买入区回升 → 买入
-      if(vrBuffer[i + 1] <= 70.0 && vrBuffer[i] > 70.0)
+      bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
+      // Strong Buy: 极度超卖后回升 + 价格上涨确认
+      if(vrBuffer[i + 1] <= 40.0 && vrBuffer[i] > 40.0 && priceUp)
+         strongBuy[i] = 32.0;
+      // Strong Sell: 极度强势后转弱 + 价格下跌确认
+      if(vrBuffer[i + 1] >= 450.0 && vrBuffer[i] < 450.0 && !priceUp)
+         strongSell[i] = 465.0;
+
+      // Normal Buy: 从安全买入区回升
+      if(vrBuffer[i + 1] <= 70.0 && vrBuffer[i] > 70.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 60.0;
 
-      // 从超买区回落 → 卖出
-      if(vrBuffer[i + 1] >= 160.0 && vrBuffer[i] < 160.0)
+      // Normal Sell: 从超买区回落
+      if(vrBuffer[i + 1] >= 160.0 && vrBuffer[i] < 160.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 170.0;
 
       // 极度超卖：VR<40后回升
-      if(vrBuffer[i + 1] <= 40.0 && vrBuffer[i] > 40.0)
+      if(vrBuffer[i + 1] <= 40.0 && vrBuffer[i] > 40.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 35.0;
 
       // 极度强势后转弱
-      if(vrBuffer[i + 1] >= 450.0 && vrBuffer[i] < 450.0)
+      if(vrBuffer[i + 1] >= 450.0 && vrBuffer[i] < 450.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 460.0;
    }
 
@@ -133,6 +159,8 @@ int start()
       vrBuffer[0] = SafeDivide(100.0 * (u0 + 0.5 * p0), (d0 + 0.5 * p0), 100.0);
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

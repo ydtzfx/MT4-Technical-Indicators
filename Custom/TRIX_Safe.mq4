@@ -13,7 +13,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 input int InpTRIXPeriod   = 12;     // TRIX周期
 input int InpSignalPeriod = 9;      // 信号线周期
@@ -22,12 +22,16 @@ double trixBuffer[];    // TRIX主线
 double signalBuffer[];  // 信号线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,trixBuffer);SetIndexLabel(0,"TRIX");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signalBuffer);SetIndexLabel(1,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,trixBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"TRIX");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signalBuffer);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("TRIX_Safe("+IntegerToString(InpTRIXPeriod)+")");return(0);
 }
 int deinit() { return(0); }
@@ -56,7 +60,7 @@ int start() {
    // TRIX = 变化率 * 100
    for(int i=limit;i>=1;i--) {
       if(ema3[i+1]!=0)trixBuffer[i]=100.0*(ema3[i]-ema3[i+1])/MathAbs(ema3[i+1]);else trixBuffer[i]=0;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // Signal = SMA of TRIX
    for(int i=limit;i>=1;i--) {
@@ -65,12 +69,23 @@ int start() {
    }
    // 信号（bar[1]+确认）
    for(int i=limit;i>=1;i--) {
-      // TRIX上穿信号线 → 金叉
-      if(trixBuffer[i+1]<=signalBuffer[i+1]&&trixBuffer[i]>signalBuffer[i])buySignal[i]=trixBuffer[i]-0.01;
-      // TRIX下穿信号线 → 死叉
-      if(trixBuffer[i+1]>=signalBuffer[i+1]&&trixBuffer[i]<signalBuffer[i])sellSignal[i]=trixBuffer[i]+0.01;
+      bool trixGrow=trixBuffer[i]>trixBuffer[i+1]&&trixBuffer[i+1]>trixBuffer[i+2];
+      bool trixShrink=trixBuffer[i]<trixBuffer[i+1]&&trixBuffer[i+1]<trixBuffer[i+2];
+      bool priceUp=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1);
+      // Strong Buy: TRIX金叉 + 持续上升 + 价格同时上涨
+      if(trixBuffer[i+1]<=signalBuffer[i+1]&&trixBuffer[i]>signalBuffer[i]&&trixGrow&&priceUp)
+         strongBuy[i]=trixBuffer[i]-0.02;
+      // Strong Sell: TRIX死叉 + 持续下降 + 价格同时下跌
+      if(trixBuffer[i+1]>=signalBuffer[i+1]&&trixBuffer[i]<signalBuffer[i]&&trixShrink&&!priceUp)
+         strongSell[i]=trixBuffer[i]+0.02;
+      // Normal Buy: TRIX上穿信号线
+      if(trixBuffer[i+1]<=signalBuffer[i+1]&&trixBuffer[i]>signalBuffer[i]&&strongBuy[i]==EMPTY_VALUE)
+         buySignal[i]=trixBuffer[i]-0.01;
+      // Normal Sell: TRIX下穿信号线
+      if(trixBuffer[i+1]>=signalBuffer[i+1]&&trixBuffer[i]<signalBuffer[i]&&strongSell[i]==EMPTY_VALUE)
+         sellSignal[i]=trixBuffer[i]+0.01;
       // TRIX上穿零轴
-      if(trixBuffer[i+1]<0&&trixBuffer[i]>0)buySignal[i]=trixBuffer[i]-0.01;
+      if(trixBuffer[i+1]<0&&trixBuffer[i]>0&&strongBuy[i]==EMPTY_VALUE)buySignal[i]=trixBuffer[i]-0.01;
    }
    // 刷新bar[0]
    if(Bars>0){
@@ -78,7 +93,7 @@ int start() {
       double e20=ema2[1]*alpha+e10*(1-alpha);
       double e30=ema3[1]*alpha+e20*(1-alpha);
       trixBuffer[0]=ema3[1]!=0?100.0*(e30-ema3[1])/MathAbs(ema3[1]):0;
-      signalBuffer[0]=signalBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;
+      signalBuffer[0]=signalBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;
    }
    return(0);
 }

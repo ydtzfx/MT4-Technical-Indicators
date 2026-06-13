@@ -18,8 +18,8 @@ input int InpLookback=50;input int InpTouchCount=3;
 double resistance[],support[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(0,resistance);SetIndexLabel(0,"Dynamic Res");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,support);SetIndexLabel(1,"Dynamic Sup");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(0,resistance);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Dynamic Res");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,support);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Dynamic Sup");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("DynSR_Safe");return(0);

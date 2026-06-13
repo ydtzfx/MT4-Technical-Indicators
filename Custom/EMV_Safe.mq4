@@ -21,7 +21,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int    InpEMVPeriod = 14;          // EMV平滑周期
 input ENUM_MA_METHOD_SAFE InpMAMethod = MA_SMA; // 平滑方式
@@ -30,14 +30,16 @@ input ENUM_MA_METHOD_SAFE InpMAMethod = MA_SMA; // 平滑方式
 double emvBuffer[];     // EMV主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, clrDodgerBlue);
    SetIndexBuffer(0, emvBuffer);
-   SetIndexLabel(0, "EMV");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "EMV");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(1, buySignal);
@@ -50,6 +52,18 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("EMV_Safe(" + IntegerToString(InpEMVPeriod) + ")");
@@ -107,24 +121,35 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // EMV零轴穿越 — 买入信号
-      if(emvBuffer[i + 1] < 0.0 && emvBuffer[i] > 0.0)
+      bool emvRising = emvBuffer[i] > emvBuffer[i + 1] && emvBuffer[i + 1] > emvBuffer[i + 2];
+      bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
+      // Strong Buy: EMV零轴穿越 + 持续上升 + 价格上涨
+      if(emvBuffer[i + 1] < 0.0 && emvBuffer[i] > 0.0 && emvRising && priceUp)
+         strongBuy[i] = emvBuffer[i] * 0.4;
+      // Strong Sell: EMV零轴穿越 + 持续下降 + 价格下跌
+      if(emvBuffer[i + 1] > 0.0 && emvBuffer[i] < 0.0 && !emvRising && !priceUp)
+         strongSell[i] = emvBuffer[i] * 1.6;
+
+      // Normal Buy: EMV零轴穿越
+      if(emvBuffer[i + 1] < 0.0 && emvBuffer[i] > 0.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = emvBuffer[i] * 0.5;
 
-      // EMV零轴穿越 — 卖出信号
-      if(emvBuffer[i + 1] > 0.0 && emvBuffer[i] < 0.0)
+      // Normal Sell: EMV零轴穿越
+      if(emvBuffer[i + 1] > 0.0 && emvBuffer[i] < 0.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = emvBuffer[i] * 1.5;
 
       // EMV连续上升且价格盘整 → 可能突破向上
-      if(emvBuffer[i] > emvBuffer[i + 1] && emvBuffer[i + 1] > emvBuffer[i + 2])
+      if(emvBuffer[i] > emvBuffer[i + 1] && emvBuffer[i + 1] > emvBuffer[i + 2] && strongBuy[i] == EMPTY_VALUE)
       {
          double range3 = MathAbs(iClose(_Symbol, _Period, i) - iClose(_Symbol, _Period, i + 3));
-         if(range3 < iClose(_Symbol, _Period, i) * 0.01)  // 1%内窄幅
+         if(range3 < iClose(_Symbol, _Period, i) * 0.01)
             buySignal[i] = emvBuffer[i] * 0.5;
       }
    }
@@ -132,9 +157,11 @@ int start()
    // --- 第4步：刷新 bar[0] ---
    if(Bars > 0)
    {
-      emvBuffer[0] = emvBuffer[1];  // 近似值
+      emvBuffer[0] = emvBuffer[1];
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

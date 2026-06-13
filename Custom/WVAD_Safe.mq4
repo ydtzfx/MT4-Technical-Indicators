@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int    InpWVADPeriod = 24;        // 累加周期
 input ENUM_MA_METHOD_SAFE InpMAMethod = MA_SMA;
@@ -26,14 +26,16 @@ input ENUM_MA_METHOD_SAFE InpMAMethod = MA_SMA;
 double wvadBuffer[];    // WVAD主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, clrDodgerBlue);
    SetIndexBuffer(0, wvadBuffer);
-   SetIndexLabel(0, "WVAD");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "WVAD");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(1, buySignal);
@@ -46,6 +48,18 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("WVAD_Safe(" + IntegerToString(InpWVADPeriod) + ")");
@@ -93,26 +107,37 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // WVAD零轴穿越 → 资金流向转变
-      if(wvadBuffer[i + 1] < 0.0 && wvadBuffer[i] > 0.0)
+      bool wvadRising = wvadBuffer[i] > wvadBuffer[i + 1] && wvadBuffer[i + 1] > wvadBuffer[i + 2];
+      double priceI  = iClose(_Symbol, _Period, i);
+      double priceI3 = iClose(_Symbol, _Period, i + 3);
+      // Strong Buy: WVAD零轴穿越 + 持续上升 + 价格上涨
+      if(wvadBuffer[i + 1] < 0.0 && wvadBuffer[i] > 0.0 && wvadRising && priceI > priceI3)
+         strongBuy[i] = wvadBuffer[i] * 0.4;
+      // Strong Sell: WVAD零轴穿越 + 持续下降 + 价格下跌
+      if(wvadBuffer[i + 1] > 0.0 && wvadBuffer[i] < 0.0 && !wvadRising && priceI < priceI3)
+         strongSell[i] = wvadBuffer[i] * 1.6;
+
+      // Normal Buy: WVAD零轴穿越
+      if(wvadBuffer[i + 1] < 0.0 && wvadBuffer[i] > 0.0 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = wvadBuffer[i] * 0.5;
 
-      if(wvadBuffer[i + 1] > 0.0 && wvadBuffer[i] < 0.0)
+      // Normal Sell: WVAD零轴穿越
+      if(wvadBuffer[i + 1] > 0.0 && wvadBuffer[i] < 0.0 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = wvadBuffer[i] * 1.5;
 
       // 底背离：价格新低但WVAD底部抬升
-      double priceI  = iClose(_Symbol, _Period, i);
-      double priceI3 = iClose(_Symbol, _Period, i + 3);
-      if(priceI < priceI3 && wvadBuffer[i] > wvadBuffer[i + 3])
+      if(priceI < priceI3 && wvadBuffer[i] > wvadBuffer[i + 3] && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = wvadBuffer[i] * 0.5;
 
       // 顶背离：价格新高但WVAD顶部下降
-      if(priceI > priceI3 && wvadBuffer[i] < wvadBuffer[i + 3])
+      if(priceI > priceI3 && wvadBuffer[i] < wvadBuffer[i + 3] && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = wvadBuffer[i] * 1.5;
    }
 
@@ -122,6 +147,8 @@ int start()
       wvadBuffer[0] = wvadBuffer[1];
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

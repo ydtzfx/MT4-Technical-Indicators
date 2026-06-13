@@ -10,20 +10,22 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum 0.2
 #property indicator_maximum 0.8
 #property indicator_level1 0.5
 
 input int InpPeriod=50; // 估计Hurst的窗口
 
-double hurst[],trendStr[],buySignal[],sellSignal[];
+double hurst[],trendStr[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,hurst);SetIndexLabel(0,"Hurst");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(1,trendStr);SetIndexLabel(1,"Trend Bias");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,hurst);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Hurst");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(1,trendStr);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Trend Bias");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(3);IndicatorShortName("Hurst_Safe("+IntegerToString(InpPeriod)+")");return(0);
 }
 int deinit(){return(0);}
@@ -52,15 +54,22 @@ int start() {
       }
       hurst[i]=nLevels>0?MathMax(0.2,MathMin(0.8,sumRS/nLevels)):0.5;
       trendStr[i]=(hurst[i]-0.5)*200; // 正=趋势倾向，负=回归倾向
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=2;i--){
-      // Hurst从<0.5翻到>0.5 = 市场从回归转为趋势 → 跟趋势方向
-      if(hurst[i+1]<0.5&&hurst[i]>0.5&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+3))buySignal[i]=0.45;
-      if(hurst[i+1]<0.5&&hurst[i]>0.5&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+3))sellSignal[i]=0.55;
+      double c=iClose(_Symbol,_Period,i),c3=iClose(_Symbol,_Period,i+3);
+      bool priceUp=c>c3,priceDown=c<c3;
+      // Strong Buy: Hurst翻多 + 趋势强度正 + 价格上涨
+      if(hurst[i+1]<0.5&&hurst[i]>0.5&&trendStr[i]>20&&priceUp)strongBuy[i]=0.42;
+      // Strong Sell: Hurst翻多(向上趋势) + 趋势衰竭
+      if(hurst[i+1]>0.7&&hurst[i]<0.65&&trendStr[i]<-20&&priceDown)strongSell[i]=0.62;
+      // Normal Buy: Hurst从<0.5翻到>0.5
+      if(hurst[i+1]<0.5&&hurst[i]>0.5&&priceUp&&strongBuy[i]==EMPTY_VALUE)buySignal[i]=0.45;
+      // Normal Sell: Hurst从<0.5翻到>0.5且价格跌
+      if(hurst[i+1]<0.5&&hurst[i]>0.5&&priceDown&&strongSell[i]==EMPTY_VALUE)sellSignal[i]=0.55;
       // Hurst极高(>0.7)后回落 = 趋势衰竭
-      if(hurst[i+1]>0.7&&hurst[i]<0.65)sellSignal[i]=0.6;
+      if(hurst[i+1]>0.7&&hurst[i]<0.65&&strongSell[i]==EMPTY_VALUE)sellSignal[i]=0.6;
    }
-   if(Bars>0){hurst[0]=hurst[1];trendStr[0]=trendStr[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){hurst[0]=hurst[1];trendStr[0]=trendStr[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

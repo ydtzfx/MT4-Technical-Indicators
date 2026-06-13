@@ -16,7 +16,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 75
@@ -32,14 +32,16 @@ input double InpOversold   = 25.0;   // 超卖水平
 double psyBuffer[];     // PSY主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpPSYColor);
    SetIndexBuffer(0, psyBuffer);
-   SetIndexLabel(0, "PSY");
    SetIndexEmptyValue(0, 0.0);
+   SetIndexLabel(0, "PSY");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(1, buySignal);
@@ -52,6 +54,20 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强买入信号（大号青色箭头）
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   // 强卖出信号（大号深粉箭头）
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("PSY_Safe(" + IntegerToString(InpPSYPeriod) + ")");
@@ -90,25 +106,35 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // 从超卖区(悲观区)回升 → 买入：市场情绪从悲观转向乐观
-      if(psyBuffer[i + 1] <= InpOversold && psyBuffer[i] > InpOversold)
+      bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
+      // Strong Buy: 极度悲观反转 + 价格上涨 + 连续形态
+      if(psyBuffer[i + 1] <= 16.67 && psyBuffer[i] > 16.67 && priceUp)
+         strongBuy[i] = 14.0;
+      // Strong Sell: 极度乐观反转 + 价格下跌 + 连续形态
+      if(psyBuffer[i + 1] >= 83.33 && psyBuffer[i] < 83.33 && !priceUp)
+         strongSell[i] = 86.0;
+
+      // Normal Buy: 从超卖区回升
+      if(psyBuffer[i + 1] <= InpOversold && psyBuffer[i] > InpOversold && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 20.0;
 
-      // 从超买区(乐观区)回落 → 卖出：市场情绪从过度乐观回落
-      if(psyBuffer[i + 1] >= InpOverbought && psyBuffer[i] < InpOverbought)
+      // Normal Sell: 从超买区回落
+      if(psyBuffer[i + 1] >= InpOverbought && psyBuffer[i] < InpOverbought && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 80.0;
 
       // 极度悲观反转（PSY<16.67后回升）
-      if(psyBuffer[i + 1] <= 16.67 && psyBuffer[i] > 16.67)
+      if(psyBuffer[i + 1] <= 16.67 && psyBuffer[i] > 16.67 && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = 15.0;
 
       // 极度乐观反转（PSY>83.33后回落）
-      if(psyBuffer[i + 1] >= 83.33 && psyBuffer[i] < 83.33)
+      if(psyBuffer[i + 1] >= 83.33 && psyBuffer[i] < 83.33 && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = 85.0;
    }
 
@@ -124,6 +150,8 @@ int start()
       psyBuffer[0] = 100.0 * up0 / InpPSYPeriod;
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

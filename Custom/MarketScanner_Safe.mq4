@@ -19,7 +19,7 @@ input int InpRSIPeriod=14;input int InpMACDFast=12;input int InpMACDSlow=26;inpu
 double score[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,score);SetIndexLabel(0,"Market Score");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,score);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Market Score");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("MarketScanner_Safe");return(0);

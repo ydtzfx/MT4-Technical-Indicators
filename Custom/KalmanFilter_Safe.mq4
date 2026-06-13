@@ -10,12 +10,12 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 input double InpQ=0.01;    // 过程噪声(自适应基础值)
 input double InpR=0.1;     // 观测噪声
 
-double kf[],upper[],lower[],buySignal[],sellSignal[];
+double kf[],upper[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,kf);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Kalman");
@@ -23,6 +23,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrTomato);SetIndexBuffer(2,lower);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"KF-σ");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("Kalman_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -53,15 +55,23 @@ int start() {
       if(i<=limit){
          double sigma=MathSqrt(P);
          kf[i]=xHat;upper[i]=xHat+2*sigma;lower[i]=xHat-2*sigma;
-         buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+         buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
       }
    }
    for(int i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      if(c1<=lower[i+1]&&c>lower[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
-      if(c1>=upper[i+1]&&c<upper[i])sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
-      if(c1<=kf[i+1]&&c>kf[i]&&kf[i]>kf[i+1])buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;
+      double c3=iClose(_Symbol,_Period,i+3);
+      // Strong Buy: 从下轨下方回升 + 价格同步上涨
+      if(c1<=lower[i+1]&&c>lower[i]&&c>c1&&c1>c3)strongBuy[i]=iLow(_Symbol,_Period,i)-8*Point;
+      // Strong Sell: 从上轨上方回落 + 价格同步下跌
+      if(c1>=upper[i+1]&&c<upper[i]&&c<c1&&c1<c3)strongSell[i]=iHigh(_Symbol,_Period,i)+8*Point;
+      // Normal Buy: 从下轨下方回升
+      if(c1<=lower[i+1]&&c>lower[i]&&strongBuy[i]==EMPTY_VALUE)buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
+      // Normal Sell: 从上轨上方回落
+      if(c1>=upper[i+1]&&c<upper[i]&&strongSell[i]==EMPTY_VALUE)sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
+      // KF向上突破(价格上穿KF线且KF线上行)
+      if(c1<=kf[i+1]&&c>kf[i]&&kf[i]>kf[i+1]&&strongBuy[i]==EMPTY_VALUE)buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;
    }
-   if(Bars>0){kf[0]=kf[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){kf[0]=kf[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

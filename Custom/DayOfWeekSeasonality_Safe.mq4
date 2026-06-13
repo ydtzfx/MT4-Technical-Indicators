@@ -21,8 +21,8 @@ input int InpWeeks=20; // 回溯周数
 double seasonal[],confidence[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,seasonal);SetIndexLabel(0,"Seasonality");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,confidence);SetIndexLabel(1,"Confidence");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,seasonal);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Seasonality");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,confidence);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Confidence");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("DoW_Safe");return(0);

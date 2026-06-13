@@ -21,7 +21,7 @@ input ENUM_TIMEFRAMES InpTrendTF=PERIOD_H4;input int InpRSIPeriod=5;
 double raschkeSignal[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,raschkeSignal);SetIndexLabel(0,"Raschke Signal");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,raschkeSignal);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Raschke Signal");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("RaschkeSwap_Safe");return(0);

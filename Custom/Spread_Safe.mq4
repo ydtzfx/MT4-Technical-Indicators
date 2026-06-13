@@ -15,7 +15,7 @@ input double InpSpreadWarn=30; // 超过此点差发出预警(基于point)
 double spreadBuffer[],warnHigh[],warnLow[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(0,spreadBuffer);SetIndexLabel(0,"Spread");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(0,spreadBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Spread");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,warnHigh);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"High Spread");SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(2,warnLow);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Low Spread");SetIndexEmptyValue(2,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("Spread_Safe");return(0);

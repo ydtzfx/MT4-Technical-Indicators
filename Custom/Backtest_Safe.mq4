@@ -19,8 +19,8 @@ input double InpSlMult=1.0;   // 止损ATR倍数
 double winRate[],avgRR[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,winRate);SetIndexLabel(0,"Win Rate %");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,avgRR);SetIndexLabel(1,"Avg R:R");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,winRate);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Win Rate %");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,avgRR);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Avg R:R");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("Backtest_Safe");return(0);
