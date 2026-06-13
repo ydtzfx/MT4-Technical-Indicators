@@ -1,0 +1,42 @@
+#!/bin/bash
+# MT4 Indicator Pre-Commit Hook
+# Validates staged .mq4 files for no-future-function compliance
+
+STAGED_MQ4=$(git diff --cached --name-only --diff-filter=ACM | grep '\.mq4$')
+
+if [ -z "$STAGED_MQ4" ]; then
+    exit 0
+fi
+
+HAS_CRITICAL=0
+
+echo "=== MQL4 Pre-Commit Validation ==="
+
+for f in $STAGED_MQ4; do
+    if [ ! -f "$f" ]; then continue; fi
+
+    # Check 1: bar[0] signal assignment
+    BAR0_VIOLATION=$(grep -n 'signal.*\[0\].*=' "$f" 2>/dev/null | grep -v 'EMPTY_VALUE')
+    if [ -n "$BAR0_VIOLATION" ]; then
+        echo "[CRITICAL] $f: bar[0] signal assignment detected"
+        echo "$BAR0_VIOLATION"
+        HAS_CRITICAL=1
+    fi
+
+    # Check 2: Buffer count consistency
+    PROP=$(grep -oP 'indicator_buffers\s+\K\d+' "$f" 2>/dev/null || echo "0")
+    ACTUAL=$(grep -c "SetIndexBuffer" "$f" 2>/dev/null || echo "0")
+    if [ "$PROP" != "$ACTUAL" ] && [ "$PROP" != "0" ]; then
+        echo "[CRITICAL] $f: buffer count mismatch (declared=$PROP, actual=$ACTUAL)"
+        HAS_CRITICAL=1
+    fi
+done
+
+if [ $HAS_CRITICAL -eq 1 ]; then
+    echo ""
+    echo "COMMIT BLOCKED: Fix CRITICAL violations above before committing."
+    exit 1
+fi
+
+echo "All checks passed."
+exit 0

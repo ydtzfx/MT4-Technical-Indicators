@@ -1,0 +1,24 @@
+#!/bin/bash
+# MT4 Indicator Pre-Push Hook
+# Quick full scan (CRITICAL rules only, warns but never blocks)
+
+echo "=== MQL4 Pre-Push Quick Scan ==="
+
+CRITICAL_COUNT=0
+
+while IFS= read -r -d '' f; do
+    VIOLATION=$(grep -c 'signal.*\[0\].*=' "$f" 2>/dev/null)
+    EMPTY=$(grep -c 'EMPTY_VALUE.*\[0\]\|\[0\].*EMPTY_VALUE' "$f" 2>/dev/null)
+    if [ "$VIOLATION" -gt "$EMPTY" ] 2>/dev/null; then
+        echo "[WARN] $f: possible bar[0] signal assignment"
+        CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+    fi
+done < <(find . -name '*.mq4' -not -path './.git/*' -print0)
+
+if [ $CRITICAL_COUNT -gt 0 ]; then
+    echo ""
+    echo "WARNING: $CRITICAL_COUNT file(s) may have bar[0] signal issues."
+    echo "Push continues, but please review before deploying to MT4."
+fi
+
+exit 0

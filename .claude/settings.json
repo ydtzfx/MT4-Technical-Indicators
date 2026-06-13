@@ -7,6 +7,12 @@
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(echo:*)",
+      "Bash(cd:*)",
+      "Bash(cp:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(date:*)",
+      "Bash(git:*)",
       "Write(D:/MT4技术指标/**)",
       "Edit(D:/MT4技术指标/**)"
     ]
@@ -19,7 +25,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c \"file='D:/MT4技术指标/'$(echo '${CLAUDE_TOOL_INPUT:file_path}' | sed 's|.*/MT4技术指标/||'); if grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" 2>/dev/null | grep -qv EMPTY_VALUE; then echo 'WARNING: Potential bar[0] signal assignment detected in: $file'; echo 'Line(s):'; grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" | grep -v EMPTY_VALUE; else true; fi\""
+            "command": "bash -c \"file='D:/MT4技术指标/'$(echo '${CLAUDE_TOOL_INPUT:file_path}' | sed 's|.*/MT4技术指标/||'); echo '--- MQL4 Post-Write Validation: '$file' ---'; echo '[1/3] bar[0] signal:'; if grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" 2>/dev/null | grep -qv EMPTY_VALUE; then echo '  WARN: bar[0] signal detected'; grep -n 'signal.*\\[0\\].*=' \\\"$file\\\" | grep -v EMPTY_VALUE; else echo '  PASS'; fi; echo '[2/3] buffer count:'; prop=$(grep -oP 'indicator_buffers\\s+\\K\\d+' \\\"$file\\\" 2>/dev/null || echo '0'); actual=$(grep -c 'SetIndexBuffer' \\\"$file\\\" 2>/dev/null || echo '0'); if [ \\\"$prop\\\" != \\\"$actual\\\" ] && [ \\\"$prop\\\" != '0' ]; then echo '  MISMATCH: declared='$prop' actual='$actual; else echo '  PASS ('$prop'='$actual')'; fi; echo '[3/3] include paths:'; includes=$(grep -oP '#include\\s+\\\"\\\\K[^\\\"]+' \\\"$file\\\" 2>/dev/null); base=$(dirname \\\"$file\\\"); all_ok=1; for inc in $includes; do if [ ! -f \\\"$base/$inc\\\" ] && [ ! -f \\\"D:/MT4技术指标/$inc\\\" ]; then echo '  MISSING: '$inc; all_ok=0; fi; done; if [ $all_ok -eq 1 ]; then echo '  PASS'; fi\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c \"cd 'D:/MT4技术指标'; echo '=== MT4 Indicators Project ==='; echo 'Files: '$(find . -name '*.mq4' -not -path './.git/*' | wc -l)' .mq4 indicators'; echo 'Headers: '$(find Include -name '*.mqh' | wc -l)' .mqh'; echo 'Branch: '$(git branch --show-current); echo 'Last commit: '$(git log -1 --format='%h %s (%cr)'); echo 'Pending changes: '$(git status --porcelain | wc -l)' files'; echo '=============================='\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c \"cd 'D:/MT4技术指标'; echo '--- Context Compaction State ---' > /tmp/precompact-state.txt; echo 'Branch: '$(git branch --show-current) >> /tmp/precompact-state.txt; echo 'Last 3 commits:' >> /tmp/precompact-state.txt; git log -3 --oneline >> /tmp/precompact-state.txt; echo 'Modified files:' >> /tmp/precompact-state.txt; git status --short >> /tmp/precompact-state.txt; echo 'Active worktrees:' >> /tmp/precompact-state.txt; git worktree list >> /tmp/precompact-state.txt 2>/dev/null; cat /tmp/precompact-state.txt\""
           }
         ]
       }

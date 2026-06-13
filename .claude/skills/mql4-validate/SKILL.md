@@ -62,6 +62,21 @@ for f in */*.mq4; do
 done
 ```
 
+### Rule 6: Strong Signal Buffers Have SetIndexStyle (REQUIRED)
+Strong buy/sell buffers (strongBuy[], strongSell[]) must have `SetIndexStyle` configured with `DRAW_ARROW` and the correct arrow size/color.
+
+```bash
+for f in */*.mq4; do
+  if grep -q 'strongBuy\|strongSell' "$f" 2>/dev/null; then
+    has_style=$(grep -c 'SetIndexStyle.*strong' "$f" 2>/dev/null || echo "0")
+    strong_count=$(grep -c 'strongBuy\[\|strongSell\[' "$f" 2>/dev/null || echo "0")
+    if [ "$has_style" -lt "$strong_count" ] 2>/dev/null; then
+      echo "MISSING SetIndexStyle for strong buffers: $f (has=$has_style, need=$strong_count)"
+    fi
+  fi
+done
+```
+
 ## Usage
 
 Run the skill with `/mql4-validate` to execute all rules and get a compliance report. The skill outputs:

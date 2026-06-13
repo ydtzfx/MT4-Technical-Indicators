@@ -37,6 +37,26 @@ int start() {
 - No conditional logic that could erase a previously-set signal value.
 - K-line pattern or multi-bar confirmation must wait for all required bars to complete.
 
+### 6. Signal Grading Correctness (Phase 4)
+- strongBuy/strongSell buffers must be declared AND initialized with EMPTY_VALUE in init()
+- Signal strength calculation (WEAK/MEDIUM/STRONG) must use at least 2 distinct conditions
+- strongBuy only assigned when signalStrength >= STRONG and direction == BUY
+- strongSell only assigned when signalStrength >= STRONG and direction == SELL
+- bar[0] for strong buffers: strongBuy[0]=strongSell[0]=EMPTY_VALUE
+
+### 7. Display Style Consistency (Phase 5)
+- Normal arrows: SetIndexArrow for buy=233 (up), sell=234 (down), width=2
+- Strong arrows: width=4, color=clrCyan (strongBuy), color=clrDeepPink (strongSell)
+- Buffer naming: buySignal[], sellSignal[], strongBuy[], strongSell[]
+- Check: do strong buffers have SetIndexStyle with DRAW_ARROW?
+- Check: are arrow codes correct (233 for buy, 234 for sell)?
+
+### 8. Header Dependency Hygiene (Phase 2)
+- Every file using CalculateMA must include Common.mqh
+- Every file using GetTrueRange or GetPriceByTypeEx must include PriceData.mqh
+- Every file using DetectCross/DetectDivergence must include SignalBase.mqh
+- Every file using DrawBuyArrow/DrawSellArrow must include Drawing.mqh
+
 ## Review Output Format
 
 For each indicator reviewed:
@@ -47,6 +67,9 @@ File: Trend/MA_Safe.mq4
 [PASS] Buffer count match — 5/5
 [PASS] Header includes valid — 2 includes ok
 [PASS] Signal persistence — no overwrites detected
+[PASS] Signal grading correctness — strongBuy/strongSell properly configured
+[PASS] Display style consistency — arrows, colors, naming conventions
+[PASS] Header dependency hygiene — all required includes present
 Rating: 5/5 — COMPLIANT
 ```
 
