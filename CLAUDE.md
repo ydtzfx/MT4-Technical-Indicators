@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a complete set of MetaTrader 4 (MT4) technical indicators written in MQL4, with a strict **no future function** (无未来函数) design. All buy/sell signals are generated exclusively from **completed bars** (bar index ≥ 1) and never repaint.
 
-**56 files** across 7 directories: 50 indicator files (`.mq4`), 4 shared headers (`.mqh`), 1 CLAUDE.md, 1 README.
+**212 files** across 7 directories: 201 indicator files (`.mq4`), 4 shared headers (`.mqh`), 1 CLAUDE.md, 1 README, plus automation config in `.claude/` and design docs in `docs/`.
 
 ## Architecture
 
@@ -125,3 +125,20 @@ grep -c "indicator_buffers" --include="*.mq4" .
 - **`Bars` count**: `Bars` is the total number of bars in the chart. On first load, `IndicatorCounted()` returns 0 (or negative), so `limit = Bars - InpPeriod*3` prevents accessing non-existent history.
 - **`EMPTY_VALUE`**: Use for unfilled signal buffer slots. MT4 skips drawing at EMPTY_VALUE positions.
 - **Bar 0 volatility**: `iClose(_Symbol, _Period, 0)` changes every tick. Never use it for signal logic — only for live display updates.
+
+## Automation
+
+### Git Hooks (`hooks/` → `.git/hooks/`)
+- `pre-commit`: Validates staged `.mq4` files — blocks on CRITICAL violations (bar[0] signal, buffer count mismatch)
+- `pre-push`: Quick full scan with warnings only (never blocks push)
+
+### Claude Code Automation (`.claude/`)
+- `settings.json`: PostToolUse multi-rule validation (bar[0] + buffer count + include paths), SessionStart project summary, PreCompact state snapshot
+- `agents/mql4-reviewer.md`: Comprehensive MQL4 code reviewer covering 8 dimensions (bar[0] isolation, start() pattern, buffer integrity, header deps, signal persistence, signal grading, display style, header hygiene)
+- `skills/mql4-validate/SKILL.md`: 6-rule automated validator
+
+### CI/CD Validation
+Before loading indicators in MT4, run the quick check:
+```bash
+grep -rn 'signal.*\[0\].*=' --include="*.mq4" . | grep -v EMPTY_VALUE  # Must return empty
+```

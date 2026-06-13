@@ -24,7 +24,7 @@ MT4技术指标/
 │   ├── PriceData.mqh     # 安全价格数据获取封装
 │   ├── SignalBase.mqh    # 信号缓冲区管理、交叉/超买超卖检测
 │   └── Drawing.mqh       # 箭头、线条、文字标签绘图工具
-├── Trend/                # 趋势类指标（7个）
+├── Trend/                # 趋势类指标（25个）
 │   ├── MA_Safe.mq4              # 多类型移动平均线 (SMA/EMA/SMMA/LWMA)
 │   ├── BollingerBands_Safe.mq4  # 布林带
 │   ├── Envelopes_Safe.mq4       # 包络线
@@ -32,7 +32,7 @@ MT4技术指标/
 │   ├── ADX_Safe.mq4             # 平均趋向指数
 │   ├── Ichimoku_Safe.mq4        # 一目均衡表
 │   └── Alligator_Safe.mq4       # 鳄鱼线
-├── Oscillators/          # 震荡类指标（8个）
+├── Oscillators/          # 震荡类指标（20个）
 │   ├── RSI_Safe.mq4             # 相对强弱指数
 │   ├── MACD_Safe.mq4            # 指数平滑异同移动平均线
 │   ├── Stochastic_Safe.mq4      # 随机指标(KD)
@@ -41,7 +41,7 @@ MT4技术指标/
 │   ├── WilliamsR_Safe.mq4       # 威廉指标
 │   ├── DeMarker_Safe.mq4        # DeMarker指标
 │   └── OsMA_Safe.mq4            # 移动平均振荡器
-├── Volume/               # 成交量类指标（3个）
+├── Volume/               # 成交量类指标（10个）
 │   ├── OBV_Safe.mq4             # 能量潮
 │   ├── MFI_Safe.mq4             # 资金流量指数
 │   └── AD_Safe.mq4              # 累积/派发
@@ -51,7 +51,7 @@ MT4技术指标/
 │   ├── Awesome_Safe.mq4         # 动量震荡(AO)
 │   ├── Accelerator_Safe.mq4     # 加速震荡(AC)
 │   └── MarketFacilitation_Safe.mq4  # 市场促进指数(BW MFI)
-├── Custom/               # 常见自定义指标（4个）
+├── Custom/               # 常见自定义指标（140个）
 │   ├── KDJ_Safe.mq4             # KDJ随机指标
 │   ├── ASI_Safe.mq4             # 振动升降指数
 │   ├── ATR_Safe.mq4             # 平均真实波动幅度
@@ -61,7 +61,7 @@ MT4技术指标/
 └── README.md
 ```
 
-**总计：33个指标文件 + 4个公共头文件 + 1个README = 38个文件**
+**总计：201个指标文件 + 4个公共头文件 + 1个README + 自动化配置 = 212+个文件**
 
 ## 安装和使用
 
