@@ -45,14 +45,17 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpADXColor);
    SetIndexBuffer(0, adxBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "ADX");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 1, InpPlusDIColor);
    SetIndexBuffer(1, plusDIBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "+DI");
 
    SetIndexStyle(2, DRAW_LINE, STYLE_SOLID, 1, InpMinusDIColor);
    SetIndexBuffer(2, minusDIBuffer);
+   SetIndexEmptyValue(2, EMPTY_VALUE);
    SetIndexLabel(2, "-DI");
 
    SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

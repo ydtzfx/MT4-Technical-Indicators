@@ -45,14 +45,17 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpJawColor);
    SetIndexBuffer(0, jawBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "Alligator Jaw");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 2, InpTeethColor);
    SetIndexBuffer(1, teethBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "Alligator Teeth");
 
    SetIndexStyle(2, DRAW_LINE, STYLE_SOLID, 2, InpLipsColor);
    SetIndexBuffer(2, lipsBuffer);
+   SetIndexEmptyValue(2, EMPTY_VALUE);
    SetIndexLabel(2, "Alligator Lips");
 
    SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

@@ -21,7 +21,7 @@ input int InpMACDFast=23,InpMACDSlow=50,InpCycle=10;
 double stcBuffer[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,stcBuffer);SetIndexLabel(0,"STC");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,stcBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"STC");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    int idx=3;SetIndexBuffer(idx,strongBuy);SetIndexStyle(idx,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(idx,233);SetIndexEmptyValue(idx,EMPTY_VALUE);

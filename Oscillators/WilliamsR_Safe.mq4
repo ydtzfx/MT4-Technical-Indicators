@@ -37,6 +37,7 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, InpWPRColor);
    SetIndexBuffer(0, wprBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "Williams %R");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

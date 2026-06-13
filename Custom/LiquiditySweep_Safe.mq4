@@ -11,18 +11,20 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 input int InpSwingPeriod=10; // 找摆动高/低点的周期
 input int InpReturnBars=3;   // 回归确认bar数
 
-double bullSweep[],bearSweep[],buySignal[],sellSignal[];
+double bullSweep[],bearSweep[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullSweep);SetIndexArrow(0,ARROW_BUY);SetIndexLabel(0,"Bullish Sweep");SetIndexEmptyValue(0,EMPTY_VALUE);
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearSweep);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"Bearish Sweep");SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Sweep Confirmed");SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"Sweep Confirmed");SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrWhite);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Strong Buy");
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrGold);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"Strong Sell");
    IndicatorDigits(4);IndicatorShortName("LiquiditySweep_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -30,7 +32,7 @@ int deinit(){return(0);}
 int start() {
    int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
-   for(int i=limit;i>=0;i--){bullSweep[i]=EMPTY_VALUE;bearSweep[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+   for(int i=limit;i>=0;i--){bullSweep[i]=EMPTY_VALUE;bearSweep[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
 
    for(int i=limit;i>=InpSwingPeriod+InpReturnBars;i--){
       // 找近期摆动高点（潜在流动性池）
@@ -48,6 +50,8 @@ int start() {
             if(recovered&&iClose(_Symbol,_Period,i)>swingLow){ // 拉回
                bullSweep[i+j-1]=swingLow-5*Point;
                buySignal[i]=iLow(_Symbol,_Period,i)-10*Point;
+               // 强信号：Sweep确认+放量+大阳线回归
+               if(iVolume(_Symbol,_Period,i)>iVolume(_Symbol,_Period,i+1)*1.5&&iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i)>(iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i))*0.7)strongBuy[i]=iLow(_Symbol,_Period,i)-16*Point;
             }
             break;
          }
@@ -61,10 +65,13 @@ int start() {
             if(recovered&&iClose(_Symbol,_Period,i)<swingHigh){
                bearSweep[i+j-1]=swingHigh+5*Point;
                sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;
+               // 强信号：Sweep确认+放量+大阴线回归
+               if(iVolume(_Symbol,_Period,i)>iVolume(_Symbol,_Period,i+1)*1.5&&iOpen(_Symbol,_Period,i)-iClose(_Symbol,_Period,i)>(iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i))*0.7)strongSell[i]=iHigh(_Symbol,_Period,i)+16*Point;
             }
             break;
          }
       }
    }
+   if(Bars>0){bullSweep[0]=EMPTY_VALUE;bearSweep[0]=EMPTY_VALUE;buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

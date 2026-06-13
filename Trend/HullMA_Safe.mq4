@@ -16,7 +16,7 @@ input int InpPeriod=16;input color InpColor=clrDodgerBlue;input int InpWidth=2;
 double hma[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,InpWidth,InpColor);SetIndexBuffer(0,hma);SetIndexLabel(0,"HMA");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,InpWidth,InpColor);SetIndexBuffer(0,hma);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"HMA");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(3,strongBuy);SetIndexArrow(3,233);SetIndexEmptyValue(3,EMPTY_VALUE);

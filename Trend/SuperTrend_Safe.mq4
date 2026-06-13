@@ -18,9 +18,9 @@ input int InpATRPeriod=10;input double InpMultiplier=3.0;
 double upTrend[],downTrend[],trendLine[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,upTrend);SetIndexLabel(0,"Up Trend");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,downTrend);SetIndexLabel(1,"Down Trend");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,trendLine);SetIndexLabel(2,"Trend Line");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,upTrend);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Up Trend");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,downTrend);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Down Trend");
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,trendLine);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Trend Line");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexLabel(5,"Strong Buy");SetIndexEmptyValue(5,EMPTY_VALUE);

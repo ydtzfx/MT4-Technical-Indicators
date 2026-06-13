@@ -40,10 +40,12 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 1, InpUpperColor);
    SetIndexBuffer(0, upperBand);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "Envelope Upper");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 1, InpLowerColor);
    SetIndexBuffer(1, lowerBand);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "Envelope Lower");
 
    SetIndexStyle(2, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

@@ -17,9 +17,9 @@ input int InpPeriod=14;
 double adx[],pdi[],mdi[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,adx);SetIndexLabel(0,"ADX");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrLimeGreen);SetIndexBuffer(1,pdi);SetIndexLabel(1,"+DI");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrTomato);SetIndexBuffer(2,mdi);SetIndexLabel(2,"-DI");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,adx);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"ADX");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrLimeGreen);SetIndexBuffer(1,pdi);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"+DI");
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrTomato);SetIndexBuffer(2,mdi);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"-DI");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexBuffer(5,strongBuy);SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(5,233);SetIndexEmptyValue(5,EMPTY_VALUE);

@@ -9,14 +9,14 @@
 #property copyright "Original - No Future Function"
 #property version "1.00"
 #property indicator_chart_window
-#property indicator_buffers 2
+#property indicator_buffers 4
 
 input int InpGrids=10;input double InpGridSpacing=50; // 网格间距(点数)
 input bool InpPercentGrid=false; // true=百分比间距
 
-double buySignal[],sellSignal[];
+double buySignal[],sellSignal[],strongBuy[],strongSell[];
 
-int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,buySignal);SetIndexArrow(0,ARROW_BUY);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,sellSignal);SetIndexArrow(1,ARROW_SELL);SetIndexEmptyValue(1,EMPTY_VALUE);IndicatorDigits(4);IndicatorShortName("Grid_Safe");return(0);}
+int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,buySignal);SetIndexArrow(0,ARROW_BUY);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,sellSignal);SetIndexArrow(1,ARROW_SELL);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,strongBuy);SetIndexArrow(2,233);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Strong Buy");SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,strongSell);SetIndexArrow(3,234);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"Strong Sell");IndicatorDigits(4);IndicatorShortName("Grid_Safe");return(0);}
 int deinit(){RemoveAllObjects();return(0);}
 
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
@@ -36,7 +36,18 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       int nearestLo=0,nearestHi=0;
       for(int g=-InpGrids;g<=0;g++){double lvl=gridLo+(gridHi-gridLo)/2+g*step;if(c>lvl&&c-lvl<step*0.3)nearestLo++;}
       for(int g=0;g<=InpGrids;g++){double lvl=gridLo+(gridHi-gridLo)/2+g*step;if(c<lvl&&lvl-c<step*0.3)nearestHi++;}
-      if(nearestLo>0)buySignal[i]=gridLo;if(nearestHi>0)sellSignal[i]=gridHi;
+      strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
+      if(nearestLo>0){
+         buySignal[i]=gridLo;
+         // 价格在最底部的网格且放量=强买入信号
+         if(nearestLo>=InpGrids/2&&iVolume(_Symbol,_Period,i)>iVolume(_Symbol,_Period,i+1)*1.5)strongBuy[i]=gridLo-step;
+      }
+      if(nearestHi>0){
+         sellSignal[i]=gridHi;
+         // 价格在最顶部的网格且放量=强卖出信号
+         if(nearestHi>=InpGrids/2&&iVolume(_Symbol,_Period,i)>iVolume(_Symbol,_Period,i+1)*1.5)strongSell[i]=gridHi+step;
+      }
       break;
    }
+   buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;
    return(0);}

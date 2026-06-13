@@ -47,24 +47,29 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 1, InpTenkanColor);
    SetIndexBuffer(0, tenkanBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "Tenkan-sen");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 2, InpKijunColor);
    SetIndexBuffer(1, kijunBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "Kijun-sen");
 
    // Senkou Span A — 绘制为填充区域的上边界
    SetIndexStyle(2, DRAW_LINE, STYLE_SOLID, 1, InpCloudUpColor);
    SetIndexBuffer(2, senkouABuffer);
+   SetIndexEmptyValue(2, EMPTY_VALUE);
    SetIndexLabel(2, "Senkou Span A");
 
    // Senkou Span B — 填充区域的下边界
    SetIndexStyle(3, DRAW_LINE, STYLE_SOLID, 1, InpCloudDownColor);
    SetIndexBuffer(3, senkouBBuffer);
+   SetIndexEmptyValue(3, EMPTY_VALUE);
    SetIndexLabel(3, "Senkou Span B");
 
    SetIndexStyle(4, DRAW_LINE, STYLE_SOLID, 1, InpChikouColor);
    SetIndexBuffer(4, chikouBuffer);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
    SetIndexLabel(4, "Chikou Span");
 
    SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

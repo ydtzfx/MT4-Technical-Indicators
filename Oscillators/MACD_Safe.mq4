@@ -43,14 +43,17 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 1, InpMACDColor);
    SetIndexBuffer(0, macdBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "MACD");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 1, InpSignalColor);
    SetIndexBuffer(1, signalBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "Signal");
 
    SetIndexStyle(2, DRAW_HISTOGRAM, STYLE_SOLID, 2);
    SetIndexBuffer(2, histBuffer);
+   SetIndexEmptyValue(2, EMPTY_VALUE);
    SetIndexLabel(2, "Histogram");
 
    SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

@@ -13,7 +13,7 @@
 #property copyright "Original Composite - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum -100
 #property indicator_maximum 100
 #property indicator_level1 40
@@ -21,13 +21,15 @@
 
 input int InpVolAvgPeriod=20;input double InpVolSpikeMult=2.0;input double InpSmallBodyRatio=0.3;
 
-double smfLine[],buySignal[],sellSignal[],intensity[];
+double smfLine[],buySignal[],sellSignal[],intensity[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,smfLine);SetIndexLabel(0,"Smart Money Flow");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(3,intensity);SetIndexLabel(3,"Intensity");
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Strong Buy");
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"Strong Sell");
    IndicatorDigits(1);IndicatorShortName("SmartMoney_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -75,13 +77,16 @@ int start() {
 
       smfLine[i]=MathMax(-100,MathMin(100,smfScore));
       intensity[i]=MathAbs(smfLine[i]);
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=2;i--){
       if(smfLine[i+1]<-40&&smfLine[i]>-40)buySignal[i]=-50;
       if(smfLine[i+1]>40&&smfLine[i]<40)sellSignal[i]=50;
       if(smfLine[i+1]<smfLine[i+2]&&smfLine[i]>smfLine[i+1]&&smfLine[i]<-20)buySignal[i]=smfLine[i]-5;
+      // 强信号：SMF强势转向+高强度确认
+      if(smfLine[i+1]<-60&&smfLine[i]>-30&&intensity[i]>40)strongBuy[i]=-60;
+      if(smfLine[i+1]>60&&smfLine[i]<30&&intensity[i]>40)strongSell[i]=60;
    }
-   if(Bars>0){smfLine[0]=smfLine[1];intensity[0]=intensity[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){smfLine[0]=smfLine[1];intensity[0]=intensity[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

@@ -23,8 +23,8 @@ int init() {
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(5,expansion);SetIndexLabel(5,"Expansion");
-   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(6,strongBuy);SetIndexArrow(6,ARROW_BUY);SetIndexEmptyValue(6,EMPTY_VALUE);SetIndexLabel(6,"Strong Buy");
-   SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(7,strongSell);SetIndexArrow(7,ARROW_SELL);SetIndexEmptyValue(7,EMPTY_VALUE);SetIndexLabel(7,"Strong Sell");
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(6,strongBuy);SetIndexArrow(6,ARROW_BUY);SetIndexEmptyValue(6,EMPTY_VALUE);SetIndexLabel(6,"Strong Buy");
+   SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(7,strongSell);SetIndexArrow(7,ARROW_SELL);SetIndexEmptyValue(7,EMPTY_VALUE);SetIndexLabel(7,"Strong Sell");
    IndicatorDigits(4);IndicatorShortName("ORB_Safe");return(0);
 }
 int deinit(){return(0);}

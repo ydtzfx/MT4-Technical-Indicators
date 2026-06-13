@@ -10,13 +10,13 @@
 #property copyright "Original - No Future Function"
 #property version "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum -100
 #property indicator_maximum 100
 
-double wyckoffPhase[],volAnomaly[],buySignal[],sellSignal[];
+double wyckoffPhase[],volAnomaly[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
-int init(){SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,wyckoffPhase);SetIndexLabel(0,"Wyckoff Phase");SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(1,volAnomaly);SetIndexLabel(1,"Vol Anomaly");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("Wyckoff_Safe");return(0);}
+int init(){SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,wyckoffPhase);SetIndexLabel(0,"Wyckoff Phase");SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(1,volAnomaly);SetIndexLabel(1,"Vol Anomaly");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Strong Buy");SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"Strong Sell");IndicatorDigits(0);IndicatorShortName("Wyckoff_Safe");return(0);}
 int deinit(){return(0);}
 
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
@@ -38,11 +38,14 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       if(phase<-50&&volRatio>1.2&&c<c5)phase=-90;      // 强势跌破=下跌阶段
 
       wyckoffPhase[i]=phase;volAnomaly[i]=(volRatio-1)*50;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=2;i--){
       if(wyckoffPhase[i+1]<-30&&wyckoffPhase[i]>30)buySignal[i]=-50;  // 从派发/下跌转累积
       if(wyckoffPhase[i+1]>30&&wyckoffPhase[i]<-30)sellSignal[i]=50;
+      // 强信号：相位转换+成交量异常确认
+      if(wyckoffPhase[i+1]<-50&&wyckoffPhase[i]>60&&volAnomaly[i]>10)strongBuy[i]=-60;
+      if(wyckoffPhase[i+1]>50&&wyckoffPhase[i]<-60&&volAnomaly[i]<-10)strongSell[i]=60;
    }
-   if(Bars>0){wyckoffPhase[0]=wyckoffPhase[1];volAnomaly[0]=volAnomaly[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){wyckoffPhase[0]=wyckoffPhase[1];volAnomaly[0]=volAnomaly[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);}
