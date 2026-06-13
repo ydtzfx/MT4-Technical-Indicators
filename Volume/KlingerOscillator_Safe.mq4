@@ -17,8 +17,8 @@ input int InpFast=34,InpSlow=55,InpSignal=13;
 double koBuffer[],signalBuffer[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,koBuffer);SetIndexLabel(0,"KO");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signalBuffer);SetIndexLabel(1,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,koBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"KO");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signalBuffer);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);

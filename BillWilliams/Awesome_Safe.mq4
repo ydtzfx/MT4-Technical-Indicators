@@ -37,6 +37,7 @@ int init()
 {
    SetIndexStyle(0, DRAW_HISTOGRAM, STYLE_SOLID, 2);
    SetIndexBuffer(0, aoBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "AO");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

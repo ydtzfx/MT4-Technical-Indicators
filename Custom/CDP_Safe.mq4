@@ -32,13 +32,13 @@ input color InpS3Color = clrLimeGreen;
 double cdp[],r1[],s1[],r2[],s2[],r3[],s3[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpCDPColor);SetIndexBuffer(0,cdp);SetIndexLabel(0,"CDP");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,InpR1S1Color);SetIndexBuffer(1,r1);SetIndexLabel(1,"R1");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,InpR1S1Color);SetIndexBuffer(2,s1);SetIndexLabel(2,"S1");
-   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,InpR2S2Color);SetIndexBuffer(3,r2);SetIndexLabel(3,"R2");
-   SetIndexStyle(4,DRAW_LINE,STYLE_DOT,1,InpR2S2Color);SetIndexBuffer(4,s2);SetIndexLabel(4,"S2");
-   SetIndexStyle(5,DRAW_LINE,STYLE_DOT,1,InpR3Color);SetIndexBuffer(5,r3);SetIndexLabel(5,"R3");
-   SetIndexStyle(6,DRAW_LINE,STYLE_DOT,1,InpS3Color);SetIndexBuffer(6,s3);SetIndexLabel(6,"S3");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpCDPColor);SetIndexBuffer(0,cdp);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"CDP");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,InpR1S1Color);SetIndexBuffer(1,r1);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"R1");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,InpR1S1Color);SetIndexBuffer(2,s1);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"S1");
+   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,InpR2S2Color);SetIndexBuffer(3,r2);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"R2");
+   SetIndexStyle(4,DRAW_LINE,STYLE_DOT,1,InpR2S2Color);SetIndexBuffer(4,s2);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"S2");
+   SetIndexStyle(5,DRAW_LINE,STYLE_DOT,1,InpR3Color);SetIndexBuffer(5,r3);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"R3");
+   SetIndexStyle(6,DRAW_LINE,STYLE_DOT,1,InpS3Color);SetIndexBuffer(6,s3);SetIndexEmptyValue(6,EMPTY_VALUE);SetIndexLabel(6,"S3");
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(7,buySignal);SetIndexArrow(7,ARROW_BUY);SetIndexEmptyValue(7,EMPTY_VALUE);
    SetIndexStyle(8,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(8,sellSignal);SetIndexArrow(8,ARROW_SELL);SetIndexEmptyValue(8,EMPTY_VALUE);
    SetIndexStyle(9,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(9,strongBuy);SetIndexArrow(9,ARROW_BUY);SetIndexLabel(9,"Strong Buy");SetIndexEmptyValue(9,EMPTY_VALUE);

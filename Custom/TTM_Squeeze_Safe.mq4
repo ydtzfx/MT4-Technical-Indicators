@@ -19,9 +19,9 @@ input int InpKCPeriod=20;input double InpKCMult=1.5;input int InpATRPeriod=10;
 double momBuffer[],squeezeOn[],squeezeOff[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,momBuffer);SetIndexLabel(0,"Momentum");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,squeezeOn);SetIndexLabel(1,"Squeeze On");
-   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1,clrGray);SetIndexBuffer(2,squeezeOff);SetIndexLabel(2,"Squeeze Off");
+   SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,momBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Momentum");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,squeezeOn);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Squeeze On");
+   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1,clrGray);SetIndexBuffer(2,squeezeOff);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Squeeze Off");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,233);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"Strong Buy");

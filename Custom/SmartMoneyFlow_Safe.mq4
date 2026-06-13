@@ -24,10 +24,10 @@ input int InpVolAvgPeriod=20;input double InpVolSpikeMult=2.0;input double InpSm
 double smfLine[],buySignal[],sellSignal[],intensity[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,smfLine);SetIndexLabel(0,"Smart Money Flow");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,smfLine);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Smart Money Flow");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
-   SetIndexStyle(3,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(3,intensity);SetIndexLabel(3,"Intensity");
+   SetIndexStyle(3,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(3,intensity);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"Intensity");
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Strong Buy");
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"Strong Sell");
    IndicatorDigits(1);IndicatorShortName("SmartMoney_Safe");return(0);

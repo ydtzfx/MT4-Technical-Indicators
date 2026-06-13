@@ -20,11 +20,11 @@ input int InpOFIPeriod=10;input int InpSmooth=5;
 double ofi[],signal[],buySignal[],sellSignal[],delta[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,ofi);SetIndexLabel(0,"Order Flow Imbalance");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,signal);SetIndexLabel(1,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,ofi);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Order Flow Imbalance");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,signal);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
-   SetIndexStyle(4,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(4,delta);SetIndexLabel(4,"Delta");
+   SetIndexStyle(4,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(4,delta);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Delta");
    IndicatorDigits(0);IndicatorShortName("OFI_Safe");return(0);
 }
 int deinit(){return(0);}

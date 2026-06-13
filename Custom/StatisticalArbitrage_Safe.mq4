@@ -21,9 +21,9 @@ input string InpHedgeSymbol="EURUSD";input int InpPeriod=50;input int InpHalfLif
 double residualZ[],spread[],signalLine[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,residualZ);SetIndexLabel(0,"Residual Z");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,spread);SetIndexLabel(1,"Spread");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrGray);SetIndexBuffer(2,signalLine);SetIndexLabel(2,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,residualZ);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Residual Z");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,spread);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Spread");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrGray);SetIndexBuffer(2,signalLine);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Signal");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(2);IndicatorShortName("StatArb_Safe");return(0);

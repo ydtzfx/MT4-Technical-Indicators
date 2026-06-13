@@ -45,10 +45,12 @@ int init()
 {
    SetIndexStyle(0, DRAW_HISTOGRAM, STYLE_SOLID, 2, clrLimeGreen);
    SetIndexBuffer(0, upBarBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "Gator Up");
 
    SetIndexStyle(1, DRAW_HISTOGRAM, STYLE_SOLID, 2, clrTomato);
    SetIndexBuffer(1, downBarBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "Gator Down");
 
    SetIndexStyle(2, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
@@ -73,6 +75,7 @@ int init()
 
    // 内部缓冲区
    SetIndexBuffer(4, jawBuffer);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
    SetIndexLabel(4, "Jaw (hidden)");
 
    IndicatorDigits(4);

@@ -17,12 +17,12 @@ input int InpEntry=20;input int InpExit=10;input int InpATR=20;
 double entryHi[],entryLo[],exitHi[],exitLo[],atrVal[],posSize[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,entryHi);SetIndexLabel(0,"Entry Hi");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,entryLo);SetIndexLabel(1,"Entry Lo");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrLime);SetIndexBuffer(2,exitHi);SetIndexLabel(2,"Exit Hi");
-   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,clrRed);SetIndexBuffer(3,exitLo);SetIndexLabel(3,"Exit Lo");
-   SetIndexStyle(4,DRAW_NONE);SetIndexBuffer(4,atrVal);SetIndexLabel(4,"ATR");
-   SetIndexStyle(5,DRAW_NONE);SetIndexBuffer(5,posSize);SetIndexLabel(5,"PosSize");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,entryHi);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Entry Hi");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,entryLo);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Entry Lo");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrLime);SetIndexBuffer(2,exitHi);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Exit Hi");
+   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,clrRed);SetIndexBuffer(3,exitLo);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"Exit Lo");
+   SetIndexStyle(4,DRAW_NONE);SetIndexBuffer(4,atrVal);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"ATR");
+   SetIndexStyle(5,DRAW_NONE);SetIndexBuffer(5,posSize);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"PosSize");
    SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(6,buySignal);SetIndexArrow(6,ARROW_BUY);SetIndexEmptyValue(6,EMPTY_VALUE);
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(7,sellSignal);SetIndexArrow(7,ARROW_SELL);SetIndexEmptyValue(7,EMPTY_VALUE);
    SetIndexStyle(8,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(8,strongBuy);SetIndexArrow(8,233);SetIndexEmptyValue(8,EMPTY_VALUE);SetIndexLabel(8,"Strong Buy");

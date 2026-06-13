@@ -18,9 +18,9 @@ input int InpPeriod=20;input int InpBins=8; // 价格变化分桶数
 double entropy[],smoothEntropy[],change[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,entropy);SetIndexLabel(0,"Entropy");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,smoothEntropy);SetIndexLabel(1,"Smooth");
-   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(2,change);SetIndexLabel(2,"ΔEntropy");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,entropy);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Entropy");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrYellow);SetIndexBuffer(1,smoothEntropy);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Smooth");
+   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(2,change);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"ΔEntropy");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
 	   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);

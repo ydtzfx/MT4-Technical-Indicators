@@ -18,10 +18,10 @@ input bool InpAlert=false;
 double buyLine[],sellLine[],upper[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_DASH,1,clrLimeGreen);SetIndexBuffer(0,buyLine);SetIndexLabel(0,"BuyLine");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DASH,1,clrTomato);SetIndexBuffer(1,sellLine);SetIndexLabel(1,"SellLine");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(2,upper);SetIndexLabel(2,"HH");
-   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(3,lower);SetIndexLabel(3,"LL");
+   SetIndexStyle(0,DRAW_LINE,STYLE_DASH,1,clrLimeGreen);SetIndexBuffer(0,buyLine);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"BuyLine");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DASH,1,clrTomato);SetIndexBuffer(1,sellLine);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"SellLine");
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(2,upper);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"HH");
+   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(3,lower);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"LL");
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(4,buySignal);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(5,sellSignal);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
    SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(6,strongBuy);SetIndexArrow(6,ARROW_BUY);SetIndexLabel(6,"Strong Buy");SetIndexEmptyValue(6,EMPTY_VALUE);

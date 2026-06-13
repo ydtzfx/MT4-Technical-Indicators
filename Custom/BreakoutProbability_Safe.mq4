@@ -27,9 +27,9 @@ input int InpLookback=20;input double InpBreakThreshold=0.3; // 突破幅度(%AT
 double prob[],volConfirm[],breakStr[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,prob);SetIndexLabel(0,"Breakout Prob %");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1,clrLimeGreen);SetIndexBuffer(1,volConfirm);SetIndexLabel(1,"Vol Confirm");
-   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,breakStr);SetIndexLabel(2,"Break Strength");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,prob);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Breakout Prob %");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1,clrLimeGreen);SetIndexBuffer(1,volConfirm);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Vol Confirm");
+   SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,breakStr);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Break Strength");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);

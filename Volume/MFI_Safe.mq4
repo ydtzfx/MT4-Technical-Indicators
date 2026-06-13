@@ -42,6 +42,7 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2, clrDodgerBlue);
    SetIndexBuffer(0, mfiBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "MFI");
 
    SetIndexStyle(1, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

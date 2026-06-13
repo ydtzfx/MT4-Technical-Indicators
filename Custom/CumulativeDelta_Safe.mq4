@@ -16,9 +16,9 @@
 double cumDelta[],barDelta[],signal[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,cumDelta);SetIndexLabel(0,"Cumulative Δ");
-   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(1,barDelta);SetIndexLabel(1,"Bar Δ");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(2,signal);SetIndexLabel(2,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,cumDelta);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Cumulative Δ");
+   SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(1,barDelta);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Bar Δ");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(2,signal);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Signal");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("CumDelta_Safe");return(0);

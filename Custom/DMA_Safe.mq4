@@ -32,8 +32,8 @@ double strongBuyBuffer[];   // 强烈买入
 double strongSellBuffer[];  // 强烈卖出
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrWhite);SetIndexBuffer(0,difBuffer);SetIndexLabel(0,"DIF");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(1,amaBuffer);SetIndexLabel(1,"AMA");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrWhite);SetIndexBuffer(0,difBuffer);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"DIF");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(1,amaBuffer);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"AMA");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuyBuffer);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);

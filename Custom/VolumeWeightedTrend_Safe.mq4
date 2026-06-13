@@ -20,11 +20,11 @@ input ENUM_PRICE_SAFE InpPrice=PRICE_TYPICAL;
 double vwt[],signal[],buySignal[],sellSignal[],confidence[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,vwt);SetIndexLabel(0,"VW Trend");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,signal);SetIndexLabel(1,"Signal");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,vwt);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"VW Trend");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,signal);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
-   SetIndexStyle(4,DRAW_HISTOGRAM,STYLE_SOLID,1,clrGray);SetIndexBuffer(4,confidence);SetIndexLabel(4,"Confidence");
+   SetIndexStyle(4,DRAW_HISTOGRAM,STYLE_SOLID,1,clrGray);SetIndexBuffer(4,confidence);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"Confidence");
    IndicatorDigits(4);IndicatorShortName("VWT_Safe("+IntegerToString(InpPeriod)+")");return(0);
 }
 int deinit(){return(0);}

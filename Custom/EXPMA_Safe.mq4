@@ -24,11 +24,11 @@ input color InpC1=clrLimeGreen, InpC2=clrYellow, InpC3=clrOrange, InpC4=clrDodge
 double e1[],e2[],e3[],e4[],e5[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,InpC1);SetIndexBuffer(0,e1);SetIndexLabel(0,"EMA"+IntegerToString(InpEMA1));
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,InpC2);SetIndexBuffer(1,e2);SetIndexLabel(1,"EMA"+IntegerToString(InpEMA2));
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpC3);SetIndexBuffer(2,e3);SetIndexLabel(2,"EMA"+IntegerToString(InpEMA3));
-   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,InpC4);SetIndexBuffer(3,e4);SetIndexLabel(3,"EMA"+IntegerToString(InpEMA4));
-   SetIndexStyle(4,DRAW_LINE,STYLE_SOLID,2,InpC5);SetIndexBuffer(4,e5);SetIndexLabel(4,"EMA"+IntegerToString(InpEMA5));
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,InpC1);SetIndexBuffer(0,e1);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"EMA"+IntegerToString(InpEMA1));
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,InpC2);SetIndexBuffer(1,e2);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"EMA"+IntegerToString(InpEMA2));
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpC3);SetIndexBuffer(2,e3);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"EMA"+IntegerToString(InpEMA3));
+   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,InpC4);SetIndexBuffer(3,e4);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"EMA"+IntegerToString(InpEMA4));
+   SetIndexStyle(4,DRAW_LINE,STYLE_SOLID,2,InpC5);SetIndexBuffer(4,e5);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"EMA"+IntegerToString(InpEMA5));
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(5,buySignal);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
    SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(6,sellSignal);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(7,strongBuy);SetIndexArrow(7,ARROW_BUY);SetIndexEmptyValue(7,EMPTY_VALUE);

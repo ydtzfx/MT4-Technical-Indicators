@@ -18,9 +18,9 @@ input double InpR=0.1;     // 观测噪声
 double kf[],upper[],lower[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,kf);SetIndexLabel(0,"Kalman");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrLimeGreen);SetIndexBuffer(1,upper);SetIndexLabel(1,"KF+σ");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrTomato);SetIndexBuffer(2,lower);SetIndexLabel(2,"KF-σ");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,kf);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Kalman");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrLimeGreen);SetIndexBuffer(1,upper);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"KF+σ");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrTomato);SetIndexBuffer(2,lower);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"KF-σ");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("Kalman_Safe");return(0);

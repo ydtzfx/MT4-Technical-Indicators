@@ -20,8 +20,8 @@ input int InpATRPeriod=14;input double InpBaseStopMult=2.0;input double InpRRRat
 double stopATR[],takeProfit[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(0,stopATR);SetIndexLabel(0,"Stop Loss (ATR)");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,takeProfit);SetIndexLabel(1,"Take Profit (ATR)");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(0,stopATR);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"Stop Loss (ATR)");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(1,takeProfit);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Take Profit (ATR)");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,clrYellow);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_DOT);SetIndexLabel(2,"Optimal Entry");SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,clrYellow);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_DOT);SetIndexLabel(3,"Optimal Exit");SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(2);IndicatorShortName("AdaptiveSL_Safe");return(0);

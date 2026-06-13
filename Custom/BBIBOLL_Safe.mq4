@@ -29,9 +29,9 @@ input color  InpBandColor = clrRoyalBlue; // 轨线颜色
 double bbi[],upper[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpBBIColor);SetIndexBuffer(0,bbi);SetIndexLabel(0,"BBI");
-   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,InpBandColor);SetIndexBuffer(1,upper);SetIndexLabel(1,"Upper");
-   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpBandColor);SetIndexBuffer(2,lower);SetIndexLabel(2,"Lower");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpBBIColor);SetIndexBuffer(0,bbi);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"BBI");
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,InpBandColor);SetIndexBuffer(1,upper);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"Upper");
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpBandColor);SetIndexBuffer(2,lower);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"Lower");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,Cyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);

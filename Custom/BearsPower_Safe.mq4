@@ -41,6 +41,7 @@ int init()
    // 零轴线（隐藏）
    SetIndexStyle(1, DRAW_NONE);
    SetIndexBuffer(1, maBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
 
    // 买入箭头
    SetIndexStyle(2, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);

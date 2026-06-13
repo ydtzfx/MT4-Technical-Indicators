@@ -20,13 +20,13 @@ int pivotType=0; // Floor by default
 
 int init() {
    pivotType=(int)InpType;if(pivotType>2)pivotType=0;
-   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrWhite);SetIndexBuffer(0,pp);SetIndexLabel(0,"PP");
-   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,r1);SetIndexLabel(1,"R1");
-   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(2,s1);SetIndexLabel(2,"S1");
-   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,clrOrange);SetIndexBuffer(3,r2);SetIndexLabel(3,"R2");
-   SetIndexStyle(4,DRAW_LINE,STYLE_DOT,1,clrOrange);SetIndexBuffer(4,s2);SetIndexLabel(4,"S2");
-   SetIndexStyle(5,DRAW_LINE,STYLE_DOT,1,clrTomato);SetIndexBuffer(5,r3);SetIndexLabel(5,"R3");
-   SetIndexStyle(6,DRAW_LINE,STYLE_DOT,1,clrLimeGreen);SetIndexBuffer(6,s3);SetIndexLabel(6,"S3");
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrWhite);SetIndexBuffer(0,pp);SetIndexEmptyValue(0,EMPTY_VALUE);SetIndexLabel(0,"PP");
+   SetIndexStyle(1,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(1,r1);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexLabel(1,"R1");
+   SetIndexStyle(2,DRAW_LINE,STYLE_DOT,1,clrYellow);SetIndexBuffer(2,s1);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexLabel(2,"S1");
+   SetIndexStyle(3,DRAW_LINE,STYLE_DOT,1,clrOrange);SetIndexBuffer(3,r2);SetIndexEmptyValue(3,EMPTY_VALUE);SetIndexLabel(3,"R2");
+   SetIndexStyle(4,DRAW_LINE,STYLE_DOT,1,clrOrange);SetIndexBuffer(4,s2);SetIndexEmptyValue(4,EMPTY_VALUE);SetIndexLabel(4,"S2");
+   SetIndexStyle(5,DRAW_LINE,STYLE_DOT,1,clrTomato);SetIndexBuffer(5,r3);SetIndexEmptyValue(5,EMPTY_VALUE);SetIndexLabel(5,"R3");
+   SetIndexStyle(6,DRAW_LINE,STYLE_DOT,1,clrLimeGreen);SetIndexBuffer(6,s3);SetIndexEmptyValue(6,EMPTY_VALUE);SetIndexLabel(6,"S3");
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(7,buySignal);SetIndexArrow(7,ARROW_BUY);SetIndexEmptyValue(7,EMPTY_VALUE);
    SetIndexStyle(8,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(8,sellSignal);SetIndexArrow(8,ARROW_SELL);SetIndexEmptyValue(8,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("Pivot_Safe");return(0);

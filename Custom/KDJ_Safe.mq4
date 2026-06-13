@@ -41,14 +41,17 @@ int init()
 {
    SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 1, clrDodgerBlue);
    SetIndexBuffer(0, kBuffer);
+   SetIndexEmptyValue(0, EMPTY_VALUE);
    SetIndexLabel(0, "%K");
 
    SetIndexStyle(1, DRAW_LINE, STYLE_SOLID, 1, clrOrange);
    SetIndexBuffer(1, dBuffer);
+   SetIndexEmptyValue(1, EMPTY_VALUE);
    SetIndexLabel(1, "%D");
 
    SetIndexStyle(2, DRAW_LINE, STYLE_SOLID, 1, clrMagenta);
    SetIndexBuffer(2, jBuffer);
+   SetIndexEmptyValue(2, EMPTY_VALUE);
    SetIndexLabel(2, "%J");
 
    SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
