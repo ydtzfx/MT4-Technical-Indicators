@@ -11,10 +11,12 @@
 //|  4. 前期测试（多次测试后突破>首次突破）                              |
 //|  输出0-100%概率，>70%为高概率真突破                                |
 //+------------------------------------------------------------------+
+#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 #property copyright "Original Composite - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 70
@@ -22,7 +24,7 @@
 
 input int InpLookback=20;input double InpBreakThreshold=0.3; // 突破幅度(%ATR)
 
-double prob[],volConfirm[],breakStr[],buySignal[],sellSignal[];
+double prob[],volConfirm[],breakStr[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,prob);SetIndexLabel(0,"Breakout Prob %");
@@ -30,6 +32,8 @@ int init() {
    SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1,clrYellow);SetIndexBuffer(2,breakStr);SetIndexLabel(2,"Break Strength");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("BreakProb_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -77,12 +81,18 @@ int start() {
          bStr=(isUp?breakUp:-breakDn)*20;
       }
       prob[i]=MathMin(100,probVal);volConfirm[i]=volConf;breakStr[i]=bStr;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=2;i--){
-      if(prob[i+1]<=40&&prob[i]>70&&breakStr[i]>0)buySignal[i]=prob[i]-10;
-      if(prob[i+1]<=40&&prob[i]>70&&breakStr[i]<0)sellSignal[i]=prob[i]+10;
+      if(prob[i+1]<=40&&prob[i]>70){
+         // Strong signals (multi-condition confirmation) first
+         if(breakStr[i]>0&&volConfirm[i]>50&&breakStr[i]>15)strongBuy[i]=prob[i]-5;
+         if(breakStr[i]<0&&volConfirm[i]>50&&breakStr[i]<-15)strongSell[i]=prob[i]+5;
+         // Normal signals
+         if(breakStr[i]>0)buySignal[i]=prob[i]-10;
+         if(breakStr[i]<0)sellSignal[i]=prob[i]+10;
+      }
    }
-   if(Bars>0){prob[0]=prob[1];volConfirm[0]=volConfirm[1];breakStr[0]=breakStr[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){prob[0]=prob[1];volConfirm[0]=volConfirm[1];breakStr[0]=breakStr[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

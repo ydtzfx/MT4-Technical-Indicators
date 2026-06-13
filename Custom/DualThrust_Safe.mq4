@@ -10,12 +10,12 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 6
+#property indicator_buffers 8
 
 input int InpPeriod=5;input double InpK1=0.7;input double InpK2=0.7;
 input bool InpAlert=false;
 
-double buyLine[],sellLine[],upper[],lower[],buySignal[],sellSignal[];
+double buyLine[],sellLine[],upper[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_DASH,1,clrLimeGreen);SetIndexBuffer(0,buyLine);SetIndexLabel(0,"BuyLine");
@@ -24,6 +24,8 @@ int init() {
    SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(3,lower);SetIndexLabel(3,"LL");
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(4,buySignal);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(5,sellSignal);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(6,strongBuy);SetIndexArrow(6,ARROW_BUY);SetIndexLabel(6,"Strong Buy");SetIndexEmptyValue(6,EMPTY_VALUE);
+   SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(7,strongSell);SetIndexArrow(7,ARROW_SELL);SetIndexLabel(7,"Strong Sell");SetIndexEmptyValue(7,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("DualThrust_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -39,13 +41,20 @@ int start() {
       double range=MathMax(hh-lc,hc-ll);
       double open=iOpen(_Symbol,_Period,i);
       buyLine[i]=open+InpK1*range;sellLine[i]=open-InpK2*range;upper[i]=hh;lower[i]=ll;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      if(c1<=buyLine[i+1]&&c>buyLine[i]){buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;if(InpAlert)AlertBuy("DualThrust",c,"Break");}
-      if(c1>=sellLine[i+1]&&c<sellLine[i]){sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;if(InpAlert)AlertSell("DualThrust",c,"Break");}
+      double o=iOpen(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i);
+      bool isBuyBreak=c1<=buyLine[i+1]&&c>buyLine[i];
+      bool isSellBreak=c1>=sellLine[i+1]&&c<sellLine[i];
+      if(isBuyBreak){buySignal[i]=l-5*Point;if(InpAlert)AlertBuy("DualThrust",c,"Break");}
+      if(isSellBreak){sellSignal[i]=h+5*Point;if(InpAlert)AlertSell("DualThrust",c,"Break");}
+      // 强买入：突破 + 阳线实体较大 + 收盘价接近最高点
+      if(isBuyBreak&&c-o>(h-l)*0.4&&h-c<(h-l)*0.25){strongBuy[i]=l-10*Point;}
+      // 强卖出：跌破 + 阴线实体较大 + 收盘价接近最低点
+      if(isSellBreak&&o-c>(h-l)*0.4&&c-l<(h-l)*0.25){strongSell[i]=h+10*Point;}
    }
-   if(Bars>0){buyLine[0]=buyLine[1];sellLine[0]=sellLine[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){buyLine[0]=buyLine[1];sellLine[0]=sellLine[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

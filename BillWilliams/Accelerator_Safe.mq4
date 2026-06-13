@@ -10,13 +10,15 @@
 //|  信号逻辑（无未来函数）：                                          |
 //|  - 买入：AC从负转正且连续上升 (bar[1]确认)                         |
 //|  - 卖出：AC从正转负且连续下降 (bar[1]确认)                         |
+//|  - 强买：买入条件 + AO同步上升                                     |
+//|  - 强卖：卖出条件 + AO同步下降                                     |
 //|  - AC领先于AO，是加速/减速的先行指标                               |
 //+------------------------------------------------------------------+
 #property copyright "Open Source - No Future Function"
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 输入参数
 input color InpUpColor   = clrLimeGreen;
@@ -26,6 +28,8 @@ input color InpDownColor = clrTomato;
 double acBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -43,6 +47,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("AC_Safe");
@@ -89,19 +105,36 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]   = EMPTY_VALUE;
+      strongSell[i]  = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— 增强分级
    for(int i = limit; i >= 3; i--)
    {
-      // 连续上升且从负转正
-      if(acBuffer[i] > acBuffer[i+1] && acBuffer[i+1] > acBuffer[i+2] &&
-         acBuffer[i+1] < 0 && acBuffer[i] > 0)
+      // 基本买入条件
+      bool buyCross = (acBuffer[i] > acBuffer[i+1] && acBuffer[i+1] > acBuffer[i+2] &&
+                       acBuffer[i+1] < 0 && acBuffer[i] > 0);
+      // 基本卖出条件
+      bool sellCross = (acBuffer[i] < acBuffer[i+1] && acBuffer[i+1] < acBuffer[i+2] &&
+                        acBuffer[i+1] > 0 && acBuffer[i] < 0);
+
+      // 附加确认：AO（加速震荡的基础）同步确认方向
+      bool aoRising  = (aoBuffer[i] > aoBuffer[i+1]);
+      bool aoFalling = (aoBuffer[i] < aoBuffer[i+1]);
+
+      // 强买：零轴穿越 + 连续上升 + AO同步上升
+      if(buyCross && aoRising)
+         strongBuy[i] = acBuffer[i] - MathAbs(acBuffer[i] * 0.5);
+      // 普通买：零轴穿越 + 连续上升
+      else if(buyCross)
          buySignal[i] = acBuffer[i] - MathAbs(acBuffer[i] * 0.3);
 
-      // 连续下降且从正转负
-      if(acBuffer[i] < acBuffer[i+1] && acBuffer[i+1] < acBuffer[i+2] &&
-         acBuffer[i+1] > 0 && acBuffer[i] < 0)
+      // 强卖：零轴穿越 + 连续下降 + AO同步下降
+      if(sellCross && aoFalling)
+         strongSell[i] = acBuffer[i] + MathAbs(acBuffer[i] * 0.5);
+      // 普通卖：零轴穿越 + 连续下降
+      else if(sellCross)
          sellSignal[i] = acBuffer[i] + MathAbs(acBuffer[i] * 0.3);
    }
 

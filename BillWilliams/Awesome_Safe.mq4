@@ -12,12 +12,14 @@
 //|  - 买入2：AO连续3根上升且从零下到零上（碟形买入）                  |
 //|  - 卖出1：AO下穿零轴 (bar[1]确认)                                 |
 //|  - 卖出2：AO连续3根下降且从零上到零下（碟形卖出）                  |
+//|  - 强买入：零轴穿越 + 穿越前已在负区蓄力上涨（动量确认）           |
+//|  - 强卖出：零轴穿越 + 穿越前已在正区蓄力下跌（动量确认）           |
 //+------------------------------------------------------------------+
 #property copyright "Open Source - No Future Function"
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 输入参数
 input color InpUpColor   = clrLimeGreen;
@@ -27,6 +29,8 @@ input color  InpDownColor = clrTomato;
 double aoBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -45,6 +49,16 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
 
+   SetIndexBuffer(3, strongBuy);
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexArrow(3, 233);
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexBuffer(4, strongSell);
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexArrow(4, 234);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
+
    IndicatorDigits(4);
    IndicatorShortName("AO_Safe");
    return(0);
@@ -61,7 +75,8 @@ int start()
    if(limit > Bars - 2) limit = Bars - 100;
    if(limit < 0) limit = 0;
 
-   for(int i = limit; i >= 0; i--)
+   // Step 1: 计算历史数据 (bar[1]+)，清空信号缓冲区
+   for(int i = limit; i >= 1; i--)
    {
       // 计算5周期SMA和34周期SMA
       double sum5 = 0.0, sum34 = 0.0;
@@ -79,30 +94,67 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // Step 2: 信号生成（bar[1]+确认）— 多条件强信号优先
    for(int i = limit; i >= 3; i--)
    {
-      // AO上穿零轴
-      if(aoBuffer[i+1] < 0 && aoBuffer[i] > 0)
+      // ---- 买入信号 ----
+      bool crossUp    = (aoBuffer[i+1] < 0 && aoBuffer[i] > 0);
+      bool saucerBuy  = (aoBuffer[i] > aoBuffer[i+1] && aoBuffer[i+1] > aoBuffer[i+2] &&
+                         aoBuffer[i] > aoBuffer[i+3] &&
+                         aoBuffer[i] < 0 && aoBuffer[i+1] < 0);
+
+      if(crossUp)
+      {
+         // 强买入：零轴穿越 + 穿越前已在负区蓄力上涨
+         if(aoBuffer[i+1] > aoBuffer[i+2] && aoBuffer[i+2] < 0)
+            strongBuy[i] = aoBuffer[i] - MathAbs(aoBuffer[i] * 0.3);
+         else
+            buySignal[i] = aoBuffer[i] - MathAbs(aoBuffer[i] * 0.2);
+      }
+      else if(saucerBuy)
+      {
          buySignal[i] = aoBuffer[i] - MathAbs(aoBuffer[i] * 0.2);
+      }
 
-      // AO下穿零轴
-      if(aoBuffer[i+1] > 0 && aoBuffer[i] < 0)
+      // ---- 卖出信号 ----
+      bool crossDown  = (aoBuffer[i+1] > 0 && aoBuffer[i] < 0);
+      bool saucerSell = (aoBuffer[i] < aoBuffer[i+1] && aoBuffer[i+1] < aoBuffer[i+2] &&
+                         aoBuffer[i] < aoBuffer[i+3] &&
+                         aoBuffer[i] > 0 && aoBuffer[i+1] > 0);
+
+      if(crossDown)
+      {
+         // 强卖出：零轴穿越 + 穿越前已在正区蓄力下跌
+         if(aoBuffer[i+1] < aoBuffer[i+2] && aoBuffer[i+2] > 0)
+            strongSell[i] = aoBuffer[i] + MathAbs(aoBuffer[i] * 0.3);
+         else
+            sellSignal[i] = aoBuffer[i] + MathAbs(aoBuffer[i] * 0.2);
+      }
+      else if(saucerSell)
+      {
          sellSignal[i] = aoBuffer[i] + MathAbs(aoBuffer[i] * 0.2);
+      }
+   }
 
-      // 碟形买入：连续3根上升且仍为零下
-      if(aoBuffer[i] > aoBuffer[i+1] && aoBuffer[i+1] > aoBuffer[i+2] &&
-         aoBuffer[i] > aoBuffer[i+3] &&
-         aoBuffer[i] < 0 && aoBuffer[i+1] < 0)
-         buySignal[i] = aoBuffer[i] - MathAbs(aoBuffer[i] * 0.2);
-
-      // 碟形卖出：连续3根下降且仍为零上
-      if(aoBuffer[i] < aoBuffer[i+1] && aoBuffer[i+1] < aoBuffer[i+2] &&
-         aoBuffer[i] < aoBuffer[i+3] &&
-         aoBuffer[i] > 0 && aoBuffer[i+1] > 0)
-         sellSignal[i] = aoBuffer[i] + MathAbs(aoBuffer[i] * 0.2);
+   // Step 3: bar[0] — 只更新显示值，不产生任何信号
+   if(Bars > 0)
+   {
+      double sum5_0 = 0.0, sum34_0 = 0.0;
+      for(int j = 0; j < 34; j++)
+      {
+         double median0 = (iHigh(_Symbol, _Period, j) + iLow(_Symbol, _Period, j)) / 2.0;
+         sum34_0 += median0;
+         if(j < 5) sum5_0 += median0;
+      }
+      aoBuffer[0] = sum5_0 / 5.0 - sum34_0 / 34.0;
+      buySignal[0]  = EMPTY_VALUE;
+      sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

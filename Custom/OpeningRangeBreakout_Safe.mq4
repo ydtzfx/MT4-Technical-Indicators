@@ -10,11 +10,11 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 6
+#property indicator_buffers 8
 
 input int InpORMinutes=30; // 开盘区间分钟数（需要对应周期合理设置）
 
-double orHigh[],orLow[],orMid[],buySignal[],sellSignal[],expansion[];
+double orHigh[],orLow[],orMid[],buySignal[],sellSignal[],expansion[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,orHigh);SetIndexLabel(0,"OR High");
@@ -23,6 +23,8 @@ int init() {
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
    SetIndexStyle(5,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(5,expansion);SetIndexLabel(5,"Expansion");
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(6,strongBuy);SetIndexArrow(6,ARROW_BUY);SetIndexEmptyValue(6,EMPTY_VALUE);SetIndexLabel(6,"Strong Buy");
+   SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(7,strongSell);SetIndexArrow(7,ARROW_SELL);SetIndexEmptyValue(7,EMPTY_VALUE);SetIndexLabel(7,"Strong Sell");
    IndicatorDigits(4);IndicatorShortName("ORB_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -45,18 +47,35 @@ int start() {
          orHigh[i]=orH;orLow[i]=orL;orMid[i]=(orH+orL)/2;
       }
       expansion[i]=(orHigh[i]-orLow[i])/Point; // OR宽度（点数）
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
 
    for(int i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
+
+      // 计算近N个OR的平均宽度，用于判断当前OR是否"够宽"
+      int avgBars=5; double sumExp=0; int cnt=0;
+      for(int k=i+1;k<=i+avgBars&&k<Bars;k++){if(expansion[k]>=0){sumExp+=expansion[k];cnt++;}}
+      double avgExp=cnt>0?sumExp/cnt:0;
+
+      // ---- 常规信号 ----
       // 突破OR高点
-      if(c1<=orHigh[i+1]&&c>orHigh[i])buySignal[i]=orMid[i];
+      if(c1<=orHigh[i+1]&&c>orHigh[i]){
+         buySignal[i]=orMid[i];
+         // Strong: 条件A(突破) + 条件B(OR宽度≥平均80%) + 条件C(收盘在OR高+10%OR宽度之上)
+         if(expansion[i]>=avgExp*0.8&&c>orHigh[i]+expansion[i]*0.1*Point)
+            strongBuy[i]=orMid[i]+5*Point;
+      }
       // 跌破OR低点
-      if(c1>=orLow[i+1]&&c<orLow[i])sellSignal[i]=orMid[i];
-      // 回踩OR中位
+      if(c1>=orLow[i+1]&&c<orLow[i]){
+         sellSignal[i]=orMid[i];
+         // Strong: 条件A(跌破) + 条件B(OR宽度≥平均80%) + 条件C(收盘在OR低-10%OR宽度之下)
+         if(expansion[i]>=avgExp*0.8&&c<orLow[i]-expansion[i]*0.1*Point)
+            strongSell[i]=orMid[i]-5*Point;
+      }
+      // 回踩OR中位（仅常规信号）
       if(c>orHigh[i]&&c1<=orMid[i+1]&&c>orMid[i])buySignal[i]=orMid[i]-5*Point;
    }
-   if(Bars>0){orHigh[0]=orHigh[1];orLow[0]=orLow[1];orMid[0]=orMid[1];expansion[0]=expansion[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){orHigh[0]=orHigh[1];orLow[0]=orLow[1];orMid[0]=orMid[1];expansion[0]=expansion[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

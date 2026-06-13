@@ -19,14 +19,14 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 input int    InpBBIPeriod = 11;     // BBI标准差周期
 input double InpK = 2.0;            // 宽度倍数
 input color  InpBBIColor = clrOrange;   // BBI颜色
 input color  InpBandColor = clrRoyalBlue; // 轨线颜色
 
-double bbi[],upper[],lower[],buySignal[],sellSignal[];
+double bbi[],upper[],lower[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpBBIColor);SetIndexBuffer(0,bbi);SetIndexLabel(0,"BBI");
@@ -34,6 +34,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpBandColor);SetIndexBuffer(2,lower);SetIndexLabel(2,"Lower");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,Cyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,DeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("BBIBOLL_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -56,16 +58,26 @@ int start() {
       double sdSum=0;for(int j=0;j<InpBBIPeriod;j++)sdSum+=(bbiVals[j]-bbi[i])*(bbiVals[j]-bbi[i]);
       double stdDev=MathSqrt(sdSum/InpBBIPeriod);
       upper[i]=bbi[i]+InpK*stdDev;lower[i]=bbi[i]-InpK*stdDev;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号（bar[1]+确认）
    for(int i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // 从下轨下方回升+BBI走平或上翘 → 买入
-      if(c1<=lower[i+1]&&c>lower[i]&&bbi[i]>=bbi[i+1])buySignal[i]=iLow(_Symbol,_Period,i)-10*Point;
+      if(c1<=lower[i+1]&&c>lower[i]&&bbi[i]>=bbi[i+1]) {
+         buySignal[i]=iLow(_Symbol,_Period,i)-10*Point;
+         // 强化买入：布林带扩展(带宽增大)或BBI明显上翘(>1Point)
+         if((upper[i]-lower[i])>(upper[i+1]-lower[i+1])||(bbi[i]-bbi[i+1])>Point)
+            strongBuy[i]=buySignal[i];
+      }
       // 从上轨上方回落+BBI走平或下倾 → 卖出
-      if(c1>=upper[i+1]&&c<upper[i]&&bbi[i]<=bbi[i+1])sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;
+      if(c1>=upper[i+1]&&c<upper[i]&&bbi[i]<=bbi[i+1]) {
+         sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;
+         // 强化卖出：布林带扩展(带宽增大)或BBI明显下倾(>1Point)
+         if((upper[i]-lower[i])>(upper[i+1]-lower[i+1])||(bbi[i+1]-bbi[i])>Point)
+            strongSell[i]=sellSignal[i];
+      }
    }
-   if(Bars>0){bbi[0]=bbi[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){bbi[0]=bbi[1];upper[0]=upper[1];lower[0]=lower[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

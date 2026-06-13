@@ -20,7 +20,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int    InpFIPeriod = 13;           // EMA周期
 input ENUM_MA_METHOD_SAFE InpMAMethod = MA_EMA; // 平滑方式
@@ -29,6 +29,8 @@ input ENUM_MA_METHOD_SAFE InpMAMethod = MA_EMA; // 平滑方式
 double fiBuffer[];      // Force Index主线（柱状图）
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号（多条件确认）
+double strongSell[];    // 强卖出信号（多条件确认）
 
 //+------------------------------------------------------------------+
 int init()
@@ -49,6 +51,18 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, CLR_STRONG_BUY);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);  // 上箭头
+   SetIndexLabel(3, "Strong Buy Signal");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, CLR_STRONG_SELL);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);  // 下箭头
+   SetIndexLabel(4, "Strong Sell Signal");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("ForceIndex_Safe(" + IntegerToString(InpFIPeriod) + ")");
@@ -94,28 +108,61 @@ int start()
       else
          fiBuffer[i] = 0.0;
 
-      buySignal[i]  = EMPTY_VALUE;
-      sellSignal[i] = EMPTY_VALUE;
+      buySignal[i]   = EMPTY_VALUE;
+      sellSignal[i]  = EMPTY_VALUE;
+      strongBuy[i]   = EMPTY_VALUE;
+      strongSell[i]  = EMPTY_VALUE;
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // FI零轴穿越
-      if(fiBuffer[i + 1] < 0.0 && fiBuffer[i] > 0.0)
+      // --- 强信号：多条件确认（任意满足2条即强信号）---
+      // 条件A：FI零轴穿越
+      bool crossBuy  = (fiBuffer[i + 1] < 0.0 && fiBuffer[i] > 0.0);
+      bool crossSell = (fiBuffer[i + 1] > 0.0 && fiBuffer[i] < 0.0);
+
+      // 条件B：成交量激增（当前量 > 前一根量 * 1.5）
+      long volNow = iVolume(_Symbol, _Period, i);
+      long volPrev = iVolume(_Symbol, _Period, i + 1);
+      bool volSurge = (volNow > volPrev * 1.5);
+
+      // 条件C：FI绝对值超过阈值（近期均值的2倍），表示极端动量
+      double absFI = MathAbs(fiBuffer[i]);
+      double refFI = MathMax(MathAbs(fiBuffer[i + 1]), MathAbs(fiBuffer[i + 2]));
+      bool extremeFI = (absFI > refFI * 2.0 && refFI > 0.0);
+
+      // 条件D：背离确认
+      double priceI   = iClose(_Symbol, _Period, i);
+      double priceI3  = iClose(_Symbol, _Period, i + 3);
+      bool diverBuy   = (priceI < priceI3 && fiBuffer[i] > fiBuffer[i + 3]);
+      bool diverSell  = (priceI > priceI3 && fiBuffer[i] < fiBuffer[i + 3]);
+
+      // 强买入：crossBuy + (volSurge 或 extremeFI 或 diverBuy)
+      int buyStrength = (crossBuy ? 1 : 0) + (volSurge ? 1 : 0)
+                      + (extremeFI ? 1 : 0) + (diverBuy ? 1 : 0);
+      if(buyStrength >= 2)
+         strongBuy[i] = fiBuffer[i] * 0.6;
+
+      // 强卖出：crossSell + (volSurge 或 extremeFI 或 diverSell)
+      int sellStrength = (crossSell ? 1 : 0) + (volSurge ? 1 : 0)
+                       + (extremeFI ? 1 : 0) + (diverSell ? 1 : 0);
+      if(sellStrength >= 2)
+         strongSell[i] = fiBuffer[i] * 1.6;
+
+      // FI零轴穿越（普通信号）
+      if(crossBuy && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = fiBuffer[i] * 0.5;
 
-      if(fiBuffer[i + 1] > 0.0 && fiBuffer[i] < 0.0)
+      if(crossSell && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = fiBuffer[i] * 1.5;
 
-      // 底背离：价格新低但FI回升（多方力量积累）
-      double priceI  = iClose(_Symbol, _Period, i);
-      double priceI3 = iClose(_Symbol, _Period, i + 3);
-      if(priceI < priceI3 && fiBuffer[i] > fiBuffer[i + 3])
+      // 底背离（普通信号，未被强信号覆盖时）
+      if(diverBuy && strongBuy[i] == EMPTY_VALUE)
          buySignal[i] = fiBuffer[i] * 0.5;
 
-      // 顶背离：价格新高但FI下降（多方力量衰竭）
-      if(priceI > priceI3 && fiBuffer[i] < fiBuffer[i + 3])
+      // 顶背离（普通信号，未被强信号覆盖时）
+      if(diverSell && strongSell[i] == EMPTY_VALUE)
          sellSignal[i] = fiBuffer[i] * 1.5;
    }
 
@@ -125,6 +172,8 @@ int start()
       fiBuffer[0] = fiBuffer[1];
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

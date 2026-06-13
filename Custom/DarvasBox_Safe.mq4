@@ -9,17 +9,19 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 input int InpSwingPeriod=10;
 
-double boxHi[],boxLo[],buySignal[],sellSignal[];
+double boxHi[],boxLo[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,boxHi);SetIndexLabel(0,"Box High");
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,boxLo);SetIndexLabel(1,"Box Low");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("DarvasBox_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -37,13 +39,22 @@ int start() {
          currentBoxHi=h;double l=iLow(_Symbol,_Period,i);for(int j=1;j<=InpSwingPeriod&&(i-j>=0);j++){if(iLow(_Symbol,_Period,i-j)<l)l=iLow(_Symbol,_Period,i-j);}
          currentBoxLo=l;
       }
-      if(i<=limit){boxHi[i]=currentBoxHi;boxLo[i]=currentBoxLo;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+      if(i<=limit){boxHi[i]=currentBoxHi;boxLo[i]=currentBoxLo;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    }
    for(int i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      if(c1<=boxHi[i+1]&&c>boxHi[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
-      if(c1>=boxLo[i+1]&&c<boxLo[i])sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
+      double hb=iHigh(_Symbol,_Period,i),lb=iLow(_Symbol,_Period,i);
+      // Average range over swing period for momentum confirmation
+      double avgRange=0;int rCount=0;
+      for(int k=1;k<=InpSwingPeriod&&(i+k-1<Bars);k++){avgRange+=iHigh(_Symbol,_Period,i+k-1)-iLow(_Symbol,_Period,i+k-1);rCount++;}
+      if(rCount>0)avgRange/=rCount;
+      double barRange=hb-lb;
+      // Normal signals
+      if(c1<=boxHi[i+1]&&c>boxHi[i]){buySignal[i]=lb-5*Point;
+         if(barRange>=1.3*avgRange)strongBuy[i]=lb-8*Point;}
+      if(c1>=boxLo[i+1]&&c<boxLo[i]){sellSignal[i]=hb+5*Point;
+         if(barRange>=1.3*avgRange)strongSell[i]=hb+8*Point;}
    }
-   if(Bars>0){boxHi[0]=boxHi[1];boxLo[0]=boxLo[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){boxHi[0]=boxHi[1];boxLo[0]=boxLo[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

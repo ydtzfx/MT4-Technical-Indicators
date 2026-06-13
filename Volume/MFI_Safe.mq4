@@ -19,7 +19,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 80
@@ -34,6 +34,8 @@ input double InpOversold   = 20.0;
 double mfiBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];   // 强买入信号（多条件确认，含成交量验证）
+double strongSell[];  // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
@@ -51,6 +53,20 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强买入信号（更大箭头，多条件确认）
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   // 强卖出信号（更大箭头，多条件确认）
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("MFI_Safe(" + IntegerToString(InpMFIPeriod) + ")");
@@ -116,15 +132,56 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）—— 含多条件强信号分级
    for(int i = limit; i >= 1; i--)
    {
+      int buyConditions = 0, sellConditions = 0;
+
+      // ---- 条件1：标准超卖/超买区退出 ----
       if(mfiBuffer[i+1] <= InpOversold && mfiBuffer[i] > InpOversold)
-         buySignal[i] = 5.0;
+         { buySignal[i] = 5.0; buyConditions++; }
       if(mfiBuffer[i+1] >= InpOverbought && mfiBuffer[i] < InpOverbought)
-         sellSignal[i] = 95.0;
+         { sellSignal[i] = 95.0; sellConditions++; }
+
+      // ---- 条件2：成交量激增确认 ----
+      // 计算当前成交量与过去N期均量对比
+      double avgVol = 0.0;
+      for(int v = 1; v <= InpMFIPeriod; v++)
+         avgVol += iVolume(_Symbol, _Period, i + v);
+      avgVol /= InpMFIPeriod;
+      double currVol = iVolume(_Symbol, _Period, i);
+      bool volumeSurge = (avgVol > 0.0 && currVol > avgVol * 1.5);
+
+      if(volumeSurge && buySignal[i] != EMPTY_VALUE)
+         buyConditions++;
+      if(volumeSurge && sellSignal[i] != EMPTY_VALUE)
+         sellConditions++;
+
+      // ---- 条件3：极端区域（超过常规OB/OS阈值） ----
+      // 检查之前是否进入过更深度的超卖/超买区
+      if(mfiBuffer[i+1] <= InpOversold * 0.5 && mfiBuffer[i] > InpOversold * 0.5)
+         { buySignal[i] = 5.0; buyConditions += 2; }  // 深度超卖回升，权重加2
+      if(mfiBuffer[i+1] >= 100.0 - (100.0 - InpOverbought) * 0.5 && mfiBuffer[i] < 100.0 - (100.0 - InpOverbought) * 0.5)
+         { sellSignal[i] = 95.0; sellConditions += 2; }
+
+      // ---- 条件4：价格行为确认 ----
+      // 买入：阳线且收盘接近最高；卖出：阴线且收盘接近最低
+      double open  = iOpen(_Symbol, _Period, i);
+      double close = iClose(_Symbol, _Period, i);
+      if(close > open && buySignal[i] != EMPTY_VALUE)
+         buyConditions++;
+      if(close < open && sellSignal[i] != EMPTY_VALUE)
+         sellConditions++;
+
+      // ---- 综合评估：3+条件为强信号 ----
+      if(buyConditions >= 3)
+         strongBuy[i] = 5.0;
+      if(sellConditions >= 3)
+         strongSell[i] = 95.0;
    }
 
    return(0);

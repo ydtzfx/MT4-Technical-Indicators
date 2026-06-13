@@ -10,17 +10,19 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 input int InpFast=34,InpSlow=55,InpSignal=13;
 
-double koBuffer[],signalBuffer[],buySignal[],sellSignal[];
+double koBuffer[],signalBuffer[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrDodgerBlue);SetIndexBuffer(0,koBuffer);SetIndexLabel(0,"KO");
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrRed);SetIndexBuffer(1,signalBuffer);SetIndexLabel(1,"Signal");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("KO_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -40,7 +42,7 @@ int start() {
    for(int i=limit;i>=1;i--) {
       double eF=vf[i+InpSlow],eS=vf[i+InpSlow];
       for(int j=InpSlow-1;j>=0;j--){eF=vf[i+j]*aF+eF*(1-aF);eS=vf[i+j]*aS+eS*(1-aS);}
-      koBuffer[i]=eF-eS;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      koBuffer[i]=eF-eS;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    double aSig=2.0/(InpSignal+1);
    for(int i=limit;i>=1;i--) {
@@ -48,10 +50,22 @@ int start() {
       signalBuffer[i]=e;
    }
    for(int i=limit;i>=1;i--) {
-      if(koBuffer[i+1]<=signalBuffer[i+1]&&koBuffer[i]>signalBuffer[i])buySignal[i]=koBuffer[i]*0.8;
-      if(koBuffer[i+1]>=signalBuffer[i+1]&&koBuffer[i]<signalBuffer[i])sellSignal[i]=koBuffer[i]*1.2;
-      if(koBuffer[i+1]<0&&koBuffer[i]>0)buySignal[i]=koBuffer[i]*0.5;
+      // Strong signals — multi-condition volume-specific confirmation
+      bool koCrossAboveSignal=(koBuffer[i+1]<=signalBuffer[i+1]&&koBuffer[i]>signalBuffer[i]);
+      bool koCrossBelowSignal=(koBuffer[i+1]>=signalBuffer[i+1]&&koBuffer[i]<signalBuffer[i]);
+      bool koCrossAboveZero=(koBuffer[i+1]<0&&koBuffer[i]>0);
+      bool koCrossBelowZero=(koBuffer[i+1]>0&&koBuffer[i]<0);
+
+      if((koCrossAboveSignal&&koCrossAboveZero)||(koCrossAboveSignal&&koBuffer[i+1]<(-MathAbs(koBuffer[i+1])*0.5)))
+         strongBuy[i]=koBuffer[i]*0.7;
+      if((koCrossBelowSignal&&koCrossBelowZero)||(koCrossBelowSignal&&koBuffer[i+1]>MathAbs(koBuffer[i+1])*0.5))
+         strongSell[i]=koBuffer[i]*1.3;
+
+      // Normal signals
+      if(koCrossAboveSignal)buySignal[i]=koBuffer[i]*0.8;
+      if(koCrossBelowSignal)sellSignal[i]=koBuffer[i]*1.2;
+      if(koCrossAboveZero)buySignal[i]=koBuffer[i]*0.5;
    }
-   if(Bars>0){koBuffer[0]=koBuffer[1];signalBuffer[0]=signalBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){koBuffer[0]=koBuffer[1];signalBuffer[0]=signalBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

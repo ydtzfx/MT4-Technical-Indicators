@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 
 // 输入参数
 input int InpJawPeriod   = 13;   // 下巴周期
@@ -32,6 +32,8 @@ double upBarBuffer[];     // 上行柱（Lips - Teeth）
 double downBarBuffer[];   // 下行柱（-(Jaw - Teeth)）
 double buySignal[];
 double sellSignal[];
+double strongBuySignal[];
+double strongSellSignal[];
 
 // 内部计算的缓冲区
 double jawBuffer[];
@@ -58,6 +60,16 @@ int init()
    SetIndexBuffer(3, sellSignal);
    SetIndexArrow(3, ARROW_SELL);
    SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(5, strongBuySignal);
+   SetIndexArrow(5, ARROW_BUY);
+   SetIndexEmptyValue(5, EMPTY_VALUE);
+
+   SetIndexStyle(6, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(6, strongSellSignal);
+   SetIndexArrow(6, ARROW_SELL);
+   SetIndexEmptyValue(6, EMPTY_VALUE);
 
    // 内部缓冲区
    SetIndexBuffer(4, jawBuffer);
@@ -115,8 +127,10 @@ int start()
       // 下柱：-(Jaw - Teeth)
       downBarBuffer[i] = diffJawTeeth;
 
-      buySignal[i]  = EMPTY_VALUE;
-      sellSignal[i] = EMPTY_VALUE;
+      buySignal[i]       = EMPTY_VALUE;
+      sellSignal[i]      = EMPTY_VALUE;
+      strongBuySignal[i]  = EMPTY_VALUE;
+      strongSellSignal[i] = EMPTY_VALUE;
    }
 
    // 信号：鳄鱼苏醒检测（bar[1]+）
@@ -128,10 +142,27 @@ int start()
       // 柱体急速增长 = 鳄鱼苏醒
       if(prevUpHeight < Point * 3 && currUpHeight >= Point * 5)
       {
+         // 强信号：多条件确认
+         // Cond1: 柱体急速增长（已由外层条件满足）
+         // Cond2: 极限增长柱体 >= 8点
+         // Cond3: 两侧柱体同步扩张（鳄鱼上下颚同时打开）
+         bool isExtremeGrowth = (currUpHeight >= Point * 8);
+         bool bothJawsOpening = (MathAbs(downBarBuffer[i]) > MathAbs(downBarBuffer[i+1]) * 1.5);
+
          if(upBarBuffer[i] > 0)
-            buySignal[i] = downBarBuffer[i] * 0.5;
+         {
+            if(isExtremeGrowth && bothJawsOpening)
+               strongBuySignal[i] = downBarBuffer[i] * 0.5;
+            else
+               buySignal[i] = downBarBuffer[i] * 0.5;
+         }
          else
-            sellSignal[i] = downBarBuffer[i] * 1.5;
+         {
+            if(isExtremeGrowth && bothJawsOpening)
+               strongSellSignal[i] = downBarBuffer[i] * 1.5;
+            else
+               sellSignal[i] = downBarBuffer[i] * 1.5;
+         }
       }
    }
 

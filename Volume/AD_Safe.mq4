@@ -15,12 +15,14 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 指标缓冲区
 double adBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -38,6 +40,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("AD_Safe");
@@ -83,14 +97,34 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // 背离信号（bar[1]+确认）
+   // 背离信号（bar[1]+确认），含强信号分级
    for(int i = limit; i >= 3; i--)
    {
       double close_i  = iClose(_Symbol, _Period, i);
       double close_i3 = iClose(_Symbol, _Period, i + 3);
 
+      // --- 强信号：多条件确认 ---
+      // 成交量激增判断：当前成交量 > 1.5倍前5根均值
+      double avgVol = (iVolume(_Symbol, _Period, i+1)
+                     + iVolume(_Symbol, _Period, i+2)
+                     + iVolume(_Symbol, _Period, i+3)
+                     + iVolume(_Symbol, _Period, i+4)
+                     + iVolume(_Symbol, _Period, i+5)) / 5.0;
+      bool volumeSurge = (avgVol > 0.00000001 && iVolume(_Symbol, _Period, i) > avgVol * 1.5);
+
+      // 强买入：底背离 + 成交量激增 + AD负值（低位累积）
+      if(close_i < close_i3 && adBuffer[i] > adBuffer[i+3] && volumeSurge && adBuffer[i] < 0.0)
+         strongBuy[i] = adBuffer[i] * 0.90;
+
+      // 强卖出：顶背离 + 成交量激增 + AD正值（高位派发）
+      if(close_i > close_i3 && adBuffer[i] < adBuffer[i+3] && volumeSurge && adBuffer[i] > 0.0)
+         strongSell[i] = adBuffer[i] * 1.10;
+
+      // 正常信号（单条件）
       // 底背离
       if(close_i < close_i3 && adBuffer[i] > adBuffer[i+3])
          buySignal[i] = adBuffer[i] * 0.95;
@@ -99,6 +133,10 @@ int start()
       if(close_i > close_i3 && adBuffer[i] < adBuffer[i+3])
          sellSignal[i] = adBuffer[i] * 1.05;
    }
+
+   // bar[0] 仅显示更新，不产生信号
+   strongBuy[0]  = EMPTY_VALUE;
+   strongSell[0] = EMPTY_VALUE;
 
    return(0);
 }

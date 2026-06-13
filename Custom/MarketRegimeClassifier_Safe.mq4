@@ -10,7 +10,7 @@
 #property copyright "Original Composite - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_minimum 0
 #property indicator_maximum 4
 #property indicator_level1 1
@@ -19,7 +19,7 @@
 
 input int InpADXPeriod=14;input int InpBBPeriod=20;input int InpMAPeriod=20;
 
-double regime[],trendStr[],volatility[],buySignal[],sellSignal[];
+double regime[],trendStr[],volatility[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,regime);SetIndexLabel(0,"Regime");
@@ -27,6 +27,8 @@ int init() {
    SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,2,clrGray);SetIndexBuffer(2,volatility);SetIndexLabel(2,"Volatility");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexLabel(5,"Strong Buy");SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexLabel(6,"Strong Sell");SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("Regime_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -65,13 +67,16 @@ int start() {
       }else if(posVsMA>0)regVal=2.5;else regVal=1.5;
 
       regime[i]=regVal;trendStr[i]=adx;volatility[i]=bbw;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号：状态从盘整或下跌转为上涨
    for(int i=limit;i>=2;i--){
       if(regime[i+1]<=2&&regime[i]>2.5&&trendStr[i]>20)buySignal[i]=1;
       if(regime[i+1]>=2&&regime[i]<1.5&&trendStr[i]>20)sellSignal[i]=3;
+      // 强信号：状态直接跃升到强趋势区域+强趋势强度
+      if(regime[i+1]<=2&&regime[i]>3.5&&trendStr[i]>35)strongBuy[i]=1;
+      if(regime[i+1]>=2&&regime[i]<0.5&&trendStr[i]>35)strongSell[i]=3;
    }
-   if(Bars>0){regime[0]=regime[1];trendStr[0]=trendStr[1];volatility[0]=volatility[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){regime[0]=regime[1];trendStr[0]=trendStr[1];volatility[0]=volatility[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

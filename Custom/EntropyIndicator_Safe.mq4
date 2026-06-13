@@ -10,12 +10,12 @@
 #property copyright "Original - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_level1 2.5
 
 input int InpPeriod=20;input int InpBins=8; // 价格变化分桶数
 
-double entropy[],smoothEntropy[],change[],buySignal[],sellSignal[];
+double entropy[],smoothEntropy[],change[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,entropy);SetIndexLabel(0,"Entropy");
@@ -23,6 +23,8 @@ int init() {
    SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,1);SetIndexBuffer(2,change);SetIndexLabel(2,"ΔEntropy");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+	   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(5,strongBuy);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
+	   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(6,strongSell);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(3);IndicatorShortName("Entropy_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -46,7 +48,7 @@ int start() {
       // 计算香农熵
       double H=0;for(int b=0;b<InpBins;b++){if(bins[b]>0){double p=bins[b]/InpPeriod;H-=p*MathLog(p)/MathLog(2);}}
       entropy[i]=H;change[i]=entropy[i+1]-entropy[i]; // 正=熵下降（有序化）
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<5;j++)s+=entropy[i+j];smoothEntropy[i]=s/5;}
 
@@ -56,7 +58,13 @@ int start() {
       if(entropy[i+2]>2.5&&entropy[i]<1.8&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+3))sellSignal[i]=entropy[i]+0.2;
       // 熵从低位急升 = 趋势结束进入混沌
       if(entropy[i+1]<1.5&&entropy[i]>2.2)sellSignal[i]=entropy[i]+0.2;
+      // Strong: base buy + change>0(ordering) + deeper threshold(tighter order)
+      if(entropy[i+2]>2.5&&entropy[i]<1.8&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+3)&&change[i]>0&&entropy[i]<1.5)strongBuy[i]=entropy[i]-0.3;
+      // Strong: base sell(trend) + change>0 + deeper threshold
+      if(entropy[i+2]>2.5&&entropy[i]<1.8&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+3)&&change[i]>0&&entropy[i]<1.5)strongSell[i]=entropy[i]+0.3;
+      // Strong: base sell(trend-end) + change<0(entropy rising) + price declining
+      if(entropy[i+1]<1.5&&entropy[i]>2.2&&change[i]<0&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+2))strongSell[i]=entropy[i]+0.3;
    }
-   if(Bars>0){entropy[0]=entropy[1];smoothEntropy[0]=smoothEntropy[1];change[0]=change[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){entropy[0]=entropy[1];smoothEntropy[0]=smoothEntropy[1];change[0]=change[1];buySignal[0]=sellSignal[0]=strongBuy[0]=strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

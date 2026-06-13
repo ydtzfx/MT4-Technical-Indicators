@@ -19,7 +19,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 9
+#property indicator_buffers 11
 
 input int  InpDayBars = 24;     // 日级K线数（H1=24, H4=6, D1=1）
 input bool InpShowExtended = true; // 显示R3/S3扩展线
@@ -29,7 +29,7 @@ input color InpR2S2Color = clrOrange;
 input color InpR3Color = clrTomato;
 input color InpS3Color = clrLimeGreen;
 
-double cdp[],r1[],s1[],r2[],s2[],r3[],s3[],buySignal[],sellSignal[];
+double cdp[],r1[],s1[],r2[],s2[],r3[],s3[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpCDPColor);SetIndexBuffer(0,cdp);SetIndexLabel(0,"CDP");
@@ -41,6 +41,8 @@ int init() {
    SetIndexStyle(6,DRAW_LINE,STYLE_DOT,1,InpS3Color);SetIndexBuffer(6,s3);SetIndexLabel(6,"S3");
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(7,buySignal);SetIndexArrow(7,ARROW_BUY);SetIndexEmptyValue(7,EMPTY_VALUE);
    SetIndexStyle(8,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(8,sellSignal);SetIndexArrow(8,ARROW_SELL);SetIndexEmptyValue(8,EMPTY_VALUE);
+   SetIndexStyle(9,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(9,strongBuy);SetIndexArrow(9,ARROW_BUY);SetIndexLabel(9,"Strong Buy");SetIndexEmptyValue(9,EMPTY_VALUE);
+   SetIndexStyle(10,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(10,strongSell);SetIndexArrow(10,ARROW_SELL);SetIndexLabel(10,"Strong Sell");SetIndexEmptyValue(10,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("CDP_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -50,7 +52,7 @@ int start() {
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
 
    // 初始化缓冲区
-   for(int i=limit;i>=0;i--){cdp[i]=0;r1[i]=0;s1[i]=0;r2[i]=0;s2[i]=0;r3[i]=0;s3[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+   for(int i=limit;i>=0;i--){cdp[i]=0;r1[i]=0;s1[i]=0;r2[i]=0;s2[i]=0;r3[i]=0;s3[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
 
    // 计算每个"日"周期的CDP及支撑阻力位
    for(int i=limit+InpDayBars;i>=InpDayBars;i--) {
@@ -66,16 +68,24 @@ int start() {
       if(InpShowExtended){r3[i]=h+2*(pivot-l);s3[i]=l-2*(h-pivot);}
    }
 
-   // 信号（bar[1]+确认）
+   // 信号（bar[1]+确认）— strong优先
    for(int i=limit;i>=1;i--) {
       double close=iClose(_Symbol,_Period,i),close1=iClose(_Symbol,_Period,i+1);
+      // === 强买：突破R2（最强阻力位）===
+      if(close1<=r2[i+1]&&close>r2[i])strongBuy[i]=s2[i]-10*Point;
+      // === 强买：突破R1且之前已在CDP之上（持续强势）===
+      else if(close1>cdp[i+1]&&close1<=r1[i+1]&&close>r1[i])strongBuy[i]=s1[i]-10*Point;
+      // === 强卖：跌破S2（最强支撑位）===
+      if(close1>=s2[i+1]&&close<s2[i])strongSell[i]=r2[i]+10*Point;
+      // === 强卖：跌破S1且之前已在CDP之下（持续弱势）===
+      else if(close1<cdp[i+1]&&close1>=s1[i+1]&&close<s1[i])strongSell[i]=r1[i]+10*Point;
       // 价格从CDP下方突破到上方 → 买入
       if(close1<=cdp[i+1]&&close>cdp[i])buySignal[i]=s1[i]-10*Point;
       // 价格从CDP上方跌破到下方 → 卖出
       if(close1>=cdp[i+1]&&close<cdp[i])sellSignal[i]=r1[i]+10*Point;
-      // 突破R1阻力 → 强势追多
+      // 突破R1阻力 → 追多
       if(close1<=r1[i+1]&&close>r1[i])buySignal[i]=s1[i]-10*Point;
-      // 跌破S1支撑 → 强势追空
+      // 跌破S1支撑 → 追空
       if(close1>=s1[i+1]&&close<s1[i])sellSignal[i]=r1[i]+10*Point;
    }
    return(0);

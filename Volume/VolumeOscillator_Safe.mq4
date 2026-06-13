@@ -9,17 +9,19 @@
 #property copyright "Open Source - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 0
 
 input int InpFast=5,InpSlow=10;
 
-double vo[],buySignal[],sellSignal[];
+double vo[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,2);SetIndexBuffer(0,vo);SetIndexLabel(0,"Vol Osc");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(3,strongBuy);SetIndexArrow(3,233);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(4,strongSell);SetIndexArrow(4,234);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("VolOsc_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -33,14 +35,21 @@ int start() {
       double eF=0,eS=0;for(int j=0;j<InpSlow*2;j++){double v=iVolume(_Symbol,_Period,i+j);eF+=v;eS+=v;}
       eF/=InpSlow*2;eS/=InpSlow*2;
       for(int j=InpSlow*2-1;j>=0;j--){double v=iVolume(_Symbol,_Period,i+j);eF=v*aF+eF*(1-aF);eS=v*aS+eS*(1-aS);}
-      if(i<=limit){vo[i]=SafeDivide(100*(eF-eS),eS,0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+      if(i<=limit){vo[i]=SafeDivide(100*(eF-eS),eS,0);strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
    for(int i=limit;i>=1;i--){
+      // Strong signal: multi-condition volume confirmation
+      // Cond1: extreme VO surge (>40), Cond2: price direction, Cond3: close vs EMA(5) trend filter
+      double ma5=iMA(_Symbol,_Period,5,0,MODE_EMA,PRICE_CLOSE,i);
+      if(vo[i]>40&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1)&&iClose(_Symbol,_Period,i)>ma5)
+         strongBuy[i]=vo[i]*0.8;
+      if(vo[i]>40&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1)&&iClose(_Symbol,_Period,i)<ma5)
+         strongSell[i]=vo[i]*1.2;
       // 放量+价格涨=多头确认
       if(vo[i]>20&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=vo[i]*0.5;
       // 放量+价格跌=空头确认
       if(vo[i]>20&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1))sellSignal[i]=vo[i]*1.5;
    }
-   if(Bars>0){vo[0]=vo[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){vo[0]=vo[1];strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
    return(0);
 }

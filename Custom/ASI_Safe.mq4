@@ -14,12 +14,14 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 指标缓冲区
 double asiBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -37,6 +39,18 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强买入信号（大号青色箭头）
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, ARROW_BUY);
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   // 强卖出信号（大号深粉箭头）
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, ARROW_SELL);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("ASI_Safe");
@@ -96,21 +110,50 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // 信号：突破前高/前低（bar[1]+确认）
    for(int i = limit; i >= 3; i--)
    {
+      // ---- Strong Buy ----
+      if(asiBuffer[i] > asiBuffer[i+1] && asiBuffer[i] > asiBuffer[i+2] &&
+         asiBuffer[i] > asiBuffer[i+3] &&
+         asiBuffer[i] > 0.0 &&
+         iClose(_Symbol, _Period, i) > iOpen(_Symbol, _Period, i))
+      {
+         strongBuy[i] = asiBuffer[i] * 0.90;
+      }
+
+      // ---- Normal Buy ----
       // ASI新高 → 价格可能跟随上涨
       if(asiBuffer[i] > asiBuffer[i+1] && asiBuffer[i] > asiBuffer[i+2] &&
          asiBuffer[i] > asiBuffer[i+3])
          buySignal[i] = asiBuffer[i] * 0.95;
 
+      // ---- Strong Sell ----
+      if(asiBuffer[i] < asiBuffer[i+1] && asiBuffer[i] < asiBuffer[i+2] &&
+         asiBuffer[i] < asiBuffer[i+3] &&
+         asiBuffer[i] < 0.0 &&
+         iClose(_Symbol, _Period, i) < iOpen(_Symbol, _Period, i))
+      {
+         strongSell[i] = asiBuffer[i] * 1.10;
+      }
+
+      // ---- Normal Sell ----
       // ASI新低 → 价格可能跟随下跌
       if(asiBuffer[i] < asiBuffer[i+1] && asiBuffer[i] < asiBuffer[i+2] &&
          asiBuffer[i] < asiBuffer[i+3])
          sellSignal[i] = asiBuffer[i] * 1.05;
    }
+
+   // bar[0] - display only, no signals
+   asiBuffer[0] = cumulativeASI;
+   buySignal[0]  = EMPTY_VALUE;
+   sellSignal[0] = EMPTY_VALUE;
+   strongBuy[0]  = EMPTY_VALUE;
+   strongSell[0] = EMPTY_VALUE;
 
    return(0);
 }

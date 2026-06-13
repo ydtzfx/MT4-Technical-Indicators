@@ -20,7 +20,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum -1
 #property indicator_maximum 1
 #property indicator_level1 0.1
@@ -32,6 +32,8 @@ input int InpCMFPeriod = 21;    // CMF周期
 double cmfBuffer[];     // CMF主线（柱状图）
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号（多重条件确认）
+double strongSell[];    // 强卖出信号（多重条件确认）
 
 //+------------------------------------------------------------------+
 int init()
@@ -52,6 +54,18 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, CLR_STRONG_BUY);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, CLR_STRONG_SELL);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(3);
    IndicatorShortName("CMF_Safe(" + IntegerToString(InpCMFPeriod) + ")");
@@ -103,11 +117,43 @@ int start()
       // CMF = ΣMFV / ΣVolume
       cmfBuffer[i] = SafeDivide(mfvSum, volSum, 0.0);
 
-      buySignal[i]  = EMPTY_VALUE;
-      sellSignal[i] = EMPTY_VALUE;
+      buySignal[i]   = EMPTY_VALUE;
+      sellSignal[i]  = EMPTY_VALUE;
+      strongBuy[i]   = EMPTY_VALUE;
+      strongSell[i]  = EMPTY_VALUE;
    }
 
-   // --- 第2步：信号判断（bar[1]+确认）---
+   // --- 第2步：强信号判断（多重条件确认，成交量放大+极端阈值+趋势共振）---
+   for(int i = limit; i >= 1; i--)
+   {
+      // 计算平均成交量用于激增检测
+      double avgVol = 0.0;
+      int volCount = 0;
+      for(int j = 1; j <= InpCMFPeriod; j++)
+      {
+         int vShift = i + j;
+         if(vShift < Bars) { avgVol += (double)iVolume(_Symbol, _Period, vShift); volCount++; }
+      }
+      if(volCount > 0) avgVol /= volCount;
+      bool volumeSurge = (volCount > 0 && (double)iVolume(_Symbol, _Period, i) > avgVol * 1.5);
+
+      // 强买入：3条件确认 — ①退出超卖区 + ②上穿零轴 + ③成交量激增
+      if(cmfBuffer[i+1] < -0.1 && cmfBuffer[i] > 0.0 && volumeSurge)
+         strongBuy[i] = cmfBuffer[i] - 0.04;
+
+      // 强卖出：3条件确认 — ①退出超买区 + ②下穿零轴 + ③成交量激增
+      if(cmfBuffer[i+1] > 0.1 && cmfBuffer[i] < 0.0 && volumeSurge)
+         strongSell[i] = cmfBuffer[i] + 0.04;
+
+      // 附加强信号：持续极端 + 继续同向加速 + 成交量确认
+      if(cmfBuffer[i+1] > 0.1 && cmfBuffer[i+2] > 0.1 && cmfBuffer[i] > cmfBuffer[i+1] && volumeSurge)
+         strongBuy[i] = cmfBuffer[i] - 0.04;
+
+      if(cmfBuffer[i+1] < -0.1 && cmfBuffer[i+2] < -0.1 && cmfBuffer[i] < cmfBuffer[i+1] && volumeSurge)
+         strongSell[i] = cmfBuffer[i] + 0.04;
+   }
+
+   // --- 第3步：常规信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
       // 资金从流出转为流入 → 买入
@@ -127,12 +173,14 @@ int start()
          sellSignal[i] = cmfBuffer[i] + 0.03;
    }
 
-   // --- 第3步：刷新 bar[0] ---
+   // --- 第4步：刷新 bar[0] ---
    if(Bars > 0)
    {
-      cmfBuffer[0] = cmfBuffer[1];
-      buySignal[0]  = EMPTY_VALUE;
-      sellSignal[0] = EMPTY_VALUE;
+      cmfBuffer[0]  = cmfBuffer[1];
+      buySignal[0]   = EMPTY_VALUE;
+      sellSignal[0]  = EMPTY_VALUE;
+      strongBuy[0]   = EMPTY_VALUE;
+      strongSell[0]  = EMPTY_VALUE;
    }
 
    return(0);

@@ -17,12 +17,14 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 指标缓冲区
 double mfiBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -40,6 +42,16 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("BW_MFI_Safe");
@@ -70,6 +82,8 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // 信号（bar[1]+确认）— 分辨4种状态
@@ -79,6 +93,17 @@ int start()
       long vol_i1  = iVolume(_Symbol, _Period, i + 1);
       double mfi_i  = mfiBuffer[i];
       double mfi_i1 = mfiBuffer[i + 1];
+
+      // Strong signals — multi-condition volume confirmation
+      bool greenBuy  = (mfi_i > mfi_i1 && vol_i > vol_i1 && iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i+1));
+      bool greenSell = (mfi_i > mfi_i1 && vol_i > vol_i1 && iClose(_Symbol, _Period, i) < iClose(_Symbol, _Period, i+1));
+      bool squatBuy  = (mfi_i < mfi_i1 && vol_i > vol_i1 * 1.5 && iClose(_Symbol, _Period, i) < iClose(_Symbol, _Period, i+1));
+      bool squatSell = (mfi_i < mfi_i1 && vol_i > vol_i1 * 1.5 && iClose(_Symbol, _Period, i) >= iClose(_Symbol, _Period, i+1));
+
+      if((greenBuy && vol_i > vol_i1 * 1.3) || (squatBuy && vol_i > vol_i1 * 2.0))
+         strongBuy[i] = mfi_i * 0.5;
+      if((greenSell && vol_i > vol_i1 * 1.3) || (squatSell && vol_i > vol_i1 * 2.0))
+         strongSell[i] = mfi_i * 1.5;
 
       // Green: MFI ↑, Vol ↑ → 真实趋势，顺势跟单
       if(mfi_i > mfi_i1 && vol_i > vol_i1)
@@ -106,6 +131,13 @@ int start()
          }
       }
    }
+
+   // bar[0] display refresh — no signals on live bar
+   mfiBuffer[0] = (iVolume(_Symbol, _Period, 0) > 0) ? (iHigh(_Symbol, _Period, 0) - iLow(_Symbol, _Period, 0)) / (double)iVolume(_Symbol, _Period, 0) : 0.0;
+   buySignal[0]  = EMPTY_VALUE;
+   sellSignal[0] = EMPTY_VALUE;
+   strongBuy[0]  = EMPTY_VALUE;
+   strongSell[0] = EMPTY_VALUE;
 
    return(0);
 }

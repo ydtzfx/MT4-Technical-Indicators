@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 // 输入参数
 input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;
@@ -26,6 +26,8 @@ input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;
 double obvBuffer[];
 double buySignal[];
 double sellSignal[];
+double strongBuy[];
+double strongSell[];
 
 //+------------------------------------------------------------------+
 int init()
@@ -43,6 +45,16 @@ int init()
    SetIndexBuffer(2, sellSignal);
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("OBV_Safe");
@@ -86,25 +98,63 @@ int start()
       obvBuffer[i] = cumulativeOBV;
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // 信号判断：背离检测（bar[1]+确认）
    for(int i = limit; i >= 3; i--)
    {
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
+
       // 底背离：价格新低但OBV未新低
       double price_i   = GetPriceByType(i, InpPriceType);
       double price_i2  = GetPriceByType(i + 2, InpPriceType);
       double price_i4  = GetPriceByType(i + 4, InpPriceType);
 
-      if(price_i < price_i4 && price_i < price_i2 &&
-         obvBuffer[i] > obvBuffer[i+4])
-         buySignal[i] = obvBuffer[i] * 0.95;
+      // 成交量激增检测（最近20根K线平均成交量）
+      double avgVolume = 0;
+      int volCount = 0;
+      for(int j = i; j < i + 20 && j < Bars; j++)
+      {
+         avgVolume += (double)iVolume(_Symbol, _Period, j);
+         volCount++;
+      }
+      if(volCount > 0) avgVolume /= volCount;
+      bool volumeSurge = iVolume(_Symbol, _Period, i) > avgVolume * 1.5;
 
-      // 顶背离：价格新高但OBV未新高
-      if(price_i > price_i4 && price_i > price_i2 &&
-         obvBuffer[i] < obvBuffer[i+4])
+      // OBV极值检测（最近30根K线范围）
+      double obvMax = obvBuffer[i];
+      double obvMin = obvBuffer[i];
+      for(int j = i; j < i + 30 && j < Bars; j++)
+      {
+         if(obvBuffer[j] > obvMax) obvMax = obvBuffer[j];
+         if(obvBuffer[j] < obvMin) obvMin = obvBuffer[j];
+      }
+      double obvRange = obvMax - obvMin;
+      bool obvExtremeLow  = (obvRange > 0) && ((obvBuffer[i] - obvMin) < obvRange * 0.15);
+      bool obvExtremeHigh = (obvRange > 0) && ((obvMax - obvBuffer[i]) < obvRange * 0.15);
+
+      bool buyDivergence  = price_i < price_i4 && price_i < price_i2 && obvBuffer[i] > obvBuffer[i+4];
+      bool sellDivergence = price_i > price_i4 && price_i > price_i2 && obvBuffer[i] < obvBuffer[i+4];
+
+      // 强信号（多条件确认：背离 + 成交量激增 + OBV极值区域）
+      if(buyDivergence && volumeSurge && obvExtremeLow)
+         strongBuy[i] = obvBuffer[i] * 0.92;
+      if(sellDivergence && volumeSurge && obvExtremeHigh)
+         strongSell[i] = obvBuffer[i] * 1.08;
+
+      // 普通信号
+      if(buyDivergence)
+         buySignal[i] = obvBuffer[i] * 0.95;
+      if(sellDivergence)
          sellSignal[i] = obvBuffer[i] * 1.05;
    }
+
+   // 确保bar[0]无信号
+   strongBuy[0]  = EMPTY_VALUE;
+   strongSell[0] = EMPTY_VALUE;
 
    return(0);
 }

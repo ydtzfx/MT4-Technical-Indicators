@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 
 input int    InpShort = 10;          // 短周期
 input int    InpLong  = 50;          // 长周期
@@ -28,12 +28,16 @@ double difBuffer[];     // DIF线
 double amaBuffer[];     // AMA线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuyBuffer[];   // 强烈买入
+double strongSellBuffer[];  // 强烈卖出
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,clrWhite);SetIndexBuffer(0,difBuffer);SetIndexLabel(0,"DIF");
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(1,amaBuffer);SetIndexLabel(1,"AMA");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(4,strongBuyBuffer);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(5,strongSellBuffer);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("DMA_Safe("+IntegerToString(InpShort)+","+IntegerToString(InpLong)+")");return(0);
 }
 int deinit() { return(0); }
@@ -47,7 +51,7 @@ int start() {
       double prices[200];for(int j=0;j<200&&(i+j<Bars);j++)prices[j]=iClose(_Symbol,_Period,i+j);
       double maS=CalculateMA(prices,InpShort,InpMAMethod,0);
       double maL=CalculateMA(prices,InpLong,InpMAMethod,0);
-      difBuffer[i]=maS-maL;amaBuffer[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      difBuffer[i]=maS-maL;amaBuffer[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuyBuffer[i]=EMPTY_VALUE;strongSellBuffer[i]=EMPTY_VALUE;
    }
    // AMA = MA of DIF
    for(int i=limit;i>=1;i--) {
@@ -56,7 +60,13 @@ int start() {
    }
    // 步骤2: 信号（bar[1]+确认）
    for(int i=limit;i>=1;i--) {
-      // DIF上穿AMA → 金叉买入
+      // 强烈买入：DIF上穿AMA + DIF在零轴下方（深度反转确认）
+      if(difBuffer[i+1]<=amaBuffer[i+1]&&difBuffer[i]>amaBuffer[i]&&difBuffer[i+1]<0)
+         strongBuyBuffer[i]=difBuffer[i]-MathAbs(difBuffer[i]*0.25);
+      // 强烈卖出：DIF下穿AMA + DIF在零轴上方（深度反转确认）
+      if(difBuffer[i+1]>=amaBuffer[i+1]&&difBuffer[i]<amaBuffer[i]&&difBuffer[i+1]>0)
+         strongSellBuffer[i]=difBuffer[i]+MathAbs(difBuffer[i]*0.25);
+      // DIF上穿AMA -> 金叉买入
       if(difBuffer[i+1]<=amaBuffer[i+1]&&difBuffer[i]>amaBuffer[i])buySignal[i]=difBuffer[i]-MathAbs(difBuffer[i]*0.2);
       // DIF下穿AMA → 死叉卖出
       if(difBuffer[i+1]>=amaBuffer[i+1]&&difBuffer[i]<amaBuffer[i])sellSignal[i]=difBuffer[i]+MathAbs(difBuffer[i]*0.2);
@@ -68,7 +78,7 @@ int start() {
    if(Bars>0){
       double p0[200];for(int j=0;j<200;j++)p0[j]=iClose(_Symbol,_Period,j);
       difBuffer[0]=CalculateMA(p0,InpShort,InpMAMethod,0)-CalculateMA(p0,InpLong,InpMAMethod,0);
-      amaBuffer[0]=amaBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;
+      amaBuffer[0]=amaBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuyBuffer[0]=EMPTY_VALUE;strongSellBuffer[0]=EMPTY_VALUE;
    }
    return(0);
 }
