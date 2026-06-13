@@ -9,16 +9,18 @@
 #property copyright "Open Source - No Future Function"
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int InpPeriod=14;input color InpColor=clrYellow;
 
-double md[],buySignal[],sellSignal[];
+double md[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,InpColor);SetIndexBuffer(0,md);SetIndexLabel(0,"McGinley");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexBuffer(3,strongBuy);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(3,233);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexBuffer(4,strongSell);SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexArrow(4,234);SetIndexEmptyValue(4,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("McGinley_Safe("+IntegerToString(InpPeriod)+")");return(0);
 }
 int deinit(){return(0);}
@@ -35,9 +37,15 @@ int start() {
    }
    for(int i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      if(c1<=md[i+1]&&c>md[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
-      if(c1>=md[i+1]&&c<md[i])sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
+      strongBuy[i]=EMPTY_VALUE; strongSell[i]=EMPTY_VALUE;
+      bool buyCross=c1<=md[i+1]&&c>md[i];
+      bool sellCross=c1>=md[i+1]&&c<md[i];
+      // Strong signal: cross + MD slope confirmation + price momentum
+      if(buyCross&&md[i]>md[i+1]&&c>c1)strongBuy[i]=iLow(_Symbol,_Period,i)-8*Point;
+      else if(sellCross&&md[i]<md[i+1]&&c<c1)strongSell[i]=iHigh(_Symbol,_Period,i)+8*Point;
+      if(buyCross)buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
+      if(sellCross)sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
    }
-   if(Bars>0){md[0]=md[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){md[0]=md[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

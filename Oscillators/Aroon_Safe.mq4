@@ -10,19 +10,21 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 4
+#property indicator_buffers 6
 #property indicator_minimum 0
 #property indicator_maximum 100
 
 input int InpPeriod=14;
 
-double aroonUp[],aroonDown[],buySignal[],sellSignal[];
+double aroonUp[],aroonDown[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,aroonUp);SetIndexLabel(0,"Aroon Up");
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,aroonDown);SetIndexLabel(1,"Aroon Down");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuy);SetIndexArrow(4,233);SetIndexLabel(4,"Strong Buy");SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSell);SetIndexArrow(5,234);SetIndexLabel(5,"Strong Sell");SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("Aroon_Safe("+IntegerToString(InpPeriod)+")");return(0);
 }
 int deinit(){return(0);}
@@ -38,14 +40,16 @@ int start() {
          if(h>hh){hh=h;highBars=j;}if(l<ll){ll=l;lowBars=j;}
       }
       aroonUp[i]=100.0*(InpPeriod-highBars)/InpPeriod;aroonDown[i]=100.0*(InpPeriod-lowBars)/InpPeriod;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=1;i--) {
       // Aroon Up 上穿 Aroon Down → 多头趋势启动
-      if(aroonUp[i+1]<=aroonDown[i+1]&&aroonUp[i]>aroonDown[i]&&aroonUp[i]>50)buySignal[i]=45;
+      if(aroonUp[i+1]<=aroonDown[i+1]&&aroonUp[i]>aroonDown[i]&&aroonUp[i]>70&&aroonDown[i]<30)strongBuy[i]=45;
+      else if(aroonUp[i+1]<=aroonDown[i+1]&&aroonUp[i]>aroonDown[i]&&aroonUp[i]>50)buySignal[i]=45;
       // Aroon Down 上穿 Aroon Up → 空头趋势启动
-      if(aroonDown[i+1]<=aroonUp[i+1]&&aroonDown[i]>aroonUp[i]&&aroonDown[i]>50)sellSignal[i]=55;
+      if(aroonDown[i+1]<=aroonUp[i+1]&&aroonDown[i]>aroonUp[i]&&aroonDown[i]>70&&aroonUp[i]<30)strongSell[i]=55;
+      else if(aroonDown[i+1]<=aroonUp[i+1]&&aroonDown[i]>aroonUp[i]&&aroonDown[i]>50)sellSignal[i]=55;
    }
-   if(Bars>0){aroonUp[0]=aroonUp[1];aroonDown[0]=aroonDown[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){aroonUp[0]=aroonUp[1];aroonDown[0]=aroonDown[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

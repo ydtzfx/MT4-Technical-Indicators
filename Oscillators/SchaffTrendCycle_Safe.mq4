@@ -10,7 +10,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_minimum 0
 #property indicator_maximum 100
 #property indicator_level1 75
@@ -18,12 +18,14 @@
 
 input int InpMACDFast=23,InpMACDSlow=50,InpCycle=10;
 
-double stcBuffer[],buySignal[],sellSignal[];
+double stcBuffer[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrDodgerBlue);SetIndexBuffer(0,stcBuffer);SetIndexLabel(0,"STC");
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);
+   int idx=3;SetIndexBuffer(idx,strongBuy);SetIndexStyle(idx,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(idx,233);SetIndexEmptyValue(idx,EMPTY_VALUE);
+   idx++;SetIndexBuffer(idx,strongSell);SetIndexStyle(idx,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexArrow(idx,234);SetIndexEmptyValue(idx,EMPTY_VALUE);
    IndicatorDigits(2);IndicatorShortName("STC_Safe");return(0);
 }
 int deinit(){return(0);}
@@ -53,12 +55,14 @@ int start() {
    double aC=2.0/(InpCycle+1);
    for(int i=hist;i>=1;i--) {
       double e=stoch[i+InpCycle];for(int j=InpCycle-1;j>=0;j--)e=stoch[i+j]*aC+e*(1-aC);
-      stcBuffer[i]=e;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      stcBuffer[i]=e;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=1;i--) {
-      if(stcBuffer[i+1]<=25&&stcBuffer[i]>25)buySignal[i]=20;
-      if(stcBuffer[i+1]>=75&&stcBuffer[i]<75)sellSignal[i]=80;
+      if(stcBuffer[i+1]<=15&&stcBuffer[i]>25)strongBuy[i]=20;
+      else if(stcBuffer[i+1]<=25&&stcBuffer[i]>25)buySignal[i]=20;
+      if(stcBuffer[i+1]>=85&&stcBuffer[i]<75)strongSell[i]=80;
+      else if(stcBuffer[i+1]>=75&&stcBuffer[i]<75)sellSignal[i]=80;
    }
-   if(Bars>0){stcBuffer[0]=stcBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){stcBuffer[0]=stcBuffer[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

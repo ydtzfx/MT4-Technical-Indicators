@@ -17,7 +17,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int    InpStdDevPeriod = 20;      // 标准差周期
 input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
@@ -27,6 +27,8 @@ input double InpVolThreshold = 2.0;     // 波动率爆发倍数
 double sdBuffer[];      // 标准差主线
 double buySignal[];     // 波动率突破+上涨=买入
 double sellSignal[];    // 波动率突破+下跌=卖出
+double strongBuy[];     // 强买入信号 (多条件确认)
+double strongSell[];    // 强卖出信号 (多条件确认)
 
 //+------------------------------------------------------------------+
 int init()
@@ -47,6 +49,20 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Vol Breakout Down");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // 强信号缓冲区 (索引 3, 4)
+   int idx = 3;
+   SetIndexBuffer(idx, strongBuy);
+   SetIndexStyle(idx, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexArrow(idx, 233);
+   SetIndexLabel(idx, "Strong Vol Breakout Up");
+   SetIndexEmptyValue(idx, EMPTY_VALUE);
+   idx++;
+   SetIndexBuffer(idx, strongSell);
+   SetIndexStyle(idx, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexArrow(idx, 234);
+   SetIndexLabel(idx, "Strong Vol Breakout Down");
+   SetIndexEmptyValue(idx, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("StdDev_Safe(" + IntegerToString(InpStdDevPeriod) + ")");
@@ -86,6 +102,8 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：波动率爆发检测（需要足够的bar来计算均波动率）---
@@ -102,13 +120,30 @@ int start()
       {
          double closeCurr = iClose(_Symbol, _Period, i);
          double closePrev = iClose(_Symbol, _Period, i + 1);
+         double closePrev2 = iClose(_Symbol, _Period, i + 2);
 
-         // 波动率放大 + 价格上涨 → 突破买入
+         // 额外确认条件：
+         //   爆发幅度极大 (> 2.5x 均值)  或  连涨/连跌2根bar的趋势确认
+         bool extremeVol = (sdBuffer[i] > avgStdDev * 2.5);
+         bool uptrend    = (closeCurr > closePrev && closePrev > closePrev2);
+         bool downtrend  = (closeCurr < closePrev && closePrev < closePrev2);
+
+         // 波动率放大 + 价格上涨 → 突破买入 (强信号优先)
          if(closeCurr > closePrev)
-            buySignal[i] = sdBuffer[i] * 0.8;
-         // 波动率放大 + 价格下跌 → 突破卖出
+         {
+            if(extremeVol || uptrend)
+               strongBuy[i] = sdBuffer[i] * 0.8;   // 强买入
+            else
+               buySignal[i] = sdBuffer[i] * 0.8;   // 普通买入
+         }
+         // 波动率放大 + 价格下跌 → 突破卖出 (强信号优先)
          else
-            sellSignal[i] = sdBuffer[i] * 1.2;
+         {
+            if(extremeVol || downtrend)
+               strongSell[i] = sdBuffer[i] * 1.2;  // 强卖出
+            else
+               sellSignal[i] = sdBuffer[i] * 1.2;  // 普通卖出
+         }
       }
    }
 
@@ -128,6 +163,8 @@ int start()
       sdBuffer[0] = MathSqrt(ss0 / InpStdDevPeriod);
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

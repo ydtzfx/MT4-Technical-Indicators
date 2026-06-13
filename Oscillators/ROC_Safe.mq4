@@ -18,7 +18,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 #property indicator_level1 0
 
 input int    InpROCPeriod = 12;         // ROC周期
@@ -28,6 +28,8 @@ input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
 double rocBuffer[];     // ROC主线
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号（多条件确认）
+double strongSell[];    // 强卖出信号（多条件确认）
 
 //+------------------------------------------------------------------+
 int init()
@@ -48,6 +50,20 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   // --- 强信号缓冲区 ---
+   int idx = 3;
+   SetIndexBuffer(idx, strongBuy);
+   SetIndexStyle(idx, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexArrow(idx, 233);
+   SetIndexLabel(idx, "Strong Buy");
+   SetIndexEmptyValue(idx, EMPTY_VALUE);
+   idx++;
+   SetIndexBuffer(idx, strongSell);
+   SetIndexStyle(idx, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexArrow(idx, 234);
+   SetIndexLabel(idx, "Strong Sell");
+   SetIndexEmptyValue(idx, EMPTY_VALUE);
 
    IndicatorDigits(2);
    IndicatorShortName("ROC_Safe(" + IntegerToString(InpROCPeriod) + ")");
@@ -81,33 +97,49 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
    for(int i = limit; i >= 1; i--)
    {
-      // 零轴穿越 — 买入
-      if(rocBuffer[i + 1] < 0.0 && rocBuffer[i] > 0.0)
+      // ---- 零轴穿越 — 买入 ----
+      // 强信号：穿越零轴且ROC值>2.0（强劲动量）
+      if(rocBuffer[i + 1] < 0.0 && rocBuffer[i] > 0.0 && rocBuffer[i] > 2.0)
+         strongBuy[i] = rocBuffer[i] - 0.5;
+      else if(rocBuffer[i + 1] < 0.0 && rocBuffer[i] > 0.0)
          buySignal[i] = rocBuffer[i] - 0.5;
 
-      // 零轴穿越 — 卖出
-      if(rocBuffer[i + 1] > 0.0 && rocBuffer[i] < 0.0)
+      // ---- 零轴穿越 — 卖出 ----
+      // 强信号：穿越零轴且ROC值<-2.0（强劲动量）
+      if(rocBuffer[i + 1] > 0.0 && rocBuffer[i] < 0.0 && rocBuffer[i] < -2.0)
+         strongSell[i] = rocBuffer[i] + 0.5;
+      else if(rocBuffer[i + 1] > 0.0 && rocBuffer[i] < 0.0)
          sellSignal[i] = rocBuffer[i] + 0.5;
 
-      // 顶背离检测（价格新高但ROC下降）
+      // ---- 顶背离检测（价格新高但ROC下降） ----
       double priceI  = iClose(_Symbol, _Period, i);
       double priceI3 = iClose(_Symbol, _Period, i + 3);
       if(priceI > priceI3 && rocBuffer[i] < rocBuffer[i + 3] &&
          rocBuffer[i] > 0.0)
       {
-         sellSignal[i] = rocBuffer[i] + 0.5;
+         // 强信号：顶背离 + ROC此前处于极度超买区域(>5.0)
+         if(rocBuffer[i + 3] > 5.0)
+            strongSell[i] = rocBuffer[i] + 0.5;
+         else
+            sellSignal[i] = rocBuffer[i] + 0.5;
       }
 
-      // 底背离检测（价格新低但ROC上升）
+      // ---- 底背离检测（价格新低但ROC上升） ----
       if(priceI < priceI3 && rocBuffer[i] > rocBuffer[i + 3] &&
          rocBuffer[i] < 0.0)
       {
-         buySignal[i] = rocBuffer[i] - 0.5;
+         // 强信号：底背离 + ROC此前处于极度超卖区域(<-5.0)
+         if(rocBuffer[i + 3] < -5.0)
+            strongBuy[i] = rocBuffer[i] - 0.5;
+         else
+            buySignal[i] = rocBuffer[i] - 0.5;
       }
    }
 
@@ -119,6 +151,8 @@ int start()
       rocBuffer[0] = (pp > 0.0) ? 100.0 * (cp - pp) / pp : 0.0;
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);

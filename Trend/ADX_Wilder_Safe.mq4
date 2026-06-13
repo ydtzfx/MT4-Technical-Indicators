@@ -8,13 +8,13 @@
 #property copyright "Open Source - No Future Function"
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 7
 #property indicator_minimum 0
 #property indicator_maximum 100
 
 input int InpPeriod=14;
 
-double adx[],pdi[],mdi[],buySignal[],sellSignal[];
+double adx[],pdi[],mdi[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
 int init() {
    SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,adx);SetIndexLabel(0,"ADX");
@@ -22,6 +22,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,clrTomato);SetIndexBuffer(2,mdi);SetIndexLabel(2,"-DI");
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(3,buySignal);SetIndexArrow(3,ARROW_BUY);SetIndexEmptyValue(3,EMPTY_VALUE);
    SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(4,sellSignal);SetIndexArrow(4,ARROW_SELL);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexBuffer(5,strongBuy);SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(5,233);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexBuffer(6,strongSell);SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexArrow(6,234);SetIndexEmptyValue(6,EMPTY_VALUE);
    IndicatorDigits(1);IndicatorShortName("ADX_Wilder");return(0);
 }
 int deinit(){return(0);}
@@ -54,9 +56,16 @@ int start() {
       if(i<=limit){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
    for(int i=limit;i>=1;i--){
+      strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
+      // Strong buy: pDI cross above mDI + ADX>20 + ADX rising + ADX>25
+      if(pdi[i+1]<=mdi[i+1]&&pdi[i]>mdi[i]&&adx[i]>20&&adx[i]>adx[i+1]&&adx[i]>25)strongBuy[i]=10;
+      // Strong sell: mDI cross above pDI + ADX>20 + ADX rising + ADX>25
+      if(mdi[i+1]<=pdi[i+1]&&mdi[i]>pdi[i]&&adx[i]>20&&adx[i]>adx[i+1]&&adx[i]>25)strongSell[i]=90;
+      // Normal buy (multi-condition — strong must be checked before normal)
       if(pdi[i+1]<=mdi[i+1]&&pdi[i]>mdi[i]&&adx[i]>20)buySignal[i]=10;
+      // Normal sell
       if(mdi[i+1]<=pdi[i+1]&&mdi[i]>pdi[i]&&adx[i]>20)sellSignal[i]=90;
    }
-   if(Bars>0){adx[0]=adx[1];pdi[0]=pdi[1];mdi[0]=mdi[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}
+   if(Bars>0){adx[0]=adx[1];pdi[0]=pdi[1];mdi[0]=mdi[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;}
    return(0);
 }

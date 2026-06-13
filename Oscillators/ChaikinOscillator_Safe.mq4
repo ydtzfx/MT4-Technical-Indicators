@@ -14,12 +14,13 @@
 //|  信号逻辑（无未来函数）：                                          |
 //|  - 买入：CHO从负转正（bar[1]确认）                                |
 //|  - 卖出：CHO从正转负（bar[1]确认）                                |
+//|  - 强信号：零轴穿越 + 动量确认 + 大幅扩张（3条件）                |
 //+------------------------------------------------------------------+
 #property copyright "Open Source - No Future Function"
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 3
+#property indicator_buffers 5
 
 input int InpFast = 3;     // 快EMA周期
 input int InpSlow = 10;    // 慢EMA周期
@@ -28,6 +29,8 @@ input int InpSlow = 10;    // 慢EMA周期
 double choBuffer[];     // Chaikin Oscillator 主线（柱状图）
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
+double strongBuy[];     // 强买入信号
+double strongSell[];    // 强卖出信号
 
 //+------------------------------------------------------------------+
 int init()
@@ -48,6 +51,18 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexLabel(2, "Sell Signal");
    SetIndexEmptyValue(2, EMPTY_VALUE);
+
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(3, strongBuy);
+   SetIndexArrow(3, 233);
+   SetIndexLabel(3, "Strong Buy");
+   SetIndexEmptyValue(3, EMPTY_VALUE);
+
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(4, strongSell);
+   SetIndexArrow(4, 234);
+   SetIndexLabel(4, "Strong Sell");
+   SetIndexEmptyValue(4, EMPTY_VALUE);
 
    IndicatorDigits(0);
    IndicatorShortName("ChaikinOsc_Safe(" + IntegerToString(InpFast) + "," + IntegerToString(InpSlow) + ")");
@@ -113,17 +128,31 @@ int start()
 
       buySignal[i]  = EMPTY_VALUE;
       sellSignal[i] = EMPTY_VALUE;
+      strongBuy[i]  = EMPTY_VALUE;
+      strongSell[i] = EMPTY_VALUE;
    }
 
-   // --- 第3步：信号判断（bar[1]+确认）---
+   // --- 第3步：信号判断（bar[1]+确认）增强分级 ---
    for(int i = limit; i >= 1; i--)
    {
-      // CHO上穿零轴 → 资金加速流入 → 买入
-      if(choBuffer[i + 1] < 0.0 && choBuffer[i] > 0.0)
+      bool crossUp   = (choBuffer[i + 1] < 0.0 && choBuffer[i] > 0.0);
+      bool crossDown = (choBuffer[i + 1] > 0.0 && choBuffer[i] < 0.0);
+      // 动量确认：当前CHO绝对值至少为前值的50%（反转有足够力度）
+      bool momentumUp   = (choBuffer[i] > MathAbs(choBuffer[i + 1]) * 0.5);
+      bool momentumDown = (MathAbs(choBuffer[i]) > choBuffer[i + 1] * 0.5);
+      // 大幅扩张：当前CHO绝对值超过5周期前的1.2倍（资金流速度持续增强）
+      bool magnitudeExtreme = (MathAbs(choBuffer[i]) > MathAbs(choBuffer[i + 4]) * 1.2);
+
+      // 强买：零轴穿越 + 动量确认 + 大幅扩张
+      if(crossUp && momentumUp && magnitudeExtreme)
+         strongBuy[i] = choBuffer[i] * 0.3;
+      else if(crossUp)
          buySignal[i] = choBuffer[i] * 0.5;
 
-      // CHO下穿零轴 → 资金加速流出 → 卖出
-      if(choBuffer[i + 1] > 0.0 && choBuffer[i] < 0.0)
+      // 强卖：零轴穿越 + 动量确认 + 大幅扩张
+      if(crossDown && momentumDown && magnitudeExtreme)
+         strongSell[i] = choBuffer[i] * 1.7;
+      else if(crossDown)
          sellSignal[i] = choBuffer[i] * 1.5;
    }
 
@@ -133,6 +162,8 @@ int start()
       choBuffer[0] = choBuffer[1];
       buySignal[0]  = EMPTY_VALUE;
       sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]  = EMPTY_VALUE;
+      strongSell[0] = EMPTY_VALUE;
    }
 
    return(0);
