@@ -16,7 +16,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_separate_window
-#property indicator_buffers 5
+#property indicator_buffers 6
 
 input int    InpBPPeriod  = 13;           // EMA周期
 input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;  // 价格类型
@@ -27,6 +27,7 @@ double maBuffer[];      // EMA参考线（隐藏）
 double buySignal[];     // 买入信号
 double sellSignal[];    // 卖出信号
 double strongSell[];    // 强卖出信号
+double strongBuy[];     // 强买入信号
 
 //+------------------------------------------------------------------+
 int init()
@@ -61,6 +62,13 @@ int init()
    SetIndexArrow(4, ARROW_SELL);
    SetIndexLabel(4, "Strong Sell");
    SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   // 强买入箭头
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
+   SetIndexBuffer(5, strongBuy);
+   SetIndexArrow(5, ARROW_BUY);
+   SetIndexLabel(5, "Strong Buy");
+   SetIndexEmptyValue(5, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("BearsPower_Safe(" + IntegerToString(InpBPPeriod) + ")");
@@ -99,6 +107,7 @@ int start()
       buySignal[i]   = EMPTY_VALUE;
       sellSignal[i]  = EMPTY_VALUE;
       strongSell[i]  = EMPTY_VALUE;
+      strongBuy[i]   = EMPTY_VALUE;
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
@@ -117,6 +126,15 @@ int start()
          bpBuffer[i] < 0.0)
       {
          strongSell[i] = bpBuffer[i] * 1.7;
+      }
+
+      // 强买入：连续3根BearsPower柱收缩（负值越来越小，空头减弱）
+      if(bpBuffer[i] > bpBuffer[i + 1] &&
+         bpBuffer[i + 1] > bpBuffer[i + 2] &&
+         bpBuffer[i + 2] > bpBuffer[i + 3] &&
+         bpBuffer[i] < 0.0)
+      {
+         strongBuy[i] = bpBuffer[i] * 0.3;
       }
 
       // 底背离买入信号：价格创新低但BearsPower回升（绝对值缩小，即数值变大）
@@ -153,6 +171,7 @@ int start()
       buySignal[0]   = EMPTY_VALUE;
       sellSignal[0]  = EMPTY_VALUE;
       strongSell[0]  = EMPTY_VALUE;
+      strongBuy[0]   = EMPTY_VALUE;
    }
 
    return(0);

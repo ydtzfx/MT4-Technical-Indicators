@@ -45,7 +45,7 @@ int start() {
       double trSum=0;for(int j=0;j<InpATRPeriod;j++){trSum+=GetTrueRange(_Symbol,_Period,i+j);}
       double atr=trSum/InpATRPeriod;
       upper[i]=ema+InpMultiplier*atr;lower[i]=ema-InpMultiplier*atr;
-      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    if(InpShowSignals) for(int i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);

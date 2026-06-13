@@ -19,7 +19,7 @@
 #property link      ""
 #property version   "1.00"
 #property indicator_chart_window
-#property indicator_buffers 5
+#property indicator_buffers 6
 
 // 输入参数
 input int                  InpMAPeriod    = 14;         // MA周期
@@ -33,9 +33,9 @@ input bool                 InpShowSignals = true;       // 显示买卖信号
 // 指标缓冲区
 double maBuffer[];           // MA值缓冲区
 double ma2Buffer[];          // 长周期MA
-double buySignalBuffer[];    // 买入信号缓冲区
-double sellSignalBuffer[];   // 卖出信号缓冲区
-double strongSignal[];       // 强信号（双MA确认）
+double buySignal[];          // 买入信号缓冲区
+double sellSignal[];         // 卖出信号缓冲区
+double strongBuy[], strongSell[];  // 强信号（双MA确认）
 
 //+------------------------------------------------------------------+
 //| 指标初始化                                                         |
@@ -56,21 +56,28 @@ int init()
 
    // 买入信号箭头
    SetIndexStyle(2, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
-   SetIndexBuffer(2, buySignalBuffer);
+   SetIndexBuffer(2, buySignal);
    SetIndexLabel(2, "Buy Signal");
    SetIndexArrow(2, ARROW_BUY);
    SetIndexEmptyValue(2, EMPTY_VALUE);
 
    SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_SELL_SIGNAL);
-   SetIndexBuffer(3, sellSignalBuffer);
+   SetIndexBuffer(3, sellSignal);
    SetIndexLabel(3, "Sell Signal");
    SetIndexArrow(3, ARROW_SELL);
    SetIndexEmptyValue(3, EMPTY_VALUE);
 
    SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
-   SetIndexBuffer(4, strongSignal);
-   SetIndexLabel(4, "Strong Signal");
+   SetIndexBuffer(4, strongBuy);
+   SetIndexLabel(4, "Strong Buy");
+   SetIndexArrow(4, 233);
    SetIndexEmptyValue(4, EMPTY_VALUE);
+
+   SetIndexStyle(5, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
+   SetIndexBuffer(5, strongSell);
+   SetIndexLabel(5, "Strong Sell");
+   SetIndexArrow(5, 234);
+   SetIndexEmptyValue(5, EMPTY_VALUE);
 
    IndicatorDigits(4);
    IndicatorShortName("MA_Safe(" + IntegerToString(InpMAPeriod) + ")");
@@ -119,26 +126,26 @@ int start()
          double maCurr     = maBuffer[i];
          double maPrev     = maBuffer[i + 1];
 
-         buySignalBuffer[i]  = EMPTY_VALUE;
-         sellSignalBuffer[i] = EMPTY_VALUE;
-         strongSignal[i]     = EMPTY_VALUE;
+         buySignal[i]  = EMPTY_VALUE;
+         sellSignal[i] = EMPTY_VALUE;
+         strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
 
          if(maPrev > 0 && maCurr > 0)
          {
             // 金叉：收盘价从下方上穿MA
             if(closePrev <= maPrev && closeCurr > maCurr)
             {
-               buySignalBuffer[i] = iLow(_Symbol, _Period, i) - 5.0 * _Point;
+               buySignal[i] = iLow(_Symbol, _Period, i) - 5.0 * _Point;
                // 强信号：价格同时突破长周期MA且MA在长MA上方
                if(InpMA2Period > 0 && closeCurr > ma2Buffer[i] && maBuffer[i] > ma2Buffer[i])
-                  strongSignal[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
+                  strongBuy[i] = iLow(_Symbol, _Period, i) - 10.0 * _Point;
             }
             // 死叉：收盘价从上方下穿MA
             else if(closePrev >= maPrev && closeCurr < maCurr)
             {
-               sellSignalBuffer[i] = iHigh(_Symbol, _Period, i) + 5.0 * _Point;
+               sellSignal[i] = iHigh(_Symbol, _Period, i) + 5.0 * _Point;
                if(InpMA2Period > 0 && closeCurr < ma2Buffer[i] && maBuffer[i] < ma2Buffer[i])
-                  strongSignal[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
+                  strongSell[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
             }
          }
       }
@@ -162,9 +169,9 @@ int start()
          prices0[j] = GetPriceByType(j, InpPriceType);
       maBuffer[0] = CalculateMA(prices0, InpMAPeriod, InpMAMethod, 0);
       ma2Buffer[0] = (InpMA2Period > 0) ? ma2Buffer[1] : 0;
-      buySignalBuffer[0]  = EMPTY_VALUE;
-      sellSignalBuffer[0] = EMPTY_VALUE;
-      strongSignal[0]     = EMPTY_VALUE;
+      buySignal[0]  = EMPTY_VALUE;
+      sellSignal[0] = EMPTY_VALUE;
+      strongBuy[0]=EMPTY_VALUE;strongSell[0]=EMPTY_VALUE;
    }
 
    return(0);

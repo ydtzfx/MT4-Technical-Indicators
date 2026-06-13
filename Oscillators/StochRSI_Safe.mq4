@@ -39,7 +39,7 @@ int start() {
    }
    for(int i=limit;i>=1;i--){
       double mn=rsi[i],mx=rsi[i];for(int j=0;j<InpStochPeriod;j++){if(rsi[i+j]<mn)mn=rsi[i+j];if(rsi[i+j]>mx)mx=rsi[i+j];}
-      double rng=mx-mn;srsi[i]=rng>0?(rsi[i]-mn)/rng:0.5;signal[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
+      double rng=mx-mn;srsi[i]=rng>0?(rsi[i]-mn)/rng:0.5;signal[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<InpSmooth;j++)s+=srsi[i+j];signal[i]=s/InpSmooth;}
    for(int i=limit;i>=1;i--){
