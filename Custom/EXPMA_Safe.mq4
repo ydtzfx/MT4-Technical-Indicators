@@ -29,8 +29,8 @@ int init() {
    SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,InpC3);SetIndexBuffer(2,e3);SetIndexLabel(2,"EMA"+IntegerToString(InpEMA3));
    SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,2,InpC4);SetIndexBuffer(3,e4);SetIndexLabel(3,"EMA"+IntegerToString(InpEMA4));
    SetIndexStyle(4,DRAW_LINE,STYLE_SOLID,2,InpC5);SetIndexBuffer(4,e5);SetIndexLabel(4,"EMA"+IntegerToString(InpEMA5));
-   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(5,buySignal);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
-   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(6,sellSignal);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(5,buySignal);SetIndexArrow(5,ARROW_BUY);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(6,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(6,sellSignal);SetIndexArrow(6,ARROW_SELL);SetIndexEmptyValue(6,EMPTY_VALUE);
    SetIndexStyle(7,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(7,strongBuy);SetIndexArrow(7,ARROW_BUY);SetIndexEmptyValue(7,EMPTY_VALUE);
    SetIndexStyle(8,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(8,strongSell);SetIndexArrow(8,ARROW_SELL);SetIndexEmptyValue(8,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("EXPMA_Safe");return(0);

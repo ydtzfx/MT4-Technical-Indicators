@@ -46,12 +46,12 @@ int init()
    SetIndexArrow(2, ARROW_SELL);
    SetIndexEmptyValue(2, EMPTY_VALUE);
 
-   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, clrCyan);
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 4, clrCyan);
    SetIndexBuffer(3, strongBuy);
    SetIndexArrow(3, 233);
    SetIndexEmptyValue(3, EMPTY_VALUE);
 
-   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, clrDeepPink);
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 4, clrDeepPink);
    SetIndexBuffer(4, strongSell);
    SetIndexArrow(4, 234);
    SetIndexEmptyValue(4, EMPTY_VALUE);

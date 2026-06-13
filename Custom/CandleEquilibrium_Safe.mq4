@@ -9,7 +9,7 @@
 #property indicator_buffers 4
 input int InpPeriod=10;
 double equiHi[],equiLo[],buySignal[],sellSignal[];
-int init(){SetIndexStyle(0,DRAW_LINE,STYLE_DASH,2,clrYellow);SetIndexBuffer(0,equiHi);SetIndexLabel(0,"Equi Hi");SetIndexStyle(1,DRAW_LINE,STYLE_DASH,2,clrYellow);SetIndexBuffer(1,equiLo);SetIndexLabel(1,"Equi Lo");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(4);IndicatorShortName("Equi_Safe");return(0);}
+int init(){SetIndexStyle(0,DRAW_LINE,STYLE_DASH,2,clrYellow);SetIndexBuffer(0,equiHi);SetIndexLabel(0,"Equi Hi");SetIndexStyle(1,DRAW_LINE,STYLE_DASH,2,clrYellow);SetIndexBuffer(1,equiLo);SetIndexLabel(1,"Equi Lo");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(4);IndicatorShortName("Equi_Safe");return(0);}
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){equiHi[i]=equiLo[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}

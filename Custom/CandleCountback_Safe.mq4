@@ -10,7 +10,7 @@
 #property indicator_minimum 0
 input int InpBase=9; // 基准数(9/13/26/33等)
 double countUp[],countDn[],buySignal[],sellSignal[];
-int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrLimeGreen);SetIndexBuffer(0,countUp);SetIndexLabel(0,"Count Up");SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,3,clrTomato);SetIndexBuffer(1,countDn);SetIndexLabel(1,"Count Down");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("Countback_Safe");return(0);}
+int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrLimeGreen);SetIndexBuffer(0,countUp);SetIndexLabel(0,"Count Up");SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,3,clrTomato);SetIndexBuffer(1,countDn);SetIndexLabel(1,"Count Down");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("Countback_Safe");return(0);}
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=1;i--){

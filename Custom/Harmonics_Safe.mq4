@@ -15,10 +15,10 @@
 double bullPattern[],bearPattern[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullPattern);SetIndexArrow(0,ARROW_BUY);SetIndexEmptyValue(0,EMPTY_VALUE);
-   SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearPattern);SetIndexArrow(1,ARROW_SELL);SetIndexEmptyValue(1,EMPTY_VALUE);
-   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,1,clrCyan);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
-   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,1,clrDeepPink);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullPattern);SetIndexArrow(0,ARROW_BUY);SetIndexEmptyValue(0,EMPTY_VALUE);
+   SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearPattern);SetIndexArrow(1,ARROW_SELL);SetIndexEmptyValue(1,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("Harmonics_Safe");return(0);
 }
 int deinit(){return(0);}

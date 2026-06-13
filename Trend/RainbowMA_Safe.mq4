@@ -21,8 +21,8 @@ int init() {
       SetIndexStyle(i,DRAW_LINE,STYLE_SOLID,1,StringToColor(IntegerToString(r)+","+IntegerToString(g)+","+IntegerToString(b)));
       SetIndexBuffer(i,ma[i]);SetIndexLabel(i,"MA"+IntegerToString((i+1)*2));SetIndexEmptyValue(i,0);
    }
-   SetIndexStyle(20,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(20,buySignal);SetIndexArrow(20,ARROW_BUY);SetIndexEmptyValue(20,EMPTY_VALUE);
-   SetIndexStyle(21,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(21,sellSignal);SetIndexArrow(21,ARROW_SELL);SetIndexEmptyValue(21,EMPTY_VALUE);
+   SetIndexStyle(20,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(20,buySignal);SetIndexArrow(20,ARROW_BUY);SetIndexEmptyValue(20,EMPTY_VALUE);
+   SetIndexStyle(21,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(21,sellSignal);SetIndexArrow(21,ARROW_SELL);SetIndexEmptyValue(21,EMPTY_VALUE);
    SetIndexBuffer(22,strongBuy);SetIndexStyle(22,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(22,233);SetIndexEmptyValue(22,EMPTY_VALUE);
    SetIndexBuffer(23,strongSell);SetIndexStyle(23,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexArrow(23,234);SetIndexEmptyValue(23,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("RainbowMA_Safe");return(0);

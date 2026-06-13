@@ -20,8 +20,8 @@ int init() {
    SetIndexStyle(1,DRAW_HISTOGRAM,STYLE_SOLID,3,clrTomato);SetIndexBuffer(1,haHigh);SetIndexLabel(1,"HA High");SetIndexEmptyValue(1,0);
    SetIndexStyle(2,DRAW_HISTOGRAM,STYLE_SOLID,3,clrLimeGreen);SetIndexBuffer(2,haLow);SetIndexLabel(2,"HA Low");SetIndexEmptyValue(2,0);
    SetIndexStyle(3,DRAW_HISTOGRAM,STYLE_SOLID,3,clrLimeGreen);SetIndexBuffer(3,haClose);SetIndexLabel(3,"HA Close");SetIndexEmptyValue(3,0);
-   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(4,buySignal);SetIndexArrow(4,ARROW_BUY);SetIndexLabel(4,"HA Bull Flip");SetIndexEmptyValue(4,EMPTY_VALUE);
-   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(5,sellSignal);SetIndexArrow(5,ARROW_SELL);SetIndexLabel(5,"HA Bear Flip");SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(4,buySignal);SetIndexArrow(4,ARROW_BUY);SetIndexLabel(4,"HA Bull Flip");SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(5,sellSignal);SetIndexArrow(5,ARROW_SELL);SetIndexLabel(5,"HA Bear Flip");SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("HeikinAshi_Safe");return(0);
 }
 int deinit(){return(0);}

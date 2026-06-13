@@ -36,8 +36,8 @@ int init() {
    SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,2,clrYellow);SetIndexBuffer(1,amaBuffer);SetIndexLabel(1,"AMA");
    SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);
    SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);
-   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,3,clrCyan);SetIndexBuffer(4,strongBuyBuffer);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
-   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,3,clrDeepPink);SetIndexBuffer(5,strongSellBuffer);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
+   SetIndexStyle(4,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(4,strongBuyBuffer);SetIndexArrow(4,ARROW_BUY);SetIndexEmptyValue(4,EMPTY_VALUE);
+   SetIndexStyle(5,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(5,strongSellBuffer);SetIndexArrow(5,ARROW_SELL);SetIndexEmptyValue(5,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("DMA_Safe("+IntegerToString(InpShort)+","+IntegerToString(InpLong)+")");return(0);
 }
 int deinit() { return(0); }

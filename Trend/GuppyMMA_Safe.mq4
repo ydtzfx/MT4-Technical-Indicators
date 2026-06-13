@@ -26,8 +26,8 @@ int init() {
    double *longBuf[6]={l30,l35,l40,l45,l50,l60};string ln[6]={"L30","L35","L40","L45","L50","L60"};
    for(int i=0;i<6;i++){SetIndexStyle(i,DRAW_LINE,STYLE_SOLID,1,sc[i]);SetIndexBuffer(i,shortBuf[i]);SetIndexLabel(i,sn[i]);SetIndexEmptyValue(i,0);}
    for(int i=0;i<6;i++){SetIndexStyle(i+6,DRAW_LINE,STYLE_SOLID,1,lc[i]);SetIndexBuffer(i+6,longBuf[i]);SetIndexLabel(i+6,ln[i]);SetIndexEmptyValue(i+6,0);}
-   SetIndexStyle(12,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(12,buySignal);SetIndexArrow(12,ARROW_BUY);SetIndexEmptyValue(12,EMPTY_VALUE);
-   SetIndexStyle(13,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(13,sellSignal);SetIndexArrow(13,ARROW_SELL);SetIndexEmptyValue(13,EMPTY_VALUE);
+   SetIndexStyle(12,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(12,buySignal);SetIndexArrow(12,ARROW_BUY);SetIndexEmptyValue(12,EMPTY_VALUE);
+   SetIndexStyle(13,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(13,sellSignal);SetIndexArrow(13,ARROW_SELL);SetIndexEmptyValue(13,EMPTY_VALUE);
    SetIndexBuffer(14,strongBuy);SetIndexStyle(14,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexArrow(14,233);SetIndexEmptyValue(14,EMPTY_VALUE);
    SetIndexBuffer(15,strongSell);SetIndexStyle(15,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexArrow(15,234);SetIndexEmptyValue(15,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("GuppyMMA_Safe");return(0);

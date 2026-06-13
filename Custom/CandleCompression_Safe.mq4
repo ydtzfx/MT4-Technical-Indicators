@@ -11,7 +11,7 @@
 #property indicator_maximum 100
 input int InpPeriod=10;
 double compress[],expansion[],buySignal[],sellSignal[];
-int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,compress);SetIndexLabel(0,"Compression%");SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrOrange);SetIndexBuffer(1,expansion);SetIndexLabel(1,"Trend");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("Compress_Safe");return(0);}
+int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3,clrDodgerBlue);SetIndexBuffer(0,compress);SetIndexLabel(0,"Compression%");SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,clrOrange);SetIndexBuffer(1,expansion);SetIndexLabel(1,"Trend");SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexEmptyValue(2,EMPTY_VALUE);SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexEmptyValue(3,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("Compress_Safe");return(0);}
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=1;i++){

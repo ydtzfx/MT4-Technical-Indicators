@@ -74,8 +74,8 @@ enum ENUM_TREND_DIRECTION
 //+------------------------------------------------------------------+
 //| 颜色常量                                                          |
 //+------------------------------------------------------------------+
-#define CLR_BUY_SIGNAL      clrLime          // 买入信号颜色
-#define CLR_SELL_SIGNAL     clrRed           // 卖出信号颜色
+#define CLR_BUY_SIGNAL      clrCyan          // 买入信号颜色
+#define CLR_SELL_SIGNAL     clrDeepPink      // 卖出信号颜色
 #define CLR_UP_TREND        clrDodgerBlue    // 上升趋势颜色
 #define CLR_DOWN_TREND      clrOrangeRed     // 下降趋势颜色
 #define CLR_NEUTRAL_LINE    clrGray          // 中性线颜色

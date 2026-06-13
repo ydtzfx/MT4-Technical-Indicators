@@ -21,8 +21,8 @@ double bullFVG[],bearFVG[],filledBuy[],filledSell[];
 int init() {
    SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullFVG);SetIndexArrow(0,ARROW_BUY);SetIndexLabel(0,"Bullish FVG");SetIndexEmptyValue(0,EMPTY_VALUE);
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearFVG);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"Bearish FVG");SetIndexEmptyValue(1,EMPTY_VALUE);
-   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,1,clrCyan);SetIndexBuffer(2,filledBuy);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"FVG Filled-Buy");SetIndexEmptyValue(2,EMPTY_VALUE);
-   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,1,clrDeepPink);SetIndexBuffer(3,filledSell);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"FVG Filled-Sell");SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,filledBuy);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"FVG Filled-Buy");SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,filledSell);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"FVG Filled-Sell");SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("FVG_Safe");return(0);
 }
 int deinit(){RemoveObjectsByPrefix("FVG_");return(0);}

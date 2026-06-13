@@ -19,10 +19,10 @@ input int InpReturnBars=3;   // 回归确认bar数
 double bullSweep[],bearSweep[],buySignal[],sellSignal[];
 
 int init() {
-   SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullSweep);SetIndexArrow(0,ARROW_BUY);SetIndexLabel(0,"Bullish Sweep");SetIndexEmptyValue(0,EMPTY_VALUE);
-   SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,3,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearSweep);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"Bearish Sweep");SetIndexEmptyValue(1,EMPTY_VALUE);
-   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,1,clrCyan);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Sweep Confirmed");SetIndexEmptyValue(2,EMPTY_VALUE);
-   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,1,clrDeepPink);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"Sweep Confirmed");SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(0,bullSweep);SetIndexArrow(0,ARROW_BUY);SetIndexLabel(0,"Bullish Sweep");SetIndexEmptyValue(0,EMPTY_VALUE);
+   SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(1,bearSweep);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"Bearish Sweep");SetIndexEmptyValue(1,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,buySignal);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Sweep Confirmed");SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,sellSignal);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"Sweep Confirmed");SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(4);IndicatorShortName("LiquiditySweep_Safe");return(0);
 }
 int deinit(){return(0);}

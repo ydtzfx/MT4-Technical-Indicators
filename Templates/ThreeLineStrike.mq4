@@ -53,13 +53,13 @@ int init()
    SetIndexBuffer(2, slowBuffer);
    SetIndexLabel(2, "Slow MA");
 
-   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 3, CLR_BUY_SIGNAL);
+   SetIndexStyle(3, DRAW_ARROW, STYLE_SOLID, 2, CLR_BUY_SIGNAL);
    SetIndexBuffer(3, strongBuy);
    SetIndexArrow(3, ARROW_BUY);
    SetIndexLabel(3, "Strong Buy");
    SetIndexEmptyValue(3, EMPTY_VALUE);
 
-   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 3, CLR_SELL_SIGNAL);
+   SetIndexStyle(4, DRAW_ARROW, STYLE_SOLID, 2, CLR_SELL_SIGNAL);
    SetIndexBuffer(4, strongSell);
    SetIndexArrow(4, ARROW_SELL);
    SetIndexLabel(4, "Strong Sell");

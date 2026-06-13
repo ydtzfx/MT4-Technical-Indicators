@@ -22,8 +22,8 @@ double gapUp[],gapDn[],gapFilled[],gapUnfilled[];
 int init() {
    SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,clrLimeGreen);SetIndexBuffer(0,gapUp);SetIndexArrow(0,ARROW_BUY);SetIndexLabel(0,"Gap Up");SetIndexEmptyValue(0,EMPTY_VALUE);
    SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,clrTomato);SetIndexBuffer(1,gapDn);SetIndexArrow(1,ARROW_SELL);SetIndexLabel(1,"Gap Down");SetIndexEmptyValue(1,EMPTY_VALUE);
-   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,1,clrCyan);SetIndexBuffer(2,gapFilled);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Gap Filled");SetIndexEmptyValue(2,EMPTY_VALUE);
-   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,1,clrDeepPink);SetIndexBuffer(3,gapUnfilled);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"Gap Holding");SetIndexEmptyValue(3,EMPTY_VALUE);
+   SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,4,clrCyan);SetIndexBuffer(2,gapFilled);SetIndexArrow(2,ARROW_BUY);SetIndexLabel(2,"Gap Filled");SetIndexEmptyValue(2,EMPTY_VALUE);
+   SetIndexStyle(3,DRAW_ARROW,STYLE_SOLID,4,clrDeepPink);SetIndexBuffer(3,gapUnfilled);SetIndexArrow(3,ARROW_SELL);SetIndexLabel(3,"Gap Holding");SetIndexEmptyValue(3,EMPTY_VALUE);
    IndicatorDigits(0);IndicatorShortName("GapAnalyzer_Safe");return(0);
 }
 int deinit(){return(0);}
