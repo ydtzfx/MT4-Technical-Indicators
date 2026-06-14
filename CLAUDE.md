@@ -4,141 +4,137 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a complete set of MetaTrader 4 (MT4) technical indicators written in MQL4, with a strict **no future function** (无未来函数) design. All buy/sell signals are generated exclusively from **completed bars** (bar index ≥ 1) and never repaint.
+A complete set of 201 MetaTrader 4 (MT4) technical indicators written in MQL4, all compiling with **0 errors** on MT4 Build 600+. Strict **no future function** (无未来函数) design — buy/sell signals are generated exclusively from completed bars (index ≥ 1) and never repaint.
 
-**212 files** across 7 directories: 201 indicator files (`.mq4`), 4 shared headers (`.mqh`), 1 CLAUDE.md, 1 README, plus automation config in `.claude/` and design docs in `docs/`.
+```
+201 indicator files (.mq4) + 4 shared headers (.mqh) + install script
+6 category directories: Trend(25) / Oscillators(20) / Volume(10) / BillWilliams(5) / Custom(140) / Templates(1)
+```
 
 ## Architecture
 
-### Header Dependency Chain
+### Header Dependency Chain (order matters)
 ```
-Common.mqh          ← fundamental constants, enums, MA calculation, safe division
+Common.mqh          ← constants, enums (SAFE_PRICE_*), CalculateMA(), SafeDivide(), IsNewBar()
   ↓
-PriceData.mqh       ← depends on Common.mqh; safe price data access, True Range, DM
+PriceData.mqh       ← GetTrueRange(), GetHighestHigh()/GetLowestLow(), FillPriceArray()
   ↓
-SignalBase.mqh      ← depends on Common.mqh; signal buffer pattern, cross detection, OB/OS
+SignalBase.mqh      ← DetectCross(), SetArrowSignal(), DetectOverboughtOversoldExit()
   ↓
-Drawing.mqh         ← depends on Common.mqh; arrows, lines, labels, object cleanup
+Drawing.mqh         ← RemoveObjectsByPrefix(), DrawBuyArrow(), DrawSellArrow(), DrawTrendLine()
 ```
 
-All `.mq4` indicator files `#include` the needed headers from `../Include/`. Not every indicator uses all headers — simpler ones may only need `Common.mqh`.
+Every `.mq4` file must `#include "../Include/Common.mqh"` at minimum.  22 files also include PriceData.mqh (those using GetTrueRange/GetHighestHigh).  8 files also include Drawing.mqh (those using RemoveObjectsByPrefix/DrawBuyArrow).
 
-### Core Design Rule: No Future Function
+### No Future Function Pattern
 
-```
-Signals (bar ≥ 1)  → permanent, never modified, never repaints
-Display (bar = 0)  → refreshed every tick, does NOT generate signals
-```
-
-Implementation pattern used in every `start()` function:
 ```mql4
 int start() {
     int counted_bars = IndicatorCounted();
     int limit = Bars - counted_bars;
-    if (limit > Bars - 2) limit = Bars - SAFETY_MARGIN;  // first-run protection
+    if (limit > Bars - 2) limit = Bars - SAFETY_MARGIN;
 
-    // Step 1: Compute history for bar[limit] down to bar[1]
-    for (int i = limit; i >= 1; i--) {
-        buffer[i] = CalculateValue(i);  // uses only data at i, i+1, i+2...
-        // Generate signals here (if applicable)
+    for (int i = limit; i >= 1; i--) {      // Signals: bar ≥ 1 only
+        buffer[i] = CalculateValue(i);
+        signalBuffer[i] = (condition) ? value : EMPTY_VALUE;
     }
-
-    // Step 2: Refresh bar[0] for display ONLY — no signal generation
-    buffer[0] = CalculateValue(0);
-    signalBuffer[0] = EMPTY_VALUE;  // NEVER signal on bar[0]
-
+    buffer[0] = CalculateValue(0);           // Display only
+    signalBuffer[0] = EMPTY_VALUE;           // NEVER signal on bar[0]
     return(0);
 }
 ```
 
-### Key Utilities in Headers (reuse instead of rewriting)
+## Installation
 
-| Header | Key Functions |
-|--------|--------------|
-| `Common.mqh` | `GetPriceByType()`, `CalculateMA()`, `SafeDivide()`, `IsNewBar()` |
-| `PriceData.mqh` | `GetCloseSignal()` (auto-promotes shift 0→1), `GetTrueRange()`, `GetHighestHigh()`/`GetLowestLow()` |
-| `SignalBase.mqh` | `DetectCross()` (line cross), `DetectOverboughtOversoldExit()`, `SetArrowSignal()` |
-| `Drawing.mqh` | `DrawBuyArrow()`, `DrawSellArrow()`, `RemoveAllObjects()` (prefix-based), `DrawTrendLine()` |
+Use the included script to auto-detect MT4 and install:
+```powershell
+.\install_to_mt4.ps1              # Interactive (detects MT4, confirms, copies)
+.\install_to_mt4.ps1 -Force       # Silent install
+.\install_to_mt4.ps1 -MT4Path "D:\MT4"  # Specify path
+```
 
-### Indicator Categories
+Manual install:
+1. Copy all `.mq4` files to `<MT4_Data>\MQL4\Indicators\`
+2. Copy all `.mqh` files to `<MT4_Data>\MQL4\Include\`
+3. Compile in MT4: F4 → open file → F7
 
-| Directory | Count | Chart Location | Signal Style |
-|-----------|-------|----------------|--------------|
-| `Trend/` | 7 | Main chart | Arrows at price level, some with strong-signal markers |
-| `Oscillators/` | 11 | Separate window | Arrows at indicator value, signal strength grading |
-| `Volume/` | 6 | Separate window | Arrows at indicator value + colored histograms |
-| `BillWilliams/` | 5 | Mixed (Fractals on chart, others separate) | Arrows |
-| `Custom/` | 20 | Mixed | Arrows, volatility markers, multi-line CR/BIAS/DMA |
-| `Templates/` | 1 | Main chart | Multi-level arrows |
+## Compilation
 
-### Enhanced Signal System (v2.0)
-Key indicators (RSI, MACD, MA, BollingerBands) now feature:
-- **Signal strength grading**: WEAK (single condition) → MEDIUM (2 conditions) → STRONG (3+ conditions)
-- **Strong signal buffers**: Cyan arrows for strong buy, DeepPink for strong sell (larger arrow size)
-- **Multi-condition confirmation**: Combines cross detection + zone exit + divergence + K-line pattern
-- **Bandwidth squeeze detection** (BollingerBands): Identifies low-volatility compression before breakouts
+MQL4 compilation requires MetaTrader 4. From command line:
+```powershell
+& "D:\ATFX\metaeditor.exe" /compile:"path\to\indicator.mq4" /log:"path\to\output.log"
+```
 
-## Adding a New Indicator
-
-1. Create the `.mq4` file in the appropriate category directory.
-2. Include needed headers with relative paths: `#include "../Include/Common.mqh"`
-3. Follow the `indicator_buffers N` pattern — allocate separate buffers for display lines and signal arrows.
-4. Use `indicator_separate_window` for oscillators/volume, `indicator_chart_window` for overlay indicators.
-5. Signal generation MUST happen only in the `i >= 1` loop. bar[0] loop should only update display values.
-6. Use `EMPTY_VALUE` as the "no signal" sentinel for arrow buffers.
-7. Name the file with `_Safe` suffix to mark it as future-function-free.
-
-## Testing / Verification
-
-MQL4 files must be compiled in the MetaTrader 4 platform:
-1. Copy files to `<MT4_Data>/MQL4/Indicators/` and headers to `<MT4_Data>/MQL4/Include/`
-2. Open MT4 → Tools → MetaQuotes Language Editor (F4)
-3. Compile each `.mq4` file (F7)
-4. Load onto a chart and verify: signals on historical bars do not change when new bars form
-
-No automated test framework exists for MQL4. Manual verification checklist:
-- [ ] Signal arrows appear on bar[1] or older, never on bar[0]
-- [ ] Historical signals remain unchanged after new ticks/bars
-- [ ] Indicator does not repaint when switching timeframes
-- [ ] `#property indicator_buffers` count matches actual SetIndexBuffer calls
-
-## Quick Validation (Static Analysis)
-
-Use these grep patterns to catch common no-future-function violations:
-```bash
-# Find bar[0] signal assignments (should only be EMPTY_VALUE in signal buffers)
-grep -rn "signal.*\[0\].*=" --include="*.mq4" . | grep -v EMPTY_VALUE
-
-# Verify IndicatorCounted usage in all indicators
-grep -rn "IndicatorCounted" --include="*.mq4" .
-
-# Count buffers declared vs. SetIndexBuffer calls per file
-grep -c "indicator_buffers" --include="*.mq4" .
+Check results (logs are UTF-16 LE):
+```powershell
+$c = [System.IO.File]::ReadAllText("output.log", [System.Text.Encoding]::Unicode)
+$c -match "0 error"  # True = success
 ```
 
 ## MQL4 Gotchas
 
-- **UTF-8 BOM required**: MT4 compiler requires UTF-8 with BOM encoding. Files without BOM will fail to compile.
-- **`#property strict`**: Not used in this project for MT4 backward compatibility. If migrating to MT5/MQL5, add it.
-- **Include paths**: Headers are referenced as `../Include/Common.mqh` from subdirectories. If MT4 can't find them, copy `.mqh` files to `<MT4_Data>/MQL4/Include/` and change `#include` to just `"Common.mqh"`.
-- **Buffer indexing**: `SetIndexBuffer` indices are **0-based** and must match the declaration order. If you reorder buffer declarations, update all `SetIndexBuffer` calls accordingly.
-- **`Bars` count**: `Bars` is the total number of bars in the chart. On first load, `IndicatorCounted()` returns 0 (or negative), so `limit = Bars - InpPeriod*3` prevents accessing non-existent history.
-- **`EMPTY_VALUE`**: Use for unfilled signal buffer slots. MT4 skips drawing at EMPTY_VALUE positions.
-- **Bar 0 volatility**: `iClose(_Symbol, _Period, 0)` changes every tick. Never use it for signal logic — only for live display updates.
+### C89 Function-Scope Variables (CRITICAL)
+MQL4 uses C89 scoping rules: variables declared anywhere in a function body (including inside `for` loops and `{ }` blocks) are scoped to the entire function. **Never declare the same variable name twice in the same function.**
+
+```mql4
+// WRONG — MQL4 treats both i as same scope:
+int start() {
+    for (int i = 0; i < 10; i++) { ... }
+    for (int i = 5; i < 15; i++) { ... }  // ERROR: 'i' already defined
+}
+
+// RIGHT — declare once at function top, reuse:
+int start() {
+    int i;
+    for (i = 0; i < 10; i++) { ... }
+    for (i = 5; i < 15; i++) { ... }
+}
+```
+
+This applies to ALL variable names including `j`, `jj`, `jjj`, `h`, `l`, `c`, `v`, `s`, `atr`, etc. The project uses `ii`, `iii`, `iiii`, `jj`, `jjj`, `jjjj`, `jjjjj`, `jjjjjj`, `jjjjjjj` as distinct names to avoid conflicts across nested loops within the same function.
+
+### No C-Style Pointer Arrays
+MQL4 does NOT support `double *arr[] = {buf1, buf2, ...}`. Each buffer must be individually declared and bound with SetIndexBuffer. Files that originally used pointer arrays (GuppyMMA, MTF_RSI, CandlePatternScanner, RainbowMA) have been rewritten with individual buffer declarations.
+
+### Enum Name Conflicts
+MQL4 predefines `PRICE_CLOSE`, `PRICE_OPEN`, `PRICE_HIGH`, `PRICE_LOW`, `PRICE_MEDIAN`, `PRICE_TYPICAL`, `PRICE_WEIGHTED` as built-in constants. This project uses `SAFE_PRICE_CLOSE`, `SAFE_PRICE_OPEN`, etc. in `Common.mqh` to avoid conflicts.
+
+### Other Gotchas
+- **UTF-8 BOM required**: Files without BOM fail to compile. All files in this repo have BOM.
+- **Include path**: `#include "../Include/Common.mqh"` is relative from category subdirectories. Works when project structure is preserved.
+- **`#property strict`**: Not used — for MT4 backward compatibility.
+- **`EMPTY_VALUE`**: Sentinel for unfilled signal buffer slots. MT4 skips drawing at these positions.
+- **Bar 0**: `iClose(_Symbol, _Period, 0)` changes every tick. Never use for signal logic.
+
+## Adding a New Indicator
+
+1. Create `.mq4` in the appropriate category directory.
+2. Add `#include "../Include/Common.mqh"` (and PriceData/Drawing if needed).
+3. Declare all loop variables at function top (not inside for-init).
+4. Use `indicator_buffers N` matching SetIndexBuffer count (0-based).
+5. Signals only in `i >= 1` loop; bar[0] sets `EMPTY_VALUE` on signal buffers.
+6. Name with `_Safe` suffix to mark as future-function-free.
+
+## Quick Validation
+
+```bash
+# Must return empty (no bar[0] signal assignments)
+grep -rn 'signal.*\[0\].*=' --include="*.mq4" . | grep -v EMPTY_VALUE
+
+# Verify all files have IndicatorCounted
+grep -L "IndicatorCounted" --include="*.mq4" ./*/
+
+# Verify all files have #include
+grep -L '#include' --include="*.mq4" ./*/
+
+# Check for MQL4-incompatible pointer arrays
+grep -rn 'double \*' --include="*.mq4" --include="*.mqh" .
+```
 
 ## Automation
 
-### Git Hooks (`hooks/` → `.git/hooks/`)
-- `pre-commit`: Validates staged `.mq4` files — blocks on CRITICAL violations (bar[0] signal, buffer count mismatch)
-- `pre-push`: Quick full scan with warnings only (never blocks push)
-
-### Claude Code Automation (`.claude/`)
-- `settings.json`: PostToolUse multi-rule validation (bar[0] + buffer count + include paths), SessionStart project summary, PreCompact state snapshot
-- `agents/mql4-reviewer.md`: Comprehensive MQL4 code reviewer covering 8 dimensions (bar[0] isolation, start() pattern, buffer integrity, header deps, signal persistence, signal grading, display style, header hygiene)
-- `skills/mql4-validate/SKILL.md`: 6-rule automated validator
-
-### CI/CD Validation
-Before loading indicators in MT4, run the quick check:
-```bash
-grep -rn 'signal.*\[0\].*=' --include="*.mq4" . | grep -v EMPTY_VALUE  # Must return empty
-```
+- `install_to_mt4.ps1`: Auto-detect MT4 data directory and install all indicators
+- `.claude/settings.json`: PostToolUse validation (bar[0] + buffer count + include paths)
+- `.claude/agents/mql4-reviewer.md`: 8-dimension MQL4 code reviewer
+- `.claude/skills/mql4-validate/SKILL.md`: 6-rule automated validator
+- `hooks/pre-commit`: Validates staged `.mq4` files — blocks on CRITICAL violations
