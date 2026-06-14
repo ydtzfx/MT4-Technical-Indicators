@@ -131,6 +131,20 @@ grep -L '#include' --include="*.mq4" ./*/
 grep -rn 'double \*' --include="*.mq4" --include="*.mqh" .
 ```
 
+## Development Workflow
+
+For any indicator change (new indicator, bug fix, enhancement):
+
+```
+/plan        → 设计实现方案，分析影响范围
+  ↓ 人确认    → 用户审批方案
+/goal        → 明确目标与验收标准
+  ↓ 看 diff   → 编写代码，检查变更
+/review      → Code review（可调用 mql4-reviewer agent）
+  ↓ 测试      → 编译验证：metaeditor.exe /compile + 全量编译确认
+  ↓ 人工合并   → commit + push
+```
+
 ## Automation
 
 - `install_to_mt4.ps1`: Auto-detect MT4 data directory and install all indicators
@@ -138,3 +152,4 @@ grep -rn 'double \*' --include="*.mq4" --include="*.mqh" .
 - `.claude/agents/mql4-reviewer.md`: 8-dimension MQL4 code reviewer
 - `.claude/skills/mql4-validate/SKILL.md`: 6-rule automated validator
 - `hooks/pre-commit`: Validates staged `.mq4` files — blocks on CRITICAL violations
+- `hooks/pre-push`: Full scan with warnings only (never blocks push)
