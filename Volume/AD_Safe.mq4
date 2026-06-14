@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                     AD_Safe.mq4   |
 //|  累积/派发指标 — 不含未来函数                                     |
@@ -103,7 +104,7 @@ int start()
    }
 
    // 背离信号（bar[1]+确认），含强信号分级
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       double close_i  = iClose(_Symbol, _Period, i);
       double close_i3 = iClose(_Symbol, _Period, i + 3);

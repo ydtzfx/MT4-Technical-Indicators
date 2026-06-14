@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    BR_Safe.mq4    |
 //|  意愿指标（BR）— 不含未来函数                                     |
@@ -114,7 +115,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
       // Strong Buy: 极度超卖回升 + 价格上涨确认
@@ -145,7 +146,7 @@ int start()
    if(Bars > 0)
    {
       double sH = 0.0, sL = 0.0;
-      for(int j = 0; j < InpBRPeriod; j++)
+      for(int jj = 0; j < InpBRPeriod; j++)
       {
          double pc = iClose(_Symbol, _Period, j + 1);
          double h  = iHigh(_Symbol, _Period, j);

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     CandleRetracementDepth_Safe   |
 //|  K线回撤深度 — 每根K线相对于前一波动的回撤百分比                    |
@@ -21,7 +22,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double swing=hh-ll;double c=iClose(_Symbol,_Period,i);
       retrace[i]=swing>0?100*(c-ll)/swing:50;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       if(retrace[i+1]>61.8&&retrace[i]<38.2)buySignal[i]=retrace[i]-5;   // 从深度回撤反弹→买入
       if(retrace[i+1]<38.2&&retrace[i]>61.8)sellSignal[i]=retrace[i]+5; // 从浅回撤跌入深回撤
    }if(Bars>0){retrace[0]=retrace[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

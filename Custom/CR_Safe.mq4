@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    CR_Safe.mq4    |
 //|  能量指标（CR）— 不含未来函数                                     |
@@ -142,14 +143,14 @@ int start()
    }
 
    // --- 第2步：计算四条均线 ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // a均线 = SMA(CR, InpMAa)
       double sa = 0.0, sb = 0.0, sc = 0.0, sd = 0.0;
-      for(int j = 0; j < InpMAa; j++) sa += crBuffer[i + j];
-      for(int j = 0; j < InpMAb; j++) sb += crBuffer[i + j];
-      for(int j = 0; j < InpMAc; j++) sc += crBuffer[i + j];
-      for(int j = 0; j < InpMAd; j++) sd += crBuffer[i + j];
+      for(int jj = 0; j < InpMAa; j++) sa += crBuffer[i + j];
+      for(int jjj = 0; j < InpMAb; j++) sb += crBuffer[i + j];
+      for(int jjjj = 0; j < InpMAc; j++) sc += crBuffer[i + j];
+      for(int jjjjj = 0; j < InpMAd; j++) sd += crBuffer[i + j];
 
       maA[i] = sa / InpMAa;
       maB[i] = sb / InpMAb;
@@ -158,7 +159,7 @@ int start()
    }
 
    // --- 第3步：信号判断（bar[1]+，CR上穿多条均线确认强度）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // 统计CR上穿几条均线
       int upCross = 0;
@@ -193,7 +194,7 @@ int start()
    if(Bars > 0)
    {
       double sH0 = 0.0, sL0 = 0.0;
-      for(int j = 0; j < InpCRPeriod; j++)
+      for(int jjjjjj = 0; j < InpCRPeriod; j++)
       {
          double pm = (iHigh(_Symbol, _Period, j + 1) + iLow(_Symbol, _Period, j + 1) + iClose(_Symbol, _Period, j + 1)) / 3.0;
          sH0 += MathMax(iHigh(_Symbol, _Period, j) - pm, 0.0);

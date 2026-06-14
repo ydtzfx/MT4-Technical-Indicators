@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                               Gator_Safe.mq4      |
 //|  鳄鱼震荡器 — 不含未来函数                                        |
@@ -93,7 +94,7 @@ double CalcSMMA(double &prices[], int period, int shift)
    for(int i = start; i < start + period; i++)
       smma += prices[i];
    smma /= period;
-   for(int i = start - 1; i >= 0; i--)
+   for(i = start - 1; i >= 0; i--)
       smma = (prices[i] + smma * (period - 1.0)) / period;
    return(smma);
 }
@@ -101,7 +102,7 @@ double CalcSMMA(double &prices[], int period, int shift)
 //+------------------------------------------------------------------+
 int start()
 {
-   int counted_bars = IndicatorCounted();
+   int i, counted_bars = IndicatorCounted();
    if(counted_bars < 0) counted_bars = 0;
    int limit = Bars - counted_bars;
    if(limit > Bars - 2) limit = Bars - InpJawPeriod * 3;
@@ -109,7 +110,7 @@ int start()
 
    int maxShift = InpJawPeriod + InpJawShift;
 
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       int arrSize = maxShift * 2;
       double median[];
@@ -137,7 +138,7 @@ int start()
    }
 
    // 信号：鳄鱼苏醒检测（bar[1]+）
-   for(int i = limit; i >= 2; i--)
+   for(i = limit; i >= 2; i--)
    {
       double prevUpHeight = MathAbs(upBarBuffer[i+1]);
       double currUpHeight = MathAbs(upBarBuffer[i]);

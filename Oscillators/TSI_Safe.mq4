@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    TSI_Safe.mq4   |
 //|  真实强弱指数（True Strength Index）— 不含未来函数                 |
@@ -34,18 +35,18 @@ int start() {
    double pc[];ArrayResize(pc,Bars);for(int i=Bars-2;i>=1;i--)pc[i]=iClose(_Symbol,_Period,i)-iClose(_Symbol,_Period,i+1);
    double aR=2.0/(InpR+1),aS=2.0/(InpS+1),aSig=2.0/(InpSig+1);
    double ds1[],ds2[];ArrayResize(ds1,Bars);ArrayResize(ds2,Bars);
-   for(int i=Bars-2;i>=1;i--){
+   for(i=Bars-2;i>=1;i--){
       if(i>=Bars-100){ds1[i]=pc[i];ds2[i]=MathAbs(pc[i]);}
       else{ds1[i]=pc[i]*aR+ds1[i+1]*(1-aR);ds2[i]=MathAbs(pc[i])*aR+ds2[i+1]*(1-aR);}
    }
    double e1[],e2[];ArrayResize(e1,Bars);ArrayResize(e2,Bars);
-   for(int i=Bars-2;i>=1;i--){
+   for(i=Bars-2;i>=1;i--){
       if(i>=Bars-120){e1[i]=ds1[i];e2[i]=ds2[i];}
       else{e1[i]=ds1[i]*aS+e1[i+1]*(1-aS);e2[i]=ds2[i]*aS+e2[i+1]*(1-aS);}
    }
-   for(int i=limit;i>=1;i--){tsi[i]=SafeDivide(100*e1[i],e2[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=1;i--){double e=tsi[i+10];for(int j=9;j>=0;j--)e=tsi[i+j]*aSig+e*(1-aSig);signal[i]=e;}
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){tsi[i]=SafeDivide(100*e1[i],e2[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=1;i--){double e=tsi[i+10];for(int j=9;j>=0;j--)e=tsi[i+j]*aSig+e*(1-aSig);signal[i]=e;}
+   for(i=limit;i>=1;i--){
       bool crossUp=(tsi[i+1]<=signal[i+1]&&tsi[i]>signal[i]);
       bool crossDn=(tsi[i+1]>=signal[i+1]&&tsi[i]<signal[i]);
       bool zeroUp=(tsi[i+1]<0&&tsi[i]>0);

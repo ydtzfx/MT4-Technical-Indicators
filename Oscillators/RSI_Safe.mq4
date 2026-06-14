@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    RSI_Safe.mq4  |
 //|  相对强弱指数 — 不含未来函数                                      |
@@ -26,7 +27,7 @@
 
 // 输入参数
 input int   InpRSIPeriod = 14;      // RSI周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input double InpOverbought = 70.0;  // 超买水平
 input double InpOversold   = 30.0;  // 超卖水平
 input color  InpRSIColor   = clrDodgerBlue; // RSI线颜色
@@ -104,7 +105,7 @@ int start()
       double avgLoss = (changes[startIdx] < 0) ? -changes[startIdx] : 0.0;
 
       double alpha = 2.0 / (InpRSIPeriod + 1.0);
-      for(int j = startIdx - 1; j >= 0; j--)
+      for(int jj = startIdx - 1; j >= 0; j--)
       {
          if(changes[j] > 0)
          {
@@ -128,7 +129,7 @@ int start()
    }
 
    // 信号判断（bar[1]+确认，增强版：多条件确认+信号强度分级）
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       int buyConditions = 0, sellConditions = 0;
 
@@ -146,7 +147,7 @@ int start()
       if(p1<p2&&p2<p3&&r1>r2&&r2>r3&&r1<50) { buySignal[i]=5.0; buyConditions+=2; }
 
       // 条件3：RSI与均线交叉（RSI的短期趋势转多）
-      double rsiMA=0; for(int j=0;j<5;j++)rsiMA+=rsiBuffer[i+j]*0.2;
+      double rsiMA=0; for(int jjj=0;j<5;j++)rsiMA+=rsiBuffer[i+j]*0.2;
       if(rsiBuffer[i+1]<=rsiMA&&rsiBuffer[i]>rsiMA&&rsiBuffer[i]<50)
          { buyConditions++; }
 

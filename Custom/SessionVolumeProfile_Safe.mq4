@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      SessionVolumeProfile_Safe    |
 //|  时段成交量分布 — 原创指标                                         |
@@ -54,18 +55,18 @@ int start() {
 
       // 欧盘VWAP
       sumPV=0;sumV=0;cnt=0;
-      for(int j=i;j<Bars;j++){
-         datetime tj=iTime(_Symbol,_Period,j);int hj=TimeHour(tj);
-         if(hj>=InpEUStart&&hj<InpEUEnd){double tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;long v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
+      for(int jj=i;j<Bars;j++){
+         tj=iTime(_Symbol,_Period,j);hj=TimeHour(tj);
+         if(hj>=InpEUStart&&hj<InpEUEnd){tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
          if(cnt>0&&(hj>=InpEUEnd||j-i>500))break;
       }
       euVWAP[i]=cnt>0?sumPV/sumV:c;
 
       // 美盘VWAP
       sumPV=0;sumV=0;cnt=0;
-      for(int j=i;j<Bars;j++){
-         datetime tj=iTime(_Symbol,_Period,j);int hj=TimeHour(tj);
-         if(hj>=InpUSStart&&hj<InpUSEnd){double tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;long v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
+      for(int jjj=i;j<Bars;j++){
+         tj=iTime(_Symbol,_Period,j);hj=TimeHour(tj);
+         if(hj>=InpUSStart&&hj<InpUSEnd){tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
          if(cnt>0&&(hj>=InpUSEnd||j-i>500))break;
       }
       usVWAP[i]=cnt>0?sumPV/sumV:c;

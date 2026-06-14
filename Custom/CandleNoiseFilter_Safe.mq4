@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        CandleNoiseFilter_Safe.mq4 |
 //|  K线噪声过滤器 — 分离信号K线与噪声K线                              |
@@ -18,5 +19,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
          // 信号K线：大实体+小影线+方向明确
          if(b>r*0.5&&MathMax(upW,loW)<0.3)sigC++;}
       signalPct[i]=100.0*sigC/InpPeriod;noise[i]=100-signalPct[i];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=3;i++){if(noise[i+2]>70&&signalPct[i]>50&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=signalPct[i]-10;if(noise[i+2]>70&&signalPct[i]>50&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1))sellSignal[i]=signalPct[i]+10;}
+   for(i=limit;i>=3;i++){if(noise[i+2]>70&&signalPct[i]>50&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=signalPct[i]-10;if(noise[i+2]>70&&signalPct[i]>50&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1))sellSignal[i]=signalPct[i]+10;}
    if(Bars>0){signalPct[0]=signalPct[1];noise[0]=noise[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

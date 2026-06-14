@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                  CandleCloseVsPrevRange_Safe.mq4  |
 //|  收盘vs前范围 — 当前收盘在前一根K线范围内的位置                    |
@@ -19,7 +20,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       cvp[i]=pRange>0?100*(c-pl)/pRange:50;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 连续在上半区(>60)→强势整理后突破
       if(cvp[i+2]>60&&cvp[i+1]>60&&cvp[i]>100)buySignal[i]=100;
       // 从>100回落到<80=假突破确认

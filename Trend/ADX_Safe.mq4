@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    ADX_Safe.mq4  |
 //|  平均趋向指数 — 不含未来函数                                      |
@@ -146,7 +147,7 @@ int start()
       double emaMinusDM = minusDMVals[InpADXPeriod * 2 - 1];
 
       double alpha = 2.0 / (InpADXPeriod + 1.0);
-      for(int j = InpADXPeriod * 2 - 2; j >= 0; j--)
+      for(int jj = InpADXPeriod * 2 - 2; j >= 0; j--)
       {
          emaTR      = trVals[j] * alpha + emaTR * (1.0 - alpha);
          emaPlusDM  = plusDMVals[j] * alpha + emaPlusDM * (1.0 - alpha);
@@ -176,10 +177,10 @@ int start()
 
    // ADX平滑（对DX数组做EMA）
    double alphaADX = 2.0 / (InpADXPeriod + 1.0);
-   for(int i = Bars - InpADXPeriod * 3 - 1; i >= 1; i--)
+   for(i = Bars - InpADXPeriod * 3 - 1; i >= 1; i--)
    {
       double ema = adxBuffer[i + InpADXPeriod - 1];
-      for(int j = InpADXPeriod - 2; j >= 0; j--)
+      for(int jjj = InpADXPeriod - 2; j >= 0; j--)
       {
          ema = adxBuffer[i + j] * alphaADX + ema * (1.0 - alphaADX);
       }
@@ -187,7 +188,7 @@ int start()
    }
 
    // 信号判断（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool crossUp   = (plusDIBuffer[i+1] <= minusDIBuffer[i+1] && plusDIBuffer[i] > minusDIBuffer[i]);
       bool crossDown = (minusDIBuffer[i+1] <= plusDIBuffer[i+1] && minusDIBuffer[i] > plusDIBuffer[i]);

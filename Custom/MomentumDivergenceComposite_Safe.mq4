@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                MomentumDivergenceComposite_Safe   |
 //|  多周期动量背离复合 — 原创指标                                     |
@@ -57,7 +58,7 @@ int start() {
       composite[i]=0.5*shortDiv[i]+0.3*midDiv[i]+0.2*longDiv[i];
       signal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 三周期同时从负转正 = 强烈底背离共振买入
       if(shortDiv[i+1]<=0&&shortDiv[i]>0&&midDiv[i]>0&&longDiv[i]>0)signal[i]=-70;
       // 三周期同时从正转负 = 强烈顶背离共振卖出

@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                                GapAnalyzer_Safe   |
 //|  缺口分析器 — 原创指标                                            |
@@ -36,7 +38,7 @@ int ClassifyGap(int bar,bool isUp,double gapSize,double atr){
    // 计算成交量
    double vR=SafeDivide((double)iVolume(_Symbol,_Period,bar),(double)iVolume(_Symbol,_Period,bar+10),1);
    // 计算ADX
-   double trS=0,pS=0,mS=0;for(int j=0;j<10;j++){int s=bar+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pS+=up;if(dn>up&&dn>0)mS+=dn;}
+   double trS=0,pS=0,mS=0;for(int jj=0;j<10;j++){int s=bar+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pS+=up;if(dn>up&&dn>0)mS+=dn;}
    double adx=SafeDivide(100*MathAbs(pS-mS),pS+mS,0);
 
    if(adx<20)return 1; // Common
@@ -47,13 +49,14 @@ int ClassifyGap(int bar,bool isUp,double gapSize,double atr){
 }
 
 int start() {
+   int j;
    int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){gapUp[i]=EMPTY_VALUE;gapDn[i]=EMPTY_VALUE;gapFilled[i]=EMPTY_VALUE;gapUnfilled[i]=EMPTY_VALUE;}
 
-   double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
+   double atr=0;for(int jjj=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
 
-   for(int i=limit;i>=5;i--){
+   for(i=limit;i>=5;i--){
       double gap=iOpen(_Symbol,_Period,i)-iClose(_Symbol,_Period,i+1);
       double gapPct=SafeDivide(MathAbs(gap),atr,0)*100;
 
@@ -64,7 +67,7 @@ int start() {
 
          // 判断是否已被回补（价格回到缺口内）
          bool filled=false;
-         for(int j=0;j<i;j++){
+         for(int jjjj=0;j<i;j++){
             if(gap>0&&iLow(_Symbol,_Period,j)<=iClose(_Symbol,_Period,i+1))filled=true;
             else if(gap<0&&iHigh(_Symbol,_Period,j)>=iClose(_Symbol,_Period,i+1))filled=true;
          }

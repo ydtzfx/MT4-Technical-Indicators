@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      CandlePhaseClassifier_Safe   |
 //|  K线相位分类 — 每根K线属于推动/修正/盘整中的哪一类                 |
@@ -25,5 +26,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       else phase[i]=0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){if(phase[i+1]==0&&phase[i]==1)buySignal[i]=0.5;if(phase[i+1]==0&&phase[i]==-1)sellSignal[i]=-0.5;}
+   for(i=limit;i>=3;i++){if(phase[i+1]==0&&phase[i]==1)buySignal[i]=0.5;if(phase[i+1]==0&&phase[i]==-1)sellSignal[i]=-0.5;}
    if(Bars>0){phase[0]=phase[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

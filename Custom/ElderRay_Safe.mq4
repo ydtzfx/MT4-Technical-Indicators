@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                ElderRay_Safe.mq4  |
 //|  艾尔德射线（Elder Ray Index）— 不含未来函数                      |
@@ -34,12 +35,12 @@ int start() {
    for(int i=limit;i>=1;i--){
       double p[50];for(int j=0;j<50;j++)p[j]=iClose(_Symbol,_Period,i+j);
       double ema=p[49];double a=2.0/(InpPeriod+1);
-      for(int j=48;j>=0;j--)ema=p[j]*a+ema*(1-a);
+      for(int jj=48;j>=0;j--)ema=p[j]*a+ema*(1-a);
       bull[i]=iHigh(_Symbol,_Period,i)-ema;bear[i]=iLow(_Symbol,_Period,i)-ema;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
       strongBuySignal[i]=EMPTY_VALUE;strongSellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double c=iClose(_Symbol,_Period,i),c3=iClose(_Symbol,_Period,i+3);
       bool reversalBuy  = bull[i+1]<0 && bull[i]>0 && bear[i]>bear[i+1];
       bool reversalSell = bear[i+1]>0 && bear[i]<0 && bull[i]<bull[i+1];

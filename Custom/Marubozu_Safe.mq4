@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                             Marubozu_Safe.mq4     |
 //|  光头光脚检测 — 趋势最强信号                                       |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,4,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){maruBull[i]=maruBear[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       double o=iOpen(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i);
       double r=h-l;if(r<_Point)continue;
       double upW=h-MathMax(o,c),loW=MathMin(o,c)-l;

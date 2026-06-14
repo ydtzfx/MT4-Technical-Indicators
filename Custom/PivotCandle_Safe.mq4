@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          PivotCandle_Safe.mq4     |
 //|  枢纽K线 — 标记摆动高低点K线+反转确认                              |
@@ -13,15 +14,15 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,4,clrTomato);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){pivotHigh[i]=pivotLow[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpSwingBars;i--){
+   for(i=limit;i>=InpSwingBars;i--){
       double h=iHigh(_Symbol,_Period,i);bool isHigh=true;
       for(int j=1;j<=InpSwingBars;j++){if(i+j<Bars&&iHigh(_Symbol,_Period,i+j)>=h)isHigh=false;if(i-j>=0&&iHigh(_Symbol,_Period,i-j)>=h)isHigh=false;}
       if(isHigh){pivotHigh[i]=h+5*Point;
          // 枢纽K线确认反转：后续跌破枢纽K线低点
          for(int k=i-1;k>=1;k--){if(iLow(_Symbol,_Period,k)<iLow(_Symbol,_Period,i)){sellSignal[k]=iHigh(_Symbol,_Period,k)+10*Point;break;}}}
       double l=iLow(_Symbol,_Period,i);bool isLow=true;
-      for(int j=1;j<=InpSwingBars;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=l)isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=l)isLow=false;}
+      for(int jj=1;j<=InpSwingBars;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=l)isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=l)isLow=false;}
       if(isLow){pivotLow[i]=l-5*Point;
-         for(int k=i-1;k>=1;k--){if(iHigh(_Symbol,_Period,k)>iHigh(_Symbol,_Period,i)){buySignal[k]=iLow(_Symbol,_Period,k)-10*Point;break;}}}
+         for(int kk=i-1;k>=1;k--){if(iHigh(_Symbol,_Period,k)>iHigh(_Symbol,_Period,i)){buySignal[k]=iLow(_Symbol,_Period,k)-10*Point;break;}}}
    }
    return(0);}

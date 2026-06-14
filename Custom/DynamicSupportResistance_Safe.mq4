@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                   DynamicSupportResistance_Safe   |
 //|  动态支撑阻力 — 原创指标                                           |
@@ -37,10 +38,10 @@ int start() {
 
       // 统计触碰次数确认S/R强度
       int touchRes=0,touchSup=0;double resZone=0,supZone=0;
-      for(int j=1;j<InpLookback;j++){
-         double h=iHigh(_Symbol,_Period,i+j);
+      for(int jj=1;j<InpLookback;j++){
+         h=iHigh(_Symbol,_Period,i+j);
          if(MathAbs(h-hh)<(hh*0.002)){touchRes++;resZone+=h;}
-         double l=iLow(_Symbol,_Period,i+j);
+         l=iLow(_Symbol,_Period,i+j);
          if(MathAbs(l-ll)<(ll*0.002)){touchSup++;supZone+=l;}
       }
       // 触碰>=阈值才视为有效S/R（动态调整）
@@ -51,7 +52,7 @@ int start() {
 
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // 突破动态阻力 → 强势买入
       if(resistance[i]>0&&c1<=resistance[i+1]&&c>resistance[i])buySignal[i]=support[i]>0?support[i]:iLow(_Symbol,_Period,i)-10*Point;

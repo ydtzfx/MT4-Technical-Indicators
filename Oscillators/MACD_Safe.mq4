@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   MACD_Safe.mq4   |
 //|  指数平滑异同移动平均线 — 不含未来函数                              |
@@ -23,7 +24,7 @@
 input int    InpFastEMA   = 12;    // 快EMA周期
 input int    InpSlowEMA   = 26;    // 慢EMA周期
 input int    InpSignalSMA = 9;     // 信号线周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input color  InpMACDColor    = clrDodgerBlue;  // MACD线颜色
 input color  InpSignalColor  = clrRed;         // 信号线颜色
 input color  InpHistUpColor  = clrLimeGreen;   // 多头柱颜色
@@ -101,7 +102,7 @@ double CalcEMAFromArray(double &prices[], int period)
    ema /= period;
 
    double alpha = 2.0 / (period + 1.0);
-   for(int i = size - period - 1; i >= 0; i--)
+   for(i = size - period - 1; i >= 0; i--)
       ema = prices[i] * alpha + ema * (1.0 - alpha);
 
    return(ema);
@@ -110,6 +111,7 @@ double CalcEMAFromArray(double &prices[], int period)
 //+------------------------------------------------------------------+
 int start()
 {
+   int i;
    int counted_bars = IndicatorCounted();
    if(counted_bars < 0) counted_bars = 0;
    int limit = Bars - counted_bars;
@@ -119,7 +121,7 @@ int start()
    // 需要足够的历史数据
    int histSize = InpSlowEMA * 3;
 
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       if(i + histSize >= Bars) continue;
 
@@ -143,12 +145,12 @@ int start()
 
    // 计算Signal线（对MACD的EMA）
    int signalStart = Bars - InpSlowEMA * 3 - InpSignalSMA;
-   for(int i = signalStart - 1; i >= 1; i--)
+   for(i = signalStart - 1; i >= 1; i--)
    {
       double macdVals[];
       ArrayResize(macdVals, InpSignalSMA * 2);
       int count = 0;
-      for(int j = 0; j < InpSignalSMA * 2; j++)
+      for(int jj = 0; j < InpSignalSMA * 2; j++)
       {
          if(i + j < ArraySize(macdBuffer))
             macdVals[count++] = macdBuffer[i + j];
@@ -156,12 +158,12 @@ int start()
       if(count >= InpSignalSMA)
       {
          double ema = 0.0;
-         for(int j = 0; j < InpSignalSMA; j++)
+         for(int jjj = 0; j < InpSignalSMA; j++)
             ema += macdVals[j];
          ema /= InpSignalSMA;
 
          double alphaSig = 2.0 / (InpSignalSMA + 1.0);
-         for(int j = InpSignalSMA; j < count; j++)
+         for(int jjjj = InpSignalSMA; j < count; j++)
             ema = macdVals[j] * alphaSig + ema * (1.0 - alphaSig);
 
          signalBuffer[i] = ema;
@@ -170,7 +172,7 @@ int start()
    }
 
    // 信号判断（bar[1]+确认，增强版：分级信号+零轴+柱状图趋势）
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       // ===== 买入信号 =====
       int buyCond = 0;

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    VolumeSpreadCandle_Safe.mq4    |
 //|  VSA量价K线 — Volume Spread Analysis on Candles                   |
@@ -16,14 +17,14 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double r=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i),v=iVolume(_Symbol,_Period,i);
       double avgR=0,avgV=0,sdR=0,sdV=0;
       for(int j=0;j<InpAvgPeriod;j++){double rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);avgR+=rj;avgV+=iVolume(_Symbol,_Period,i+j);}avgR/=InpAvgPeriod;avgV/=InpAvgPeriod;
-      for(int j=0;j<InpAvgPeriod;j++){double rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);sdR+=(rj-avgR)*(rj-avgR);sdV+=(iVolume(_Symbol,_Period,i+j)-avgV)*(iVolume(_Symbol,_Period,i+j)-avgV);}
+      for(int jj=0;j<InpAvgPeriod;j++){rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);sdR+=(rj-avgR)*(rj-avgR);sdV+=(iVolume(_Symbol,_Period,i+j)-avgV)*(iVolume(_Symbol,_Period,i+j)-avgV);}
       sdR=MathSqrt(sdR/InpAvgPeriod);sdV=MathSqrt(sdV/InpAvgPeriod);
       volZ[i]=sdV>0?(v-avgV)/sdV:0;spreadZ[i]=sdR>0?(r-avgR)/sdR:0;
       bool isUp=iClose(_Symbol,_Period,i)>iOpen(_Symbol,_Period,i);
       double sig=volZ[i]+spreadZ[i];if(isUp)sig=MathAbs(sig);else sig=-MathAbs(sig);
       vsaSignal[i]=sig;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(volZ[i+1]<-1&&spreadZ[i+1]<-1&&volZ[i]>0&&spreadZ[i]>0){if(vsaSignal[i]>0)buySignal[i]=-5;else sellSignal[i]=5;}
       if(volZ[i]>2&&spreadZ[i]<0&&iClose(_Symbol,_Period,i)<iOpen(_Symbol,_Period,i))sellSignal[i]=5; // 巨量滞涨
    }

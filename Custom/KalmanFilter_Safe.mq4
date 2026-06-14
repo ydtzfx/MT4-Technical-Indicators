@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                           KalmanFilter_Safe.mq4   |
 //|  卡尔曼滤波器 — 信号处理指标                                      |
@@ -40,7 +42,7 @@ int start() {
       else{
          // 自适应Q：波动大时增大过程噪声
          double atr=0;for(int j=0;j<5;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=5;
-         double longATR=0;for(int j=0;j<50;j++)longATR+=GetTrueRange(_Symbol,_Period,i+j);longATR/=50;
+         double longATR=0;for(int jj=0;j<50;j++)longATR+=GetTrueRange(_Symbol,_Period,i+j);longATR/=50;
          double qAdapt=InpQ*MathMax(0.5,MathMin(3.0,atr/longATR));
 
          // 预测
@@ -58,7 +60,7 @@ int start() {
          buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
       }
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double c3=iClose(_Symbol,_Period,i+3);
       // Strong Buy: 从下轨下方回升 + 价格同步上涨

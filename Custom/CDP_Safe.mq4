@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   CDP_Safe.mq4    |
 //|  逆势操作指标（CDP）— 不含未来函数                                |
@@ -55,7 +56,7 @@ int start() {
    for(int i=limit;i>=0;i--){cdp[i]=0;r1[i]=0;s1[i]=0;r2[i]=0;s2[i]=0;r3[i]=0;s3[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
 
    // 计算每个"日"周期的CDP及支撑阻力位
-   for(int i=limit+InpDayBars;i>=InpDayBars;i--) {
+   for(i=limit+InpDayBars;i>=InpDayBars;i--) {
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i);
       for(int j=1;j<InpDayBars;j++) {
          double hh=iHigh(_Symbol,_Period,i+j),ll=iLow(_Symbol,_Period,i+j);
@@ -69,7 +70,7 @@ int start() {
    }
 
    // 信号（bar[1]+确认）— strong优先
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double close=iClose(_Symbol,_Period,i),close1=iClose(_Symbol,_Period,i+1);
       // === 强买：突破R2（最强阻力位）===
       if(close1<=r2[i+1]&&close>r2[i])strongBuy[i]=s2[i]-10*Point;

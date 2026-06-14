@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     MarketFacilitation_Safe.mq4   |
 //|  市场促进指数（BW MFI）— 不含未来函数                              |
@@ -88,7 +89,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 分辨4种状态
-   for(int i = limit; i >= 2; i--)
+   for(i = limit; i >= 2; i--)
    {
       long vol_i   = iVolume(_Symbol, _Period, i);
       long vol_i1  = iVolume(_Symbol, _Period, i + 1);
@@ -123,8 +124,8 @@ int start()
          // 巨量+小波动 = 反转前兆
          if(vol_i > vol_i1 * 1.5)
          {
-            double closeCurr = iClose(_Symbol, _Period, i);
-            double closePrev = iClose(_Symbol, _Period, i + 1);
+            closeCurr = iClose(_Symbol, _Period, i);
+            closePrev = iClose(_Symbol, _Period, i + 1);
             if(closeCurr < closePrev)
                buySignal[i] = mfi_i * 0.5;  // 潜在反转买入
             else

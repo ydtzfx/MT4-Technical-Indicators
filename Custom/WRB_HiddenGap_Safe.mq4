@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           WRB_HiddenGap_Safe.mq4  |
 //|  宽幅实体+隐藏缺口（WRB Hidden Gap）检测                            |
@@ -14,7 +15,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){wrbUp[i]=wrbDn[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
    double avgBody=0;for(int j=0;j<20;j++)avgBody+=MathAbs(iClose(_Symbol,_Period,limit+10+j)-iOpen(_Symbol,_Period,limit+10+j));avgBody/=20;
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double body=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i));
       if(body>avgBody*InpWRBThreshold){
          double upShadow=iHigh(_Symbol,_Period,i)-MathMax(iOpen(_Symbol,_Period,i),iClose(_Symbol,_Period,i));

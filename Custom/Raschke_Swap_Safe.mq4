@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           Raschke_Swap_Safe.mq4   |
 //|  Raschke摆动交易 — Linda Bradford Raschke的策略                    |
@@ -42,11 +43,11 @@ int start() {
       double adx=SafeDivide(100*MathAbs(ps-ms),ps+ms,0);
 
       double stH=iHigh(_Symbol,InpTrendTF,trendBar),stL=iLow(_Symbol,InpTrendTF,trendBar);
-      for(int j=0;j<5;j++){int s=trendBar+j;double h=iHigh(_Symbol,InpTrendTF,s),l=iLow(_Symbol,InpTrendTF,s);if(h>stH)stH=h;if(l<stL)stL=l;}
+      for(int jj=0;j<5;j++){s=trendBar+j;double h=iHigh(_Symbol,InpTrendTF,s),l=iLow(_Symbol,InpTrendTF,s);if(h>stH)stH=h;if(l<stL)stL=l;}
       double stoch=SafeDivide(100*(iClose(_Symbol,InpTrendTF,trendBar)-stL),stH-stL,50);
 
       // 小周期：RSI
-      double aG=0,aL=0;for(int j=0;j<InpRSIPeriod;j++){double ch=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);if(ch>0)aG+=ch;else aL-=ch;}
+      double aG=0,aL=0;for(int jjj=0;j<InpRSIPeriod;j++){double ch=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);if(ch>0)aG+=ch;else aL-=ch;}
       double rsi=SafeDivide(100*aG,aG+aL,50);
 
       // Raschke信号：大趋势+回调+RSI反转
@@ -59,7 +60,7 @@ int start() {
       }
       raschkeSignal[i]=sig;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(raschkeSignal[i+1]<-50&&raschkeSignal[i]>-50)buySignal[i]=-55;
       if(raschkeSignal[i+1]>50&&raschkeSignal[i]<50)sellSignal[i]=55;
    }

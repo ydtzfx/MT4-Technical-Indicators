@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                Aroon_Safe.mq4     |
 //|  阿隆指标（Aroon）— 不含未来函数                                  |
@@ -42,7 +43,7 @@ int start() {
       aroonUp[i]=100.0*(InpPeriod-highBars)/InpPeriod;aroonDown[i]=100.0*(InpPeriod-lowBars)/InpPeriod;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       // Aroon Up 上穿 Aroon Down → 多头趋势启动
       if(aroonUp[i+1]<=aroonDown[i+1]&&aroonUp[i]>aroonDown[i]&&aroonUp[i]>70&&aroonDown[i]<30)strongBuy[i]=45;
       else if(aroonUp[i+1]<=aroonDown[i+1]&&aroonUp[i]>aroonDown[i]&&aroonUp[i]>50)buySignal[i]=45;

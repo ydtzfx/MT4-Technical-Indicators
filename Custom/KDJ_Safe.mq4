@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    KDJ_Safe.mq4   |
 //|  KDJ随机指标 — 不含未来函数                                       |
@@ -119,7 +120,7 @@ int start()
    }
 
    // KDJ递推（使用EMA平滑）
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       double alpha = 1.0 / InpSlowing;
 
@@ -143,7 +144,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool jCrossUp0   = (jBuffer[i+1] <= 0 && jBuffer[i] > 0);
       bool jCrossDn100 = (jBuffer[i+1] >= 100 && jBuffer[i] < 100);

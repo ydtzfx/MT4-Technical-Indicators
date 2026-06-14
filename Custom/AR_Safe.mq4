@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    AR_Safe.mq4    |
 //|  人气指标（AR）— 不含未来函数                                     |
@@ -121,7 +122,7 @@ int start()
    }
 
    // --- 第2步：信号判断（仅 bar[1]+ 确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
       // Strong Buy: 极度超卖回升 + 价格确认
@@ -152,7 +153,7 @@ int start()
    if(Bars > 0)
    {
       double sumH0 = 0.0, sumL0 = 0.0;
-      for(int j = 0; j < InpARPeriod; j++)
+      for(int jj = 0; j < InpARPeriod; j++)
       {
          double o = iOpen(_Symbol, _Period, j);
          double h = iHigh(_Symbol, _Period, j);

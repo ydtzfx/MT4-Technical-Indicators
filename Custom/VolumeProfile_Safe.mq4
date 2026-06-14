@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                          VolumeProfile_Safe.mq4   |
 //|  成交量分布（Volume Profile）— 不含未来函数                       |
@@ -31,8 +33,8 @@ int start() {
       for(int j=1;j<InpProfileBars;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
       double step=(hh-ll)/InpPriceLevels;if(step<Point)continue;
       double volByPrice[];ArrayResize(volByPrice,InpPriceLevels);ArrayInitialize(volByPrice,0);
-      for(int j=0;j<InpProfileBars;j++){
-         double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);long v=iVolume(_Symbol,_Period,i+j);
+      for(int jj=0;j<InpProfileBars;j++){
+         h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);long v=iVolume(_Symbol,_Period,i+j);
          int bidx=(int)((h-ll)/step);int sidx=(int)((l-ll)/step);
          bidx=MathMax(0,MathMin(InpPriceLevels-1,bidx));sidx=MathMax(0,MathMin(InpPriceLevels-1,sidx));
          if(bidx==sidx)volByPrice[bidx]+=v;else for(int k=sidx;k<=bidx;k++)volByPrice[k]+=v/(bidx-sidx+1);

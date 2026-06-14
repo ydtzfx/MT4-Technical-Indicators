@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          HighLowPath_Safe.mq4     |
 //|  高低路径 — K线内部是先触高还是先触低                              |
@@ -31,5 +32,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       if(upW>0.5&&loW<0.1)bias-=20; // 长上影=拒绝上涨
       pathBias[i]=MathMax(-100,MathMin(100,bias));buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){if(pathBias[i+1]<-40&&pathBias[i]>40)buySignal[i]=-50;if(pathBias[i+1]>40&&pathBias[i]<-40)sellSignal[i]=50;}
+   for(i=limit;i>=2;i++){if(pathBias[i+1]<-40&&pathBias[i]>40)buySignal[i]=-50;if(pathBias[i+1]>40&&pathBias[i]<-40)sellSignal[i]=50;}
    if(Bars>0){pathBias[0]=pathBias[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

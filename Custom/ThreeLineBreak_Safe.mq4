@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              ThreeLineBreak_Safe.mq4|
 //|  三线反转（Three Line Break）— 不含未来函数                       |
@@ -26,7 +27,7 @@ int start() {
    if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
 
-   for(int i=limit;i>=InpLineCount;i--){
+   for(i=limit;i>=InpLineCount;i--){
       // 连续N根阳线 = 突破确认（三线反转中的白线）
       bool allBull=true,allBear=true;
       for(int j=0;j<InpLineCount;j++){

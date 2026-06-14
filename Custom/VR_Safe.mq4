@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    VR_Safe.mq4    |
 //|  成交量变异率（VR）— 不含未来函数                                  |
@@ -116,7 +117,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
       // Strong Buy: 极度超卖后回升 + 价格上涨确认
@@ -147,7 +148,7 @@ int start()
    if(Bars > 0)
    {
       double u0 = 0.0, d0 = 0.0, p0 = 0.0;
-      for(int j = 0; j < InpVRPeriod; j++)
+      for(int jj = 0; j < InpVRPeriod; j++)
       {
          double cc = iClose(_Symbol, _Period, j);
          double cp = iClose(_Symbol, _Period, j + 1);

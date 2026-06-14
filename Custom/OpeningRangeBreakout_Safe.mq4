@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       OpeningRangeBreakout_Safe   |
 //|  开盘区间突破（ORB）— 日内交易经典策略                             |
@@ -50,7 +51,7 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
 
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
 
       // 计算近N个OR的平均宽度，用于判断当前OR是否"够宽"

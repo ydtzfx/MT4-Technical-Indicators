@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                  WVAD_Safe.mq4    |
 //|  威廉变异离散量（WVAD）— 不含未来函数                              |
@@ -95,7 +96,7 @@ int start()
    }
 
    // --- 第2步：N周期累加 ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double sum = 0.0;
       for(int j = 0; j < InpWVADPeriod; j++)
@@ -112,7 +113,7 @@ int start()
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool wvadRising = wvadBuffer[i] > wvadBuffer[i + 1] && wvadBuffer[i + 1] > wvadBuffer[i + 2];
       double priceI  = iClose(_Symbol, _Period, i);

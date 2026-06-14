@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        BodyShadowRatio_Safe.mq4   |
 //|  实体/影线比率 — K线结构分析指标                                   |
@@ -21,7 +22,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       bool isBull=c>o;if(isBull)bsr[i]=bsr[i];else bsr[i]=-bsr[i];
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // 从高BSR(-)翻到高BSR(+)=影线主导转实体主导=确认反转
       if(bsr[i+1]<-50&&bsr[i]>50)buySignal[i]=-60;
       if(bsr[i+1]>50&&bsr[i]<-50)sellSignal[i]=60;

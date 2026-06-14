@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                      BreakoutProbability_Safe.mq4 |
 //|  突破概率评估器 — 原创指标                                         |
 //|  Part of: MT4 技术指标完整体 (No Future Function)                  |
@@ -47,8 +47,8 @@ int start() {
    for(int i=limit;i>=1;i--){
       // 找局部高低点作为"突破参考位"
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1);
-      for(int j=2;j<InpLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
-      double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
+      for(int jj=2;j<InpLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
+      double atr=0;for(int jjj=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
 
       double c=iClose(_Symbol,_Period,i);
       double breakUp=SafeDivide(c-hh,atr,0);   // 向上突破幅度(ATR倍数)
@@ -66,15 +66,15 @@ int start() {
 
          // 前期测试：检查该价位是否被多次触碰
          int touches=0;
-         for(int j=2;j<InpLookback;j++){
-            double h=iHigh(_Symbol,_Period,i+j);
+         for(int jjjj=2;j<InpLookback;j++){
+            h=iHigh(_Symbol,_Period,i+j);
             if(isUp&&MathAbs(h-hh)<atr*0.5)touches++;
             else if(!isUp&&MathAbs(iLow(_Symbol,_Period,i+j)-ll)<atr*0.5)touches++;
          }
          double testScore=MathMin(100,touches*25);
 
          // ADX趋势强度
-         double adxS=0;for(int j=0;j<14;j++)adxS+=GetTrueRange(_Symbol,_Period,i+j);adxS/=14;
+         double adxS=0;for(int jjjjj=0;j<14;j++)adxS+=GetTrueRange(_Symbol,_Period,i+j);adxS/=14;
          double adxA=SafeDivide(adxS,atr,0);double trendScore=MathMin(100,adxA*50);
 
          probVal=0.35*volConf+0.3*sizeScore+0.2*testScore+0.15*trendScore;
@@ -83,7 +83,7 @@ int start() {
       prob[i]=MathMin(100,probVal);volConfirm[i]=volConf;breakStr[i]=bStr;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(prob[i+1]<=40&&prob[i]>70){
          // Strong signals (multi-condition confirmation) first
          if(breakStr[i]>0&&volConfirm[i]>50&&breakStr[i]>15)strongBuy[i]=prob[i]-5;

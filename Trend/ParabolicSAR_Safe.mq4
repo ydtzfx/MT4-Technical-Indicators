@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          ParabolicSAR_Safe.mq4    |
 //|  抛物线SAR指标 — 不含未来函数                                     |
@@ -73,8 +74,9 @@ int deinit() { return(0); }
 //+------------------------------------------------------------------+
 int start()
 {
-   int counted_bars = IndicatorCounted();
+   int i, limit, counted_bars = IndicatorCounted();
    if(counted_bars < 0) counted_bars = 0;
+   limit = Bars - counted_bars;
 
    // SAR需要从最初开始递推，但可以用已计算部分优化
    int startBar = Bars - 2;
@@ -113,7 +115,7 @@ int start()
       ep = initHigh2;
    }
 
-   for(int i = startBar; i >= 0; i--)
+   for(i = startBar; i >= 0; i--)
    {
       double high_i = iHigh(_Symbol, _Period, i);
       double low_i  = iLow(_Symbol, _Period, i);
@@ -185,17 +187,17 @@ int start()
    }
 
    // 信号判断：SAR与价格的相对位置变化 — 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       if(sarBuffer[i] == EMPTY_VALUE || sarBuffer[i+1] == EMPTY_VALUE)
          continue;
 
-      double low_i    = iLow(_Symbol, _Period, i);
+      low_i    = iLow(_Symbol, _Period, i);
       double low_i1   = iLow(_Symbol, _Period, i + 1);
-      double high_i   = iHigh(_Symbol, _Period, i);
+      high_i   = iHigh(_Symbol, _Period, i);
       double high_i1  = iHigh(_Symbol, _Period, i + 1);
       double close_i  = iClose(_Symbol, _Period, i);
-      double af       = MathAbs(sarBuffer[i] - sarBuffer[i+1]) / MathMax(sarBuffer[i+1], _Point); // 加速因子
+      af       = MathAbs(sarBuffer[i] - sarBuffer[i+1]) / MathMax(sarBuffer[i+1], _Point); // 加速因子
 
       // 强买：SAR大幅翻转到下方 + 价格强势突破
       if(sarBuffer[i+1] > high_i1 && sarBuffer[i] < low_i && af > InpStep * 3)

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            ADX_Wilder_Safe.mq4    |
 //|  经典Wilder ADX — 不含未来函数                                    |
@@ -43,19 +44,19 @@ int start() {
       double up=h-ph,dn=pl-l;pdm[i]=(up>dn&&up>0)?up:0;mdm[i]=(dn>up&&dn>0)?dn:0;
    }
    // Wilder SMMA
-   for(int i=Bars-InpPeriod-1;i>=1;i--){
-      if(i>=Bars-InpPeriod-2){double s=0;for(int j=0;j<InpPeriod;j++)s+=tr[i+j];atr[i]=s/InpPeriod;s=0;for(int j=0;j<InpPeriod;j++)s+=pdm[i+j];pdiRaw[i]=s/InpPeriod;s=0;for(int j=0;j<InpPeriod;j++)s+=mdm[i+j];mdiRaw[i]=s/InpPeriod;}
+   for(i=Bars-InpPeriod-1;i>=1;i--){
+      if(i>=Bars-InpPeriod-2){double s=0;for(int j=0;j<InpPeriod;j++)s+=tr[i+j];atr[i]=s/InpPeriod;s=0;for(int jj=0;j<InpPeriod;j++)s+=pdm[i+j];pdiRaw[i]=s/InpPeriod;s=0;for(int jjj=0;j<InpPeriod;j++)s+=mdm[i+j];mdiRaw[i]=s/InpPeriod;}
       else{atr[i]=(atr[i+1]*(InpPeriod-1)+tr[i])/InpPeriod;pdiRaw[i]=(pdiRaw[i+1]*(InpPeriod-1)+pdm[i])/InpPeriod;mdiRaw[i]=(mdiRaw[i+1]*(InpPeriod-1)+mdm[i])/InpPeriod;}
       pdi[i]=SafeDivide(100*pdiRaw[i],atr[i],0);mdi[i]=SafeDivide(100*mdiRaw[i],atr[i],0);
       double dxi=SafeDivide(100*MathAbs(pdi[i]-mdi[i]),pdi[i]+mdi[i],0);dx[i]=dxi;
    }
    // ADX = SMMA of DX
-   for(int i=Bars-InpPeriod*2-1;i>=1;i--){
-      if(i>=Bars-InpPeriod*2-2){double s=0;for(int j=0;j<InpPeriod;j++)s+=dx[i+j];adx[i]=s/InpPeriod;}
+   for(i=Bars-InpPeriod*2-1;i>=1;i--){
+      if(i>=Bars-InpPeriod*2-2){s=0;for(int jjjj=0;j<InpPeriod;j++)s+=dx[i+j];adx[i]=s/InpPeriod;}
       else adx[i]=(adx[i+1]*(InpPeriod-1)+dx[i])/InpPeriod;
       if(i<=limit){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
       // Strong buy: pDI cross above mDI + ADX>20 + ADX rising + ADX>25
       if(pdi[i+1]<=mdi[i+1]&&pdi[i]>mdi[i]&&adx[i]>20&&adx[i]>adx[i+1]&&adx[i]>25)strongBuy[i]=10;

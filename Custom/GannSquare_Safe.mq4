@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                          GannSquare_Safe.mq4      |
 //|  Gann Square of 9 — 江恩四方图                                     |
@@ -17,13 +19,13 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       // Gann关键角度线: 每圈8个方向的价格水平
       for(int ring=1;ring<=InpRings;ring++){
          double r=ring*step;double levels[8];for(int k=0;k<8;k++)levels[k]=base+r*(k+1)/8;
-         for(int k=0;k<8;k++){
+         for(int kk=0;k<8;k++){
             string nm=OBJ_PREFIX+"GS_"+IntegerToString(i)+"_"+IntegerToString(ring)+"_"+IntegerToString(k);
             if(ObjectFind(nm)<0){ObjectCreate(nm,OBJ_HLINE,0,0,levels[k]);ObjectSet(nm,OBJPROP_COLOR,k==0||k==4?clrYellow:clrGray);ObjectSet(nm,OBJPROP_STYLE,ring==1?STYLE_SOLID:STYLE_DOT);}
          }
       }
       double c=iClose(_Symbol,_Period,i);int nearest=-1;double minDist=99999;
-      for(int ring=1;ring<=InpRings;ring++){double lvl=base+ring*step*0.375;double dist=MathAbs(c-lvl);if(dist<minDist){minDist=dist;nearest=ring;}}
+      for(int ringg=1;ring<=InpRings;ring++){double lvl=base+ring*step*0.375;double dist=MathAbs(c-lvl);if(dist<minDist){minDist=dist;nearest=ring;}}
       if(nearest>0&&c>base)buySignal[i]=base-5*Point;
       break;}
    return(0);}

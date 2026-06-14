@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    MFI_Safe.mq4   |
 //|  资金流量指数 — 不含未来函数                                      |
@@ -138,7 +139,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）—— 含多条件强信号分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       int buyConditions = 0, sellConditions = 0;
 
@@ -172,7 +173,7 @@ int start()
       // ---- 条件4：价格行为确认 ----
       // 买入：阳线且收盘接近最高；卖出：阴线且收盘接近最低
       double open  = iOpen(_Symbol, _Period, i);
-      double close = iClose(_Symbol, _Period, i);
+      close = iClose(_Symbol, _Period, i);
       if(close > open && buySignal[i] != EMPTY_VALUE)
          buyConditions++;
       if(close < open && sellSignal[i] != EMPTY_VALUE)

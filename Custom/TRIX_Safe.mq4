@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   TRIX_Safe.mq4   |
 //|  三重指数平滑平均线（TRIX）— 不含未来函数                          |
@@ -49,26 +50,26 @@ int start() {
       if(i>=Bars-InpTRIXPeriod*2)ema1[i]=iClose(_Symbol,_Period,i);
       else ema1[i]=iClose(_Symbol,_Period,i)*alpha+ema1[i+1]*(1-alpha);
    }
-   for(int i=Bars-2;i>=0;i--) {
+   for(i=Bars-2;i>=0;i--) {
       if(i>=Bars-InpTRIXPeriod*3)ema2[i]=ema1[i];
       else ema2[i]=ema1[i]*alpha+ema2[i+1]*(1-alpha);
    }
-   for(int i=Bars-2;i>=0;i--) {
+   for(i=Bars-2;i>=0;i--) {
       if(i>=Bars-InpTRIXPeriod*4)ema3[i]=ema2[i];
       else ema3[i]=ema2[i]*alpha+ema3[i+1]*(1-alpha);
    }
    // TRIX = 变化率 * 100
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       if(ema3[i+1]!=0)trixBuffer[i]=100.0*(ema3[i]-ema3[i+1])/MathAbs(ema3[i+1]);else trixBuffer[i]=0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // Signal = SMA of TRIX
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double s=0;int c=0;for(int j=0;j<InpSignalPeriod&&(i+j<Bars);j++){s+=trixBuffer[i+j];c++;}
       signalBuffer[i]=c>0?s/c:0;
    }
    // 信号（bar[1]+确认）
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       bool trixGrow=trixBuffer[i]>trixBuffer[i+1]&&trixBuffer[i+1]>trixBuffer[i+2];
       bool trixShrink=trixBuffer[i]<trixBuffer[i+1]&&trixBuffer[i+1]<trixBuffer[i+2];
       bool priceUp=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1);

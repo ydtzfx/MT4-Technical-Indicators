@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                             Harmonics_Safe.mq4    |
 //|  谐波形态检测 — 不含未来函数（确认后绘制）                          |
@@ -33,20 +34,22 @@ int FindSwingHigh(int start,int lookback){
    return -1;
 }
 int FindSwingLow(int start,int lookback){
-   for(int i=start+1;i<start+lookback;i++){
+   int i,j;
+   for(i=start+1;i<start+lookback;i++){
       bool isLow=true;
-      for(int j=1;j<=3;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
+      for(int jj=1;j<=3;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
       if(isLow)return i;
    }
    return -1;
 }
 
 int start() {
+   int i;
    int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
-   for(int i=limit;i>=0;i--){bullPattern[i]=EMPTY_VALUE;bearPattern[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
+   for(i=limit;i>=0;i--){bullPattern[i]=EMPTY_VALUE;bearPattern[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
 
-   for(int i=limit;i>=20;i--){
+   for(i=limit;i>=20;i--){
       // 找XABC 4个摆动点
       int x=FindSwingLow(i,30);if(x<0)continue;
       int a=FindSwingHigh(x-5,20);if(a<0)continue;

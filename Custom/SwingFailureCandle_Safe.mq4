@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       SwingFailureCandle_Safe.mq4 |
 //|  摆动失败K线 — 尝试创新高/低但失败的K线                           |
@@ -13,10 +14,10 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){failBuy[i]=failSell[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpSwingBars;i--){
+   for(i=limit;i>=InpSwingBars;i--){
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i);
       double refH=iHigh(_Symbol,_Period,i+1);for(int j=2;j<=InpSwingBars;j++){double hj=iHigh(_Symbol,_Period,i+j);if(hj>refH)refH=hj;}
-      double refL=iLow(_Symbol,_Period,i+1);for(int j=2;j<=InpSwingBars;j++){double lj=iLow(_Symbol,_Period,i+j);if(lj<refL)refL=lj;}
+      double refL=iLow(_Symbol,_Period,i+1);for(int jj=2;j<=InpSwingBars;j++){double lj=iLow(_Symbol,_Period,i+j);if(lj<refL)refL=lj;}
       // 尝试突破新高但收盘低于前高=买方失败→卖方信号
       if(h>refH&&c<refH)failSell[i]=h+5*Point;
       // 尝试跌破新低但收盘高于前低=卖方失败→买方信号

@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                         ReversalRiskMeter_Safe.mq4|
 //|  反转风险计 — 原创指标                                            |
@@ -48,7 +50,7 @@ int start() {
       double riskScore=0;
 
       // === 因子1：RSI极端值（>75或<25）===
-      double aG=0,aL=0;for(int j=0;j<InpPeriod;j++){double ch=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);if(ch>0)aG+=ch;else aL-=ch;}
+      double aG=0,aL=0;for(int jj=0;j<InpPeriod;j++){double ch=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);if(ch>0)aG+=ch;else aL-=ch;}
       double rsi=SafeDivide(100*aG,aG+aL,50);
       if(rsi>75)riskScore+=25;else if(rsi>65)riskScore+=15;
       if(rsi<25)riskScore+=25;else if(rsi<35)riskScore+=15;
@@ -66,19 +68,19 @@ int start() {
       if(volR>1.5&&wickRatio>0.5)riskScore+=10;  // 放量+长影线
 
       // === 因子4：波动率突变 ===
-      double atr3=0,atr10=0;for(int j=0;j<3;j++)atr3+=GetTrueRange(_Symbol,_Period,i+j);
-      for(int j=0;j<10;j++)atr10+=GetTrueRange(_Symbol,_Period,i+j);
+      double atr3=0,atr10=0;for(int jjj=0;j<3;j++)atr3+=GetTrueRange(_Symbol,_Period,i+j);
+      for(int jjjj=0;j<10;j++)atr10+=GetTrueRange(_Symbol,_Period,i+j);
       if(SafeDivide(atr3/3,atr10/10,1)>1.8)riskScore+=15;
 
       // === 因子5：连续同向K线后的反转风险 ===
       int consec=0;
-      for(int j=1;j<6;j++){if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1)==isUp)consec++;else break;}
+      for(int jjjjj=1;j<6;j++){if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1)==isUp)consec++;else break;}
       if(consec>=5)riskScore+=20; // 连续5根同向=过度延伸
 
       risk[i]=MathMin(100,riskScore);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 风险从高位回落+价格开始反转
       if(risk[i+1]>70&&risk[i]<50&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1))buySignal[i]=risk[i]-5;
       if(risk[i+1]>70&&risk[i]<50&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))sellSignal[i]=risk[i]+5;

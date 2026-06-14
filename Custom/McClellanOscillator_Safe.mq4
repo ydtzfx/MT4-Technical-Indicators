@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    McClellanOscillator_Safe.mq4   |
 //|  麦克莱伦振荡器 — 市场宽度指标（单品种模拟版）                      |
@@ -24,12 +25,12 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    double upRatio[];ArrayResize(upRatio,Bars);
    for(int i=Bars-2;i>=1;i--){int up=0;for(int j=0;j<5;j++)if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1))up++;upRatio[i]=up/5.0;}
    double aS=2.0/(InpShort+1),aL=2.0/(InpLong+1);
-   for(int i=limit;i>=1;i--){
-      double eS=0,eL=0;for(int j=0;j<InpLong*2;j++){eS+=upRatio[i+j];eL+=upRatio[i+j];}eS/=(InpLong*2);eL/=(InpLong*2);
-      for(int j=InpLong*2-1;j>=0;j--){eS=upRatio[i+j]*aS+eS*(1-aS);eL=upRatio[i+j]*aL+eL*(1-aL);}
+   for(i=limit;i>=1;i--){
+      double eS=0,eL=0;for(int jj=0;j<InpLong*2;j++){eS+=upRatio[i+j];eL+=upRatio[i+j];}eS/=(InpLong*2);eL/=(InpLong*2);
+      for(int jjj=InpLong*2-1;j>=0;j--){eS=upRatio[i+j]*aS+eS*(1-aS);eL=upRatio[i+j]*aL+eL*(1-aL);}
       mcOsc[i]=eS-eL;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(mcOsc[i+1]<-0.1&&mcOsc[i]>-0.1)buySignal[i]=-0.15;
       if(mcOsc[i+1]>0.1&&mcOsc[i]<0.1)sellSignal[i]=0.15;
    }

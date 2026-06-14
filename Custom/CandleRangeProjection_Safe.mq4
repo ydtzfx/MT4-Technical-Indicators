@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                   CandleRangeProjection_Safe.mq4  |
 //|  K线范围预测 — 基于近期K线统计估算下一根K线的高概率范围             |
@@ -20,7 +21,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       projHi[i]=c+avgDir+avgR/2;projLo[i]=c+avgDir-avgR/2;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 实际K线超越预测高=超强→买入
       if(iClose(_Symbol,_Period,i-1)>projHi[i])buySignal[i-1]=iLow(_Symbol,_Period,i-1)-5*Point;
       // 实际K线低于预测低=超弱→卖出

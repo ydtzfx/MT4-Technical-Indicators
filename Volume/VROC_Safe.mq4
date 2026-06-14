@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   VROC_Safe.mq4   |
 //|  量变化率（Volume Rate of Change）— 不含未来函数                   |
@@ -34,7 +35,7 @@ int start() {
       long v=iVolume(_Symbol,_Period,i),vp=iVolume(_Symbol,_Period,i+InpPeriod);
       vroc[i]=vp>0?100.0*(v-vp)/vp:0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       // 强烈多头：极端放量(>120) + 价格上涨 + 成交量加速
       if(vroc[i]>120&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1)&&vroc[i]>vroc[i+1])strongBuy[i]=vroc[i]*0.35;
       // 强烈空头：极端放量(>120) + 价格下跌 + 成交量加速

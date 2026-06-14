@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      SwingMeasuredMove_Safe.mq4   |
 //|  摆幅测量 — 基于已完成波段的等幅/扩展目标投影                      |
@@ -11,7 +12,7 @@ int init(){SetIndexStyle(0,DRAW_LINE,STYLE_DOT,1,clrLimeGreen);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){targetUp[i]=targetDn[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=5;i--){
+   for(i=limit;i>=5;i--){
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1);
       int hiBar=i+1,loBar=i+1;
       for(int j=2;j<10;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh){hh=h;hiBar=i+j;}if(l<ll){ll=l;loBar=i+j;}}

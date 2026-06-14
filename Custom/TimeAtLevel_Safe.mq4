@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                             TimeAtLevel_Safe.mq4  |
 //|  价位停留时间 — 原创指标（吸收/拒绝分析）                           |
@@ -37,7 +39,7 @@ int start() {
       double c=iClose(_Symbol,_Period,i);
       // 统计之前有多少连续bar在这个窄幅区间内
       int barsInZone=0;double zoneMid=c;
-      for(int j=i+1;j<Bars;j++){
+      for(int jj=i+1;j<Bars;j++){
          double cj=iClose(_Symbol,_Period,j);
          if(MathAbs(cj-zoneMid)<zoneWidth)barsInZone++;
          else break;
@@ -47,7 +49,7 @@ int start() {
       breakProb[i]=MathMin(100,barsInZone*5.0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 长时间盘整后突破
       if(timeAtLevel[i+1]>10&&timeAtLevel[i]==0&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=5;
       if(timeAtLevel[i+1]>10&&timeAtLevel[i]==0&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1))sellSignal[i]=5;

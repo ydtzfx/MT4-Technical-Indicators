@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                          KeyLevelTest_Safe.mq4    |
 //|  关键位测试K线 — 检测价格对关键位的触碰和反应                      |
@@ -13,11 +15,11 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,clrTomato);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){testResist[i]=testSupport[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=10;i--){
+   for(i=limit;i>=10;i--){
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1);
       for(int j=2;j<InpSRLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
-      double c=iClose(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i);
-      double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;double tol=atr*0.2;
+      double c=iClose(_Symbol,_Period,i);h=iHigh(_Symbol,_Period,i);l=iLow(_Symbol,_Period,i);
+      double atr=0;for(int jj=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;double tol=atr*0.2;
       // 触碰阻力
       if(MathAbs(h-hh)<tol){testResist[i]=h+3*Point;if(c<h&&c<hh)sellSignal[i]=h+8*Point;}
       // 触碰支撑

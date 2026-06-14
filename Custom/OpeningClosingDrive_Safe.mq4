@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    OpeningClosingDrive_Safe.mq4   |
 //|  开盘/收盘驱动 — K线开盘和收盘阶段的方向力度                        |
@@ -24,7 +25,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       drive[i]=SafeDivide(openDrive+closeDrive*2,r,0)*50;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){
+   for(i=limit;i>=2;i++){
       if(drive[i+1]<-30&&drive[i]>30)buySignal[i]=-40; // 开盘弱+收盘强=反转买入
       if(drive[i+1]>30&&drive[i]<-30)sellSignal[i]=40;
       if(drive[i+1]>20&&drive[i]>50&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=-40; // 持续强势

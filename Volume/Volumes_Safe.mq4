@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                Volumes_Safe.mq4   |
 //|  彩色成交量指标 — 不含未来函数                                    |
@@ -86,7 +87,7 @@ int start()
    if(avgVolume < 1) avgVolume = 1;
 
    // --- 第2步：分色显示 + 巨量预警 ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       long   volume    = iVolume(_Symbol, _Period, i);
       double closeCurr = iClose(_Symbol, _Period, i);

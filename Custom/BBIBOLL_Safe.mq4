@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                BBIBOLL_Safe.mq4   |
 //|  多空布林带（BBI + BOLL）— 不含未来函数                           |
@@ -50,18 +51,18 @@ int start() {
       double ma12=CalculateMA(prices,12,MA_SMA,0),ma24=CalculateMA(prices,24,MA_SMA,0);
       bbi[i]=(ma3+ma6+ma12+ma24)/4.0;
       // 计算BBI值序列的标准差
-      double bbiVals[30];for(int j=0;j<InpBBIPeriod;j++){
+      double bbiVals[30];for(int jj=0;j<InpBBIPeriod;j++){
          double p3=CalculateMA(prices,3,MA_SMA,j),p6=CalculateMA(prices,6,MA_SMA,j);
          double p12=CalculateMA(prices,12,MA_SMA,j),p24=CalculateMA(prices,24,MA_SMA,j);
          bbiVals[j]=(p3+p6+p12+p24)/4.0;
       }
-      double sdSum=0;for(int j=0;j<InpBBIPeriod;j++)sdSum+=(bbiVals[j]-bbi[i])*(bbiVals[j]-bbi[i]);
+      double sdSum=0;for(int jjj=0;j<InpBBIPeriod;j++)sdSum+=(bbiVals[j]-bbi[i])*(bbiVals[j]-bbi[i]);
       double stdDev=MathSqrt(sdSum/InpBBIPeriod);
       upper[i]=bbi[i]+InpK*stdDev;lower[i]=bbi[i]-InpK*stdDev;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号（bar[1]+确认）
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // 从下轨下方回升+BBI走平或上翘 → 买入
       if(c1<=lower[i+1]&&c>lower[i]&&bbi[i]>=bbi[i+1]) {

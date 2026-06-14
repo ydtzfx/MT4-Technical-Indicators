@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        BollingerBands_Safe.mq4    |
 //|  布林带指标 — 不含未来函数                                        |
@@ -23,7 +24,7 @@
 // 输入参数
 input int    InpBBPeriod    = 20;          // 布林带周期
 input double InpDeviations  = 2.0;         // 标准差倍数
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input bool   InpShowSignals = true;        // 显示信号
 input color  InpUpperColor  = clrRoyalBlue;  // 上轨颜色
 input color  InpLowerColor  = clrRoyalBlue;  // 下轨颜色
@@ -120,14 +121,14 @@ int start()
 
       // 计算SMA（中轨）
       double sum = 0.0;
-      for(int j = 0; j < InpBBPeriod; j++)
+      for(int jj = 0; j < InpBBPeriod; j++)
          sum += prices[j];
       double sma = sum / InpBBPeriod;
       middleBand[i] = sma;
 
       // 计算标准差
       double sumSqDiff = 0.0;
-      for(int j = 0; j < InpBBPeriod; j++)
+      for(int jjj = 0; j < InpBBPeriod; j++)
       {
          double diff = prices[j] - sma;
          sumSqDiff += diff * diff;
@@ -150,7 +151,7 @@ int start()
    // 信号计算（仅在 bar >= 1 上产生信号，增强版：带宽收缩预警 + 信号分级）
    if(InpShowSignals)
    {
-      for(int i = limit; i >= 3; i--)
+      for(i = limit; i >= 3; i--)
       {
          double low_i    = iLow(_Symbol, _Period, i);
          double low_i1   = iLow(_Symbol, _Period, i + 1);
@@ -161,7 +162,7 @@ int start()
 
          // 带宽挤压检测
          bool isSqueeze = true;
-         for(int j=1;j<=20;j++) {
+         for(int jjjj=1;j<=20;j++) {
             if(bandwidthBuffer[i] > bandwidthBuffer[i+j]) { isSqueeze = false; break; }
          }
          bool tightSqueeze = (isSqueeze && bandwidthBuffer[i] < 2.0);

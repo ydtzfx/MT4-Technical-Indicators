@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                       ChanZhongShu_Safe.mq4       |
 //|  缠论中枢 — 三段重叠区域识别                                       |
@@ -16,7 +18,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    for(int i=limit;i>=0;i--){zhongShuHi[i]=EMPTY_VALUE;zhongShuLo[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuySignal[i]=EMPTY_VALUE;strongSellSignal[i]=EMPTY_VALUE;}
    // 找摆动点，每3段重叠=中枢
    double segHi[],segLo[];int segBars[],segCnt=0;ArrayResize(segHi,200);ArrayResize(segLo,200);ArrayResize(segBars,200);
-   for(int i=Bars-InpFenxingBars-2;i>=InpFenxingBars;i--){
+   for(i=Bars-InpFenxingBars-2;i>=InpFenxingBars;i--){
       bool isHigh=true,isLow=true;
       for(int j=1;j<=InpFenxingBars;j++){if(i+j<Bars&&iHigh(_Symbol,_Period,i+j)>=iHigh(_Symbol,_Period,i))isHigh=false;if(i-j>=0&&iHigh(_Symbol,_Period,i-j)>=iHigh(_Symbol,_Period,i))isHigh=false;if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
       if((isHigh||isLow)&&segCnt<199){segHi[segCnt]=isHigh?iHigh(_Symbol,_Period,i):iLow(_Symbol,_Period,i);segLo[segCnt]=isHigh?iLow(_Symbol,_Period,i):iHigh(_Symbol,_Period,i);segBars[segCnt]=i;segCnt++;}

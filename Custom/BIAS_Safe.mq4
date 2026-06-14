@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   BIAS_Safe.mq4   |
 //|  乖离率（BIAS）— 不含未来函数                                     |
@@ -128,7 +129,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double b1 = bias1Buffer[i],     b1p = bias1Buffer[i + 1];
       double b2 = bias2Buffer[i],     b2p = bias2Buffer[i + 1];
@@ -164,7 +165,7 @@ int start()
    {
       double p0[];
       ArrayResize(p0, maxPeriod * 3);
-      for(int j = 0; j < maxPeriod * 3; j++)
+      for(int jj = 0; j < maxPeriod * 3; j++)
          p0[j] = iClose(_Symbol, _Period, j);
       double m1 = CalculateMA(p0, InpBIAS1, InpMAMethod, 0);
       double m2 = CalculateMA(p0, InpBIAS2, InpMAMethod, 0);

@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                            MurreyMath_Safe.mq4    |
 //|  莫里数学线（Murrey Math Lines）— 不含未来函数                    |
@@ -33,12 +35,12 @@ int start() {
       if(octave<Point)continue;
       string levelNames[]={"0/8","1/8","2/8","3/8","4/8","5/8","6/8","7/8","8/8","+1/8","+2/8"};
       color lvlColors[]={clrGray,clrYellow,clrOrange,clrTomato,clrDodgerBlue,clrTomato,clrOrange,clrYellow,clrGray,clrMagenta,clrMagenta};
-      for(int l=0;l<11;l++){
-         double price=ll+octave*(l-1);
-         string nm=OBJ_PREFIX+"MM_"+IntegerToString(i)+"_"+IntegerToString(l);
+      for(int idx=0;idx<11;idx++){
+         double price=ll+octave*(idx-1);
+         string nm=OBJ_PREFIX+"MM_"+IntegerToString(i)+"_"+IntegerToString(idx);
          if(ObjectFind(nm)<0){
-            ObjectCreate(nm,OBJ_HLINE,0,0,price);ObjectSet(nm,OBJPROP_COLOR,lvlColors[l]);
-            ObjectSet(nm,OBJPROP_STYLE,(l==0||l==8)?STYLE_SOLID:STYLE_DOT);ObjectSet(nm,OBJPROP_BACK,true);
+            ObjectCreate(nm,OBJ_HLINE,0,0,price);ObjectSet(nm,OBJPROP_COLOR,lvlColors[idx]);
+            ObjectSet(nm,OBJPROP_STYLE,(idx==0||idx==8)?STYLE_SOLID:STYLE_DOT);ObjectSet(nm,OBJPROP_BACK,true);
          }
       }
       double c=iClose(_Symbol,_Period,i);

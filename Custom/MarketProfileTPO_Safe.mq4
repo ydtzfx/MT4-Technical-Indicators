@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                        MarketProfileTPO_Safe.mq4  |
 //|  市场轮廓TPO — 原创指标                                            |
@@ -40,8 +42,8 @@ int start() {
 
       // 统计每个价格水平的TPO
       int tpo[];ArrayResize(tpo,InpLevels);ArrayInitialize(tpo,0);
-      for(int j=0;j<InpTPOBars;j++){
-         double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);
+      for(int jj=0;j<InpTPOBars;j++){
+         h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);
          int hi=(int)((h-ll)/step),li=(int)((l-ll)/step);
          hi=MathMax(0,MathMin(InpLevels-1,hi));li=MathMax(0,MathMin(InpLevels-1,li));
          for(int k=li;k<=hi;k++)tpo[k]++;

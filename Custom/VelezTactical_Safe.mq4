@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                         VelezTactical_Safe.mq4    |
 //|  Velez战术交易信号 — Oliver Velez的经典体系                        |
@@ -31,21 +32,21 @@ int start() {
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;weakBuy[i]=EMPTY_VALUE;weakSell[i]=EMPTY_VALUE;}
 
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double c=iClose(_Symbol,_Period,i),o=iOpen(_Symbol,_Period,i);
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i);
       double range=h-l,body=MathAbs(c-o);
 
       // 计算快速和慢速EMA
       double p[80];for(int j=0;j<80;j++)p[j]=iClose(_Symbol,_Period,i+j);
-      double fast=0,slow=0;for(int j=79;j>=0;j--){if(j==79){fast=p[j];slow=p[j];}else{double aF=2.0/(InpFastMA+1);fast=p[j]*aF+fast*(1-aF);double aS=2.0/(InpSlowMA+1);slow=p[j]*aS+slow*(1-aS);}}
+      double fast=0,slow=0;for(int jj=79;j>=0;j--){if(j==79){fast=p[j];slow=p[j];}else{double aF=2.0/(InpFastMA+1);fast=p[j]*aF+fast*(1-aF);double aS=2.0/(InpSlowMA+1);slow=p[j]*aS+slow*(1-aS);}}
 
       // ADX
-      double trS=0,ps=0,ms=0;for(int j=0;j<14;j++){int s=i+j;double hi=iHigh(_Symbol,_Period,s),lo=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(hi-lo,MathMax(MathAbs(hi-pc),MathAbs(lo-pc)));double up=hi-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-lo;if(up>dn&&up>0)ps+=up;if(dn>up&&dn>0)ms+=dn;}
+      double trS=0,ps=0,ms=0;for(int jjj=0;j<14;j++){int s=i+j;double hi=iHigh(_Symbol,_Period,s),lo=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(hi-lo,MathMax(MathAbs(hi-pc),MathAbs(lo-pc)));double up=hi-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-lo;if(up>dn&&up>0)ps+=up;if(dn>up&&dn>0)ms+=dn;}
       double adx=SafeDivide(100*MathAbs(ps-ms),ps+ms,0);
 
       // 成交量
-      double v=iVolume(_Symbol,_Period,i),vAvg=0;for(int j=0;j<20;j++)vAvg+=iVolume(_Symbol,_Period,i+j);vAvg/=20;
+      double v=iVolume(_Symbol,_Period,i),vAvg=0;for(int jjjj=0;j<20;j++)vAvg+=iVolume(_Symbol,_Period,i+j);vAvg/=20;
       double volRatio=SafeDivide(v,vAvg,1);
 
       // 条件1：趋势 — 快线上穿慢线或快线在慢线上方

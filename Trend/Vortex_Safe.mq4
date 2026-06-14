@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              Vortex_Safe.mq4      |
 //|  漩涡指标（Vortex Indicator）— 不含未来函数                       |
@@ -42,7 +43,7 @@ int start() {
       vmp[i]=SafeDivide(sumVMp,sumTR,0);vmm[i]=SafeDivide(sumVMm,sumTR,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       bool crossUp=vmp[i+1]<=vmm[i+1]&&vmp[i]>vmm[i];
       bool crossDn=vmp[i+1]>=vmm[i+1]&&vmp[i]<vmm[i];
       if(crossUp&&vmp[i]>0.6&&(vmp[i]-vmm[i])>0.08)strongBuy[i]=vmp[i]*0.85;

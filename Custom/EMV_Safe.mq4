@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   EMV_Safe.mq4    |
 //|  简易波动指标（Ease of Movement）— 不含未来函数                   |
@@ -106,7 +107,7 @@ int start()
    }
 
    // --- 第2步：平滑EMV ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double rawVals[];
       int count = 0;
@@ -126,7 +127,7 @@ int start()
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool emvRising = emvBuffer[i] > emvBuffer[i + 1] && emvBuffer[i + 1] > emvBuffer[i + 2];
       bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);

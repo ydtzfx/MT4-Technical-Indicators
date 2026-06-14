@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           Correlation_Safe.mq4    |
 //|  货币对相关性 — 不含未来函数                                      |
@@ -41,7 +42,7 @@ int start() {
       double den=MathSqrt((n*sumX2-sumX*sumX)*(n*sumY2-sumY*sumY));
       corr[i]=SafeDivide(num,den,0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       if(corr[i+1]<-0.8&&corr[i]>-0.8)buySignal[i]=-0.85; // 从强负相关回升
       if(corr[i+1]>0.8&&corr[i]<0.8)sellSignal[i]=0.85;   // 从强正相关回落
    }

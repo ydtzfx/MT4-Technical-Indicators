@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          WickReversal_Safe.mq4    |
 //|  影线反转 — 长影线在趋势末端的多种反转变体                         |
@@ -12,7 +13,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){wickRevUp[i]=wickRevDn[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=5;i++){
+   for(i=limit;i>=5;i++){
       double o=iOpen(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i),r=h-l;if(r<_Point)continue;
       double loW=(MathMin(o,c)-l)/r,upW=(h-MathMax(o,c))/r,body=MathAbs(c-o)/r;
       // 判断趋势方向

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           ElliottWave_Safe.mq4    |
 //|  波浪自动标注 — 原创指标                                           |
@@ -23,7 +24,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    // 找摆动点序列
    double swings[];int swingBars[],swingCount=0;ArrayResize(swings,Bars);ArrayResize(swingBars,Bars);
    bool lastIsHigh=false;
-   for(int i=Bars-10;i>=10;i--){
+   for(i=Bars-10;i>=10;i--){
       bool isHigh=true,isLow=true;
       for(int j=1;j<=5;j++){if(i+j<Bars&&iHigh(_Symbol,_Period,i+j)>=iHigh(_Symbol,_Period,i))isHigh=false;if(i-j>=0&&iHigh(_Symbol,_Period,i-j)>=iHigh(_Symbol,_Period,i))isHigh=false;if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
       if(isHigh){swings[swingCount]=iHigh(_Symbol,_Period,i);swingBars[swingCount]=i;swingCount++;lastIsHigh=true;}

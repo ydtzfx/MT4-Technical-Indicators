@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                          GannFan_Safe.mq4         |
 //|  Gann Fan — 江恩角度线 1x1/1x2/2x1等                              |

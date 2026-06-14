@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                              ConsecutiveDirectionalClose_Safe.mq4 |
 //|  连续定向收盘 — N根K线收盘持续在开盘的某一侧                        |
@@ -18,11 +19,11 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       int buyCnt=0,sellCnt=0;
       // 统计连续收盘在开盘上方(阳线方向)或下方的K线数
       for(int j=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)>iOpen(_Symbol,_Period,i+j))buyCnt++;else break;}
-      for(int j=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)<iOpen(_Symbol,_Period,i+j))sellCnt++;else break;}
+      for(int jj=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)<iOpen(_Symbol,_Period,i+j))sellCnt++;else break;}
       consec[i]=buyCnt>0?buyCnt:(sellCnt>0?-sellCnt:0);streak[i]=buyCnt+sellCnt;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 连续5+阳线后首阴=强力反转
       if(consec[i+1]>=5&&consec[i]<=-1)sellSignal[i]=consec[i]+1;
       // 连续5+阴线后首阳

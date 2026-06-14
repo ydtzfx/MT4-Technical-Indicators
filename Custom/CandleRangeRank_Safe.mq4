@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                         CandleRangeRank_Safe.mq4  |
 //|  K线范围排名 — 当前K线范围在历史中的百分位                         |
@@ -25,7 +26,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       if(body>r*0.7)rangePct[i]=rangePct[i]; // 保持原值
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // >90%分位=极端大范围→可能衰竭或突破
       if(rangePct[i+1]>90&&rangePct[i]<70){if(iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+2))buySignal[i]=rangePct[i]-10;else sellSignal[i]=rangePct[i]+10;}
       // <10%分位后扩张=压缩后突破

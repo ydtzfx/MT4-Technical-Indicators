@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        EntropyIndicator_Safe.mq4  |
 //|  信息熵指标（Shannon Entropy）— 信息论指标                         |
@@ -41,18 +42,18 @@ int start() {
       // 分桶统计概率
       double bins[];ArrayResize(bins,InpBins);ArrayInitialize(bins,0);
       double binWidth=(maxC-minC)/InpBins;if(binWidth<Point)binWidth=Point;
-      for(int j=0;j<InpPeriod;j++){
+      for(int jj=0;j<InpPeriod;j++){
          int b=(int)((changes[j]-minC)/binWidth);b=MathMax(0,MathMin(InpBins-1,b));bins[b]++;
       }
 
       // 计算香农熵
-      double H=0;for(int b=0;b<InpBins;b++){if(bins[b]>0){double p=bins[b]/InpPeriod;H-=p*MathLog(p)/MathLog(2);}}
+      double H=0;for(b=0;b<InpBins;b++){if(bins[b]>0){double p=bins[b]/InpPeriod;H-=p*MathLog(p)/MathLog(2);}}
       entropy[i]=H;change[i]=entropy[i+1]-entropy[i]; // 正=熵下降（有序化）
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<5;j++)s+=entropy[i+j];smoothEntropy[i]=s/5;}
+   for(i=limit;i>=1;i++){double s=0;for(int jjj=0;j<5;j++)s+=entropy[i+j];smoothEntropy[i]=s/5;}
 
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // 熵从高位骤降 = 市场从无序进入有序 → 跟趋势
       if(entropy[i+2]>2.5&&entropy[i]<1.8&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+3))buySignal[i]=entropy[i]-0.2;
       if(entropy[i+2]>2.5&&entropy[i]<1.8&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+3))sellSignal[i]=entropy[i]+0.2;

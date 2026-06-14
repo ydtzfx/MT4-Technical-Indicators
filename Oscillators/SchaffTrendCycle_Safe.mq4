@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    SchaffTrendCycle_Safe.mq4      |
 //|  沙夫趋势周期（Schaff Trend Cycle）— 不含未来函数                 |
@@ -40,24 +41,24 @@ int start() {
    // MACD Line
    for(int i=hist;i>=1;i--) {
       double prices[200];for(int j=0;j<hist;j++)prices[j]=iClose(_Symbol,_Period,i+j);
-      double emaF=0;for(int j=hist-1;j>=hist-InpMACDFast;j--)emaF+=prices[j];emaF/=InpMACDFast;
-      double aF=2.0/(InpMACDFast+1);for(int j=hist-InpMACDFast-1;j>=0;j--)emaF=prices[j]*aF+emaF*(1-aF);
-      double emaS=0;for(int j=hist-1;j>=hist-InpMACDSlow;j--)emaS+=prices[j];emaS/=InpMACDSlow;
-      double aS=2.0/(InpMACDSlow+1);for(int j=hist-InpMACDSlow-1;j>=0;j--)emaS=prices[j]*aS+emaS*(1-aS);
+      double emaF=0;for(int jj=hist-1;j>=hist-InpMACDFast;j--)emaF+=prices[j];emaF/=InpMACDFast;
+      double aF=2.0/(InpMACDFast+1);for(int jjj=hist-InpMACDFast-1;j>=0;j--)emaF=prices[j]*aF+emaF*(1-aF);
+      double emaS=0;for(int jjjj=hist-1;j>=hist-InpMACDSlow;j--)emaS+=prices[j];emaS/=InpMACDSlow;
+      double aS=2.0/(InpMACDSlow+1);for(int jjjjj=hist-InpMACDSlow-1;j>=0;j--)emaS=prices[j]*aS+emaS*(1-aS);
       macd[i]=emaF-emaS;
    }
    // Stochastic of MACD
-   for(int i=hist;i>=1;i--) {
-      double mn=macd[i],mx=macd[i];for(int j=0;j<InpCycle;j++){if(macd[i+j]<mn)mn=macd[i+j];if(macd[i+j]>mx)mx=macd[i+j];}
+   for(i=hist;i>=1;i--) {
+      double mn=macd[i],mx=macd[i];for(int jjjjjj=0;j<InpCycle;j++){if(macd[i+j]<mn)mn=macd[i+j];if(macd[i+j]>mx)mx=macd[i+j];}
       double rng=mx-mn;stoch[i]=MathAbs(rng)>0?100*(macd[i]-mn)/rng:50;
    }
    // EMA of Stochastic
    double aC=2.0/(InpCycle+1);
-   for(int i=hist;i>=1;i--) {
-      double e=stoch[i+InpCycle];for(int j=InpCycle-1;j>=0;j--)e=stoch[i+j]*aC+e*(1-aC);
+   for(i=hist;i>=1;i--) {
+      double e=stoch[i+InpCycle];for(int jjjjjjj=InpCycle-1;j>=0;j--)e=stoch[i+j]*aC+e*(1-aC);
       stcBuffer[i]=e;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       if(stcBuffer[i+1]<=15&&stcBuffer[i]>25)strongBuy[i]=20;
       else if(stcBuffer[i+1]<=25&&stcBuffer[i]>25)buySignal[i]=20;
       if(stcBuffer[i+1]>=85&&stcBuffer[i]<75)strongSell[i]=80;

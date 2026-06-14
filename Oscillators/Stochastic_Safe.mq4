@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            Stochastic_Safe.mq4    |
 //|  随机指标（KD）— 不含未来函数                                     |
@@ -112,10 +113,10 @@ int start()
    }
 
    // 平滑%K
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       double sum = 0.0;
-      for(int j = 0; j < InpSlowing; j++)
+      for(int jj = 0; j < InpSlowing; j++)
       {
          if(i + j < ArraySize(rawK))
             sum += rawK[i + j];
@@ -124,11 +125,11 @@ int start()
    }
 
    // 计算%D = MA of %K
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       double kPrices[];
       ArrayResize(kPrices, InpDPeriod * 2);
-      for(int j = 0; j < InpDPeriod * 2; j++)
+      for(int jjj = 0; j < InpDPeriod * 2; j++)
          kPrices[j] = kBuffer[i + j];
 
       dBuffer[i] = CalculateMA(kPrices, InpDPeriod, InpMAMethod, 0);
@@ -139,7 +140,7 @@ int start()
    }
 
    // 信号判断（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool crossUp   = (kBuffer[i+1] <= dBuffer[i+1] && kBuffer[i] > dBuffer[i]);
       bool crossDown = (kBuffer[i+1] >= dBuffer[i+1] && kBuffer[i] < dBuffer[i]);

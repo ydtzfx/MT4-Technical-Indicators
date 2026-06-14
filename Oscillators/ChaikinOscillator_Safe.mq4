@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                  ChaikinOscillator_Safe.mq4       |
 //|  蔡金振荡器 — 不含未来函数                                        |
@@ -112,7 +113,7 @@ int start()
    double alphaFast = 2.0 / (InpFast + 1.0);
    double alphaSlow = 2.0 / (InpSlow + 1.0);
 
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // 快EMA
       double emaFast = adl[i + InpSlow];
@@ -121,7 +122,7 @@ int start()
 
       // 慢EMA
       double emaSlow = adl[i + InpSlow];
-      for(int j = InpSlow - 1; j >= 0; j--)
+      for(int jj = InpSlow - 1; j >= 0; j--)
          emaSlow = adl[i + j] * alphaSlow + emaSlow * (1.0 - alphaSlow);
 
       choBuffer[i] = emaFast - emaSlow;
@@ -133,7 +134,7 @@ int start()
    }
 
    // --- 第3步：信号判断（bar[1]+确认）增强分级 ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool crossUp   = (choBuffer[i + 1] < 0.0 && choBuffer[i] > 0.0);
       bool crossDown = (choBuffer[i + 1] > 0.0 && choBuffer[i] < 0.0);

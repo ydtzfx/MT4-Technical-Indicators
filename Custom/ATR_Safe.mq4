@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    ATR_Safe.mq4   |
 //|  平均真实波动幅度 — 不含未来函数                                  |
@@ -86,7 +87,7 @@ int start()
       double alpha = 2.0 / (InpATRPeriod + 1.0);
 
       // 继续EMA递推到当前位置
-      for(int j = InpATRPeriod; j < InpATRPeriod * 2; j++)
+      for(int jj = InpATRPeriod; j < InpATRPeriod * 2; j++)
       {
          int shift2 = i + j;
          if(shift2 < Bars)
@@ -108,11 +109,11 @@ int start()
    // 波动率预警（bar[1]+确认）
    if(InpShowVolatility)
    {
-      for(int i = limit; i >= 20; i--)
+      for(i = limit; i >= 20; i--)
       {
          // 计算20周期均ATR作为基准
          double avgATR20 = 0.0;
-         for(int j = 0; j < 20; j++)
+         for(int jjj = 0; j < 20; j++)
             avgATR20 += atrBuffer[i + j];
          avgATR20 /= 20.0;
 

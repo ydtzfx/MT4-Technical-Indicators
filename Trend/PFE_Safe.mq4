@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   PFE_Safe.mq4    |
 //|  极化分形效率（Polarized Fractal Efficiency）— 不含未来函数       |
@@ -38,11 +39,11 @@ int start() {
       for(int j=0;j<InpPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);den+=MathSqrt(d*d+1);}
       raw[i]=SafeDivide(100*num,den,0);if(dp<0)raw[i]=-raw[i];
    }
-   for(int i=limit;i>=1;i--){
-      double s=0;for(int j=0;j<InpSmooth;j++)s+=raw[i+j];pfe[i]=s/InpSmooth;
+   for(i=limit;i>=1;i--){
+      double s=0;for(int jj=0;j<InpSmooth;j++)s+=raw[i+j];pfe[i]=s/InpSmooth;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       // Strong signals (multi-condition confirmation)
       if(pfe[i+1]<-50&&pfe[i]>-50&&raw[i+1]<-50)strongBuy[i]=-60;
       if(pfe[i+1]>50&&pfe[i]<50&&raw[i+1]>50)strongSell[i]=60;

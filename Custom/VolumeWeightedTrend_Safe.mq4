@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       VolumeWeightedTrend_Safe    |
 //|  成交量加权趋势线 — 原创指标                                       |
@@ -15,7 +16,7 @@
 #property indicator_buffers 5
 
 input int InpPeriod=20;input int InpSignal=9;
-input ENUM_PRICE_SAFE InpPrice=PRICE_TYPICAL;
+input ENUM_PRICE_SAFE InpPrice=SAFE_PRICE_TYPICAL;
 
 double vwt[],signal[],buySignal[],sellSignal[],confidence[];
 
@@ -44,16 +45,16 @@ int start() {
       vwt[i]=SafeDivide(sumPV,sumV,iClose(_Symbol,_Period,i));
 
       // 信号线
-      double s=0;for(int j=0;j<InpSignal;j++)s+=vwt[i+j];signal[i]=s/InpSignal;
+      double s=0;for(int jj=0;j<InpSignal;j++)s+=vwt[i+j];signal[i]=s/InpSignal;
 
       // 置信度 = 近期成交量 / 均量（高量=趋势更可靠）
-      double curV=0,avgV=0;for(int j=0;j<5;j++)curV+=iVolume(_Symbol,_Period,i+j);curV/=5;
-      for(int j=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,i+j);avgV/=20;
+      double curV=0,avgV=0;for(int jjj=0;j<5;j++)curV+=iVolume(_Symbol,_Period,i+j);curV/=5;
+      for(int jjjj=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,i+j);avgV/=20;
       confidence[i]=MathMin(100,SafeDivide(curV,avgV,1)*50);
 
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       bool crossUp=(vwt[i+1]<=signal[i+1]&&vwt[i]>signal[i]);
       bool crossDn=(vwt[i+1]>=signal[i+1]&&vwt[i]<signal[i]);

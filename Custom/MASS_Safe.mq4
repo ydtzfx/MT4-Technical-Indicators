@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                  MASS_Safe.mq4    |
 //|  梅斯线（Mass Index）— 不含未来函数                               |
@@ -45,16 +46,16 @@ int start() {
       double range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
       if(i>=Bars-30)ema1[i]=range;else ema1[i]=range*alpha+ema1[i+1]*(1.0-alpha);
    }
-   for(int i=Bars-2;i>=0;i--) {
+   for(i=Bars-2;i>=0;i--) {
       if(i>=Bars-40)ema2[i]=ema1[i];else ema2[i]=ema1[i]*alpha+ema2[i+1]*(1.0-alpha);
       ratio[i]=SafeDivide(ema1[i],ema2[i],1.0);
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double sum=0.0;for(int j=0;j<InpSumPeriod;j++)sum+=ratio[i+j];
       massBuffer[i]=sum;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号：Mass从27上方回落到触发线以下 → 趋势反转前兆
-   for(int i=limit;i>=2;i--) {
+   for(i=limit;i>=2;i--) {
       if(massBuffer[i+1]>=InpReversalLine&&massBuffer[i]<InpReversalTrigger) {
          double c=iClose(_Symbol,_Period,i),pc=iClose(_Symbol,_Period,i+1);
          if(c<pc) {

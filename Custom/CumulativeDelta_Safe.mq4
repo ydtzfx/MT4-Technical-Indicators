@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          CumulativeDelta_Safe.mq4 |
 //|  累积Delta — 原创指标（基于K线推算）                               |
@@ -38,9 +39,9 @@ int start() {
       cum+=delta;
       if(i<=limit){cumDelta[i]=cum;barDelta[i]=delta;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<10;j++)s+=cumDelta[i+j];signal[i]=s/10;}
+   for(i=limit;i>=1;i++){double s=0;for(int j=0;j<10;j++)s+=cumDelta[i+j];signal[i]=s/10;}
 
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // CumDelta与价格背离
       double priceNow=iClose(_Symbol,_Period,i),pricePrev=iClose(_Symbol,_Period,i+5);
       if(priceNow>pricePrev&&cumDelta[i]<cumDelta[i+5])sellSignal[i]=cumDelta[i]*1.2;  // 顶背离

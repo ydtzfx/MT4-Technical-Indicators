@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        CandleCountback_Safe.mq4   |
 //|  K线计数回溯 — 日本蜡烛图计数法                                    |
@@ -17,14 +18,14 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       // 买入计数：找到最低点后，依次比较每根K线收盘是否高于前第2根收盘
       int buyCount=0;double lowest=iLow(_Symbol,_Period,i+1);int lowBar=i+1;
       for(int j=2;j<20;j++){if(iLow(_Symbol,_Period,i+j)<lowest){lowest=iLow(_Symbol,_Period,i+j);lowBar=i+j;}}
-      for(int j=lowBar-1;j>=1;j--){if(iClose(_Symbol,_Period,j)>iClose(_Symbol,_Period,j+2))buyCount++;else break;if(buyCount>=InpBase)break;}
+      for(int jj=lowBar-1;j>=1;j--){if(iClose(_Symbol,_Period,j)>iClose(_Symbol,_Period,j+2))buyCount++;else break;if(buyCount>=InpBase)break;}
       // 卖出计数：找到最高点后，依次比较收盘是否低于前第2根
       int sellCount=0;double highest=iHigh(_Symbol,_Period,i+1);int highBar=i+1;
-      for(int j=2;j<20;j++){if(iHigh(_Symbol,_Period,i+j)>highest){highest=iHigh(_Symbol,_Period,i+j);highBar=i+j;}}
-      for(int j=highBar-1;j>=1;j--){if(iClose(_Symbol,_Period,j)<iClose(_Symbol,_Period,j+2))sellCount++;else break;if(sellCount>=InpBase)break;}
+      for(int jjj=2;j<20;j++){if(iHigh(_Symbol,_Period,i+j)>highest){highest=iHigh(_Symbol,_Period,i+j);highBar=i+j;}}
+      for(int jjjj=highBar-1;j>=1;j--){if(iClose(_Symbol,_Period,j)<iClose(_Symbol,_Period,j+2))sellCount++;else break;if(sellCount>=InpBase)break;}
       countUp[i]=buyCount;countDn[i]=sellCount;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){
+   for(i=limit;i>=2;i++){
       if(countUp[i+1]<InpBase&&countUp[i]>=InpBase)buySignal[i]=InpBase-1;   // 计数完成=买入
       if(countDn[i+1]<InpBase&&countDn[i]>=InpBase)sellSignal[i]=InpBase+1;
    }

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     CandleBodyMomentum_Safe.mq4   |
 //|  K线实体动量 — 实体连续扩大/缩小的趋势分析                          |
@@ -24,7 +25,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       bodyMom[i]=isUp?MathAbs(change):-MathAbs(change);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 阳线实体连续扩大=买方加速
       if(bodyMom[i+2]>20&&bodyMom[i+1]>30&&bodyMom[i]>40)buySignal[i]=bodyMom[i]-10;
       // 阴线实体连续扩大=卖方加速

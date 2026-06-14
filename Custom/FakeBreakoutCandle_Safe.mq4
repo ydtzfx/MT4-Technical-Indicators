@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    FakeBreakoutCandle_Safe.mq4    |
 //|  假突破K线 — 突破关键位后又回到区间内的K线                         |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuf
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){fakeBuy[i]=fakeSell[i]=trueBuy[i]=trueSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=5;i--){
+   for(i=limit;i>=5;i--){
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i),o=iOpen(_Symbol,_Period,i);
       double hh=h,ll=l;for(int j=1;j<InpLookback;j++){double hj=iHigh(_Symbol,_Period,i+j),lj=iLow(_Symbol,_Period,i+j);if(hj>hh)hh=hj;if(lj<ll)ll=lj;}
       // 假突破上：先突破前高→又回落到前高以下

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     UltimateOscillator_Safe.mq4   |
 //|  终极振荡器（Ultimate Oscillator）— 不含未来函数                  |
@@ -41,15 +42,15 @@ int start() {
       bp[i]=MathMax(h-pc,MathMax(pc-l,MathMax(c-pl,0.0)));
       tr[i]=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double avg7=0,avg14=0,avg28=0,sumBP7=0,sumTR7=0,sumBP14=0,sumTR14=0,sumBP28=0,sumTR28=0;
       for(int j=0;j<InpSlow;j++){sumBP28+=bp[i+j];sumTR28+=tr[i+j];if(j<InpMid){sumBP14+=bp[i+j];sumTR14+=tr[i+j];}if(j<InpFast){sumBP7+=bp[i+j];sumTR7+=tr[i+j];}}
       avg7=SafeDivide(sumBP7,sumTR7,0);avg14=SafeDivide(sumBP14,sumTR14,0);avg28=SafeDivide(sumBP28,sumTR28,0);
       uoBuffer[i]=100*(4*avg7+2*avg14+avg28)/7;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
-      double c=iClose(_Symbol,_Period,i),c2=iClose(_Symbol,_Period,i+3);
+   for(i=limit;i>=1;i--) {
+      c=iClose(_Symbol,_Period,i);double c2=iClose(_Symbol,_Period,i+3);
       bool crossBuy=(uoBuffer[i+1]<=30&&uoBuffer[i]>30);
       bool crossSell=(uoBuffer[i+1]>=70&&uoBuffer[i]<70);
       bool divBuy=(c<c2&&uoBuffer[i]>uoBuffer[i+3]&&uoBuffer[i]<50);

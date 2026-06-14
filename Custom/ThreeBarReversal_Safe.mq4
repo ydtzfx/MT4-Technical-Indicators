@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       ThreeBarReversal_Safe.mq4   |
 //|  三K线反转 — 3根K线组合反转形态                                    |
@@ -12,7 +13,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,4,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){threeBuy[i]=threeSell[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=4;i++){
+   for(i=limit;i>=4;i++){
       double c1=iClose(_Symbol,_Period,i),o1=iOpen(_Symbol,_Period,i),r1=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
       double c2=iClose(_Symbol,_Period,i+1),o2=iOpen(_Symbol,_Period,i+1);
       double c3=iClose(_Symbol,_Period,i+2),o3=iOpen(_Symbol,_Period,i+2);

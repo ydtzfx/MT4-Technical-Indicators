@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                           GridTrading_Safe.mq4    |
 //|  网格交易指标 — 自动显示网格层级                                  |
@@ -34,8 +36,8 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       }
       // 信号：到达网格下边界=买入，到达上边界=卖出
       int nearestLo=0,nearestHi=0;
-      for(int g=-InpGrids;g<=0;g++){double lvl=gridLo+(gridHi-gridLo)/2+g*step;if(c>lvl&&c-lvl<step*0.3)nearestLo++;}
-      for(int g=0;g<=InpGrids;g++){double lvl=gridLo+(gridHi-gridLo)/2+g*step;if(c<lvl&&lvl-c<step*0.3)nearestHi++;}
+      for(int gg=-InpGrids;g<=0;g++){double lvl=gridLo+(gridHi-gridLo)/2+g*step;if(c>lvl&&c-lvl<step*0.3)nearestLo++;}
+      for(int ggg=0;g<=InpGrids;g++){lvl =gridLo+(gridHi-gridLo)/2+g*step;if(c<lvl&&lvl-c<step*0.3)nearestHi++;}
       strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
       if(nearestLo>0){
          buySignal[i]=gridLo;

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      RegressionChannel_Safe.mq4   |
 //|  线性回归通道 — 不含未来函数                                      |
@@ -42,13 +43,13 @@ int start() {
       double intercept=SafeDivide(sumY-slope*sumX,n,0);
       // 标准差
       double seSum=0;
-      for(int j=0;j<n;j++){double yPred=slope*j+intercept;double diff=iClose(_Symbol,_Period,i+j)-yPred;seSum+=diff*diff;}
+      for(int jj=0;j<n;j++){double yPred=slope*j+intercept;double diff=iClose(_Symbol,_Period,i+j)-yPred;seSum+=diff*diff;}
       double stdErr=MathSqrt(seSum/n);
       // 当前点（j=0）的回归值
       mid[i]=intercept;upper[i]=mid[i]+InpK*stdErr;lower[i]=mid[i]-InpK*stdErr;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // Strong buy: price crosses above lower band + uptrend confirmed by rising regression line
       if(c1<=lower[i+1]&&c>lower[i]&&mid[i]>mid[i+1])strongBuy[i]=iLow(_Symbol,_Period,i)-5*Point;

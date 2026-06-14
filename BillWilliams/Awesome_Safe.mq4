@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            Awesome_Safe.mq4       |
 //|  动量震荡指标（Awesome Oscillator）— 不含未来函数                  |
@@ -100,7 +101,7 @@ int start()
    }
 
    // Step 2: 信号生成（bar[1]+确认）— 多条件强信号优先
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       // ---- 买入信号 ----
       bool crossUp    = (aoBuffer[i+1] < 0 && aoBuffer[i] > 0);
@@ -145,7 +146,7 @@ int start()
    if(Bars > 0)
    {
       double sum5_0 = 0.0, sum34_0 = 0.0;
-      for(int j = 0; j < 34; j++)
+      for(int jj = 0; j < 34; j++)
       {
          double median0 = (iHigh(_Symbol, _Period, j) + iLow(_Symbol, _Period, j)) / 2.0;
          sum34_0 += median0;

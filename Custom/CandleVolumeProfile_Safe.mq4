@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      CandleVolumeProfile_Safe.mq4 |
 //|  K线成交量节点 — 每根K线的成交量在其价格范围内的重心               |
@@ -23,5 +24,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       if(cPos<0.5)center-=20;
       volCenter[i]=MathMax(-100,MathMin(100,center-50));buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){if(volCenter[i+1]<-30&&volCenter[i]>30)buySignal[i]=-40;if(volCenter[i+1]>30&&volCenter[i]<-30)sellSignal[i]=40;}
+   for(i=limit;i>=2;i++){if(volCenter[i+1]<-30&&volCenter[i]>30)buySignal[i]=-40;if(volCenter[i+1]>30&&volCenter[i]<-30)sellSignal[i]=40;}
    if(Bars>0){volCenter[0]=volCenter[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    CCI_Safe.mq4   |
 //|  商品通道指数 — 不含未来函数                                      |
@@ -94,7 +95,7 @@ int start()
 
       // Mean Deviation
       double meanDev = 0.0;
-      for(int j = 0; j < InpCCIPeriod; j++)
+      for(int jj = 0; j < InpCCIPeriod; j++)
          meanDev += MathAbs(tp[j] - smaTP);
       meanDev /= InpCCIPeriod;
 
@@ -110,7 +111,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool exitDeepOS  = (cciBuffer[i+1] <= -200 && cciBuffer[i] > -200);
       bool exitOS      = (cciBuffer[i+1] <= -100 && cciBuffer[i] > -100);

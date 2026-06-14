@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        InsideOutsideBar_Safe.mq4  |
 //|  内含线/外包线检测 — Price Action核心形态                          |
@@ -12,7 +13,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){inside[i]=outside[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i),o=iOpen(_Symbol,_Period,i);
       double ph=iHigh(_Symbol,_Period,i+1),pl=iLow(_Symbol,_Period,i+1);
       // Inside Bar: 完全在前一根范围内

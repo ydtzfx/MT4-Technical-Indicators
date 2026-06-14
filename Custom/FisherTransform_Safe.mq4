@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        FisherTransform_Safe.mq4   |
 //|  费雪变换（Fisher Transform）— 不含未来函数                       |
@@ -15,7 +16,7 @@
 #property indicator_level1 2
 #property indicator_level2 -2
 
-input int InpPeriod=10;input ENUM_PRICE_SAFE InpPrice=PRICE_MEDIAN;
+input int InpPeriod=10;input ENUM_PRICE_SAFE InpPrice=SAFE_PRICE_MEDIAN;
 
 double fisher[],buySignal[],sellSignal[],strongBuy[],strongSell[];
 
@@ -42,11 +43,11 @@ int start() {
       val1[i]=0.5*MathLog((1+x)/(1-x));
    }
    double prevFish=0;
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       prevFish=0.5*val1[i]+0.5*prevFish;
       fisher[i]=prevFish;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       bool priceUp=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+3);
       bool fishRising=fisher[i]>fisher[i+1]&&fisher[i+1]>fisher[i+2];
       bool fishFalling=fisher[i]<fisher[i+1]&&fisher[i+1]<fisher[i+2];

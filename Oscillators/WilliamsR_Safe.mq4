@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              WilliamsR_Safe.mq4   |
 //|  威廉指标 — 不含未来函数                                          |
@@ -102,7 +103,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool exitDeepOS = (wprBuffer[i+1] <= -95 && wprBuffer[i] > -95);
       bool exitOS     = (wprBuffer[i+1] <= -80 && wprBuffer[i] > -80);

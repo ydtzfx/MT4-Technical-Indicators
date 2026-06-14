@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              Wyckoff_Safe.mq4    |
 //|  威科夫累积/派发检测 — 原创指标                                    |
@@ -22,9 +23,9 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=20;i--){
       double range5=0,range20=0;for(int j=0;j<5;j++){range5+=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);}range5/=5;
-      for(int j=0;j<20;j++){range20+=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);}range20/=20;
-      double vol5=0,vol20=0;for(int j=0;j<5;j++)vol5+=iVolume(_Symbol,_Period,i+j);vol5/=5;
-      for(int j=0;j<20;j++)vol20+=iVolume(_Symbol,_Period,i+j);vol20/=20;
+      for(int jj=0;j<20;j++){range20+=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);}range20/=20;
+      double vol5=0,vol20=0;for(int jjj=0;j<5;j++)vol5+=iVolume(_Symbol,_Period,i+j);vol5/=5;
+      for(int jjjj=0;j<20;j++)vol20+=iVolume(_Symbol,_Period,i+j);vol20/=20;
       double rangeRatio=SafeDivide(range5,range20,1);double volRatio=SafeDivide(vol5,vol20,1);
       // Wyckoff相位判断
       double phase=0;
@@ -40,7 +41,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       wyckoffPhase[i]=phase;volAnomaly[i]=(volRatio-1)*50;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(wyckoffPhase[i+1]<-30&&wyckoffPhase[i]>30)buySignal[i]=-50;  // 从派发/下跌转累积
       if(wyckoffPhase[i+1]>30&&wyckoffPhase[i]<-30)sellSignal[i]=50;
       // 强信号：相位转换+成交量异常确认

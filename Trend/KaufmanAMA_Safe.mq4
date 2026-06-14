@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            KaufmanAMA_Safe.mq4    |
 //|  考夫曼自适应移动平均（KAMA）— 不含未来函数                       |
@@ -39,8 +40,8 @@ int start() {
       if(i>=Bars-InpPeriod*2)ama[i]=iClose(_Symbol,_Period,i);
       else ama[i]=ama[i+1]+sc*(iClose(_Symbol,_Period,i)-ama[i+1]);
    }
-   for(int i=limit;i>=1;i--){ama[i]=ama[i]>0?ama[i]:iClose(_Symbol,_Period,i);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=1;i--){ama[i]=ama[i]>0?ama[i]:iClose(_Symbol,_Period,i);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=2;i--){
       // Strong Buy: crossover + significant price-KAMA gap + clear KAMA uptrend
       if(iClose(_Symbol,_Period,i+1)<=ama[i+1]&&iClose(_Symbol,_Period,i)>ama[i]&&ama[i]>ama[i+1]&&
          (iClose(_Symbol,_Period,i)-ama[i])>Point*20&&(ama[i]-ama[i+1])>Point)

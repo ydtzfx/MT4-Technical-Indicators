@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   DMA_Safe.mq4    |
 //|  均线差（DMA）— 不含未来函数                                      |
@@ -54,12 +55,12 @@ int start() {
       difBuffer[i]=maS-maL;amaBuffer[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuyBuffer[i]=EMPTY_VALUE;strongSellBuffer[i]=EMPTY_VALUE;
    }
    // AMA = MA of DIF
-   for(int i=limit;i>=1;i--) {
-      double d[60];int c=0;for(int j=0;j<InpM*2&&(i+j<Bars);j++)d[c++]=difBuffer[i+j];
+   for(i=limit;i>=1;i--) {
+      double d[60];int c=0;for(int jj=0;j<InpM*2&&(i+j<Bars);j++)d[c++]=difBuffer[i+j];
       if(c>=InpM)amaBuffer[i]=CalculateMA(d,InpM,InpMAMethod,0);
    }
    // 步骤2: 信号（bar[1]+确认）
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       // 强烈买入：DIF上穿AMA + DIF在零轴下方（深度反转确认）
       if(difBuffer[i+1]<=amaBuffer[i+1]&&difBuffer[i]>amaBuffer[i]&&difBuffer[i+1]<0)
          strongBuyBuffer[i]=difBuffer[i]-MathAbs(difBuffer[i]*0.25);
@@ -76,7 +77,7 @@ int start() {
    }
    // 步骤3: 刷新bar[0]
    if(Bars>0){
-      double p0[200];for(int j=0;j<200;j++)p0[j]=iClose(_Symbol,_Period,j);
+      double p0[200];for(int jjj=0;j<200;j++)p0[j]=iClose(_Symbol,_Period,j);
       difBuffer[0]=CalculateMA(p0,InpShort,InpMAMethod,0)-CalculateMA(p0,InpLong,InpMAMethod,0);
       amaBuffer[0]=amaBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuyBuffer[0]=EMPTY_VALUE;strongSellBuffer[0]=EMPTY_VALUE;
    }

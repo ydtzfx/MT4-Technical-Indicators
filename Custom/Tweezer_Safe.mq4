@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                              Tweezer_Safe.mq4     |
 //|  平头/平底检测（Tweezer Tops/Bottoms）                             |
@@ -14,7 +16,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){tweezerTop[i]=tweezerBot[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
    double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;double tol=InpTolerance*atr/100;
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i),o=iOpen(_Symbol,_Period,i);
       double ph=iHigh(_Symbol,_Period,i+1),pl=iLow(_Symbol,_Period,i+1);
       // 平顶：连续两根的高点几乎相同

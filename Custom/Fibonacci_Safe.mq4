@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                             Fibonacci_Safe.mq4    |
 //|  斐波那契回撤线 — 不含未来函数（基于已完成的高低点）               |
@@ -37,7 +39,7 @@ int start() {
       double hh=iHigh(_Symbol,_Period,i),ll=iLow(_Symbol,_Period,i);
       for(int j=1;j<=InpLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
       bool isHigh=true,isLow=true;
-      for(int j=1;j<=InpConfirmation;j++){
+      for(int jj=1;j<=InpConfirmation;j++){
          if(iHigh(_Symbol,_Period,i-j)>=hh)isHigh=false;
          if(iLow(_Symbol,_Period,i-j)<=ll)isLow=false;
       }

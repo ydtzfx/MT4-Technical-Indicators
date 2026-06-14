@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      MarketRegimeClassifier_Safe  |
 //|  市场状态识别器 — 原创指标                                         |
@@ -49,12 +50,12 @@ int start() {
       double adx=SafeDivide(100*MathAbs(pdmSum-mdmSum),pdmSum+mdmSum,0);
 
       // === BB宽度（波动率）===
-      double sum=0;for(int j=0;j<InpBBPeriod;j++)sum+=iClose(_Symbol,_Period,i+j);
-      double sma=sum/InpBBPeriod;double sd=0;for(int j=0;j<InpBBPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
+      double sum=0;for(int jj=0;j<InpBBPeriod;j++)sum+=iClose(_Symbol,_Period,i+j);
+      double sma=sum/InpBBPeriod;double sd=0;for(int jjj=0;j<InpBBPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
       double bbw=SafeDivide(2*MathSqrt(sd/InpBBPeriod),sma,0)*100;
 
       // === 均线排列 ===
-      double ma=0;for(int j=0;j<InpMAPeriod;j++)ma+=iClose(_Symbol,_Period,i+j);ma/=InpMAPeriod;
+      double ma=0;for(int jjjj=0;j<InpMAPeriod;j++)ma+=iClose(_Symbol,_Period,i+j);ma/=InpMAPeriod;
       double posVsMA=iClose(_Symbol,_Period,i)>ma?1:-1;
 
       // === 状态分类 ===
@@ -70,7 +71,7 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号：状态从盘整或下跌转为上涨
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(regime[i+1]<=2&&regime[i]>2.5&&trendStr[i]>20)buySignal[i]=1;
       if(regime[i+1]>=2&&regime[i]<1.5&&trendStr[i]>20)sellSignal[i]=3;
       // 强信号：状态直接跃升到强趋势区域+强趋势强度

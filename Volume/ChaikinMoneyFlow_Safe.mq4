@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     ChaikinMoneyFlow_Safe.mq4     |
 //|  蔡金资金流（CMF）— 不含未来函数                                  |
@@ -124,12 +125,12 @@ int start()
    }
 
    // --- 第2步：强信号判断（多重条件确认，成交量放大+极端阈值+趋势共振）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // 计算平均成交量用于激增检测
       double avgVol = 0.0;
       int volCount = 0;
-      for(int j = 1; j <= InpCMFPeriod; j++)
+      for(int jj = 1; j <= InpCMFPeriod; j++)
       {
          int vShift = i + j;
          if(vShift < Bars) { avgVol += (double)iVolume(_Symbol, _Period, vShift); volCount++; }
@@ -154,7 +155,7 @@ int start()
    }
 
    // --- 第3步：常规信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // 资金从流出转为流入 → 买入
       if(cmfBuffer[i + 1] < -0.1 && cmfBuffer[i] > -0.1)

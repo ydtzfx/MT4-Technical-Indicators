@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                StochRSI_Safe.mq4  |
 //|  随机RSI（StochRSI）— 不含未来函数                                |
@@ -37,12 +38,12 @@ int start() {
       double aG=0,aL=0;for(int j=0;j<InpRSIPeriod;j++){double ch=iClose(_Symbol,_Period,i+j)-iClose(_Symbol,_Period,i+j+1);if(ch>0)aG+=ch;else aL-=ch;}
       aG/=InpRSIPeriod;aL/=InpRSIPeriod;double rs=SafeDivide(aG,aL,0);rsi[i]=(aL<0.00000001)?1:1-1/(1+rs);
    }
-   for(int i=limit;i>=1;i--){
-      double mn=rsi[i],mx=rsi[i];for(int j=0;j<InpStochPeriod;j++){if(rsi[i+j]<mn)mn=rsi[i+j];if(rsi[i+j]>mx)mx=rsi[i+j];}
+   for(i=limit;i>=1;i--){
+      double mn=rsi[i],mx=rsi[i];for(int jj=0;j<InpStochPeriod;j++){if(rsi[i+j]<mn)mn=rsi[i+j];if(rsi[i+j]>mx)mx=rsi[i+j];}
       double rng=mx-mn;srsi[i]=rng>0?(rsi[i]-mn)/rng:0.5;signal[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<InpSmooth;j++)s+=srsi[i+j];signal[i]=s/InpSmooth;}
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i++){double s=0;for(int jjj=0;j<InpSmooth;j++)s+=srsi[i+j];signal[i]=s/InpSmooth;}
+   for(i=limit;i>=1;i--){
       bool deepOS=(srsi[i+1]<=0.05&&srsi[i]>0.05);  // <0.05深超卖
       bool deepOB=(srsi[i+1]>=0.95&&srsi[i]<0.95);  // >0.95深超买
       bool crossUp=(srsi[i+1]<=signal[i+1]&&srsi[i]>signal[i]);

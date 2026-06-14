@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      ImpliedVolatility_Safe.mq4   |
 //|  隐含波动率代理 — 用历史波动率期限结构推算                          |
@@ -15,14 +16,14 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    for(int i=limit;i>=1;i--){
       double ret[];ArrayResize(ret,InpIVPeriod);double sum=0;
       for(int j=0;j<InpIVPeriod;j++){ret[j]=MathLog(iClose(_Symbol,_Period,i+j)/iClose(_Symbol,_Period,i+j+1));sum+=ret[j];}
-      double mean=sum/InpIVPeriod;double var=0;for(int j=0;j<InpIVPeriod;j++){double d=ret[j]-mean;var+=d*d;}
+      double mean=sum/InpIVPeriod;double var=0;for(int jj=0;j<InpIVPeriod;j++){double d=ret[j]-mean;var+=d*d;}
       // 年化波动率 = 标准差 * sqrt(PeriodsPerYear)
       int barsPerYear=0;switch(Period()){case PERIOD_D1:barsPerYear=260;break;case PERIOD_H4:barsPerYear=1560;break;case PERIOD_H1:barsPerYear=6240;break;default:barsPerYear=260;}
       iv[i]=MathSqrt(var/InpIVPeriod)*MathSqrt(barsPerYear)*100;
       delta[i]=iv[i]-iv[i+1];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<InpSignalPeriod;j++)s+=iv[i+j];ivMA[i]=s/InpSignalPeriod;}
-   for(int i=limit;i>=2;i++){
+   for(i=limit;i>=1;i++){double s=0;for(int jjj=0;j<InpSignalPeriod;j++)s+=iv[i+j];ivMA[i]=s/InpSignalPeriod;}
+   for(i=limit;i>=2;i++){
       // IV从极高位回落 = 恐慌消退 → 可能反弹
       if(iv[i+1]>ivMA[i+1]*1.5&&iv[i]<iv[i+1])buySignal[i]=iv[i]-5;
       // IV从低位飙升 = 风险突增 → 可能下跌

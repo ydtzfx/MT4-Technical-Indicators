@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                    VolatilityAdaptiveBands_Safe   |
 //|  波动率自适应通道 — 原创指标                                       |
@@ -37,14 +39,14 @@ int start() {
 
    for(int i=limit;i>=1;i--){
       // EMA中线
-      double p[40];for(int j=0;j<40;j++)p[j]=iClose(_Symbol,_Period,i+j);
-      double ema=p[39];double a=2.0/21;for(int j=38;j>=0;j--)ema=p[j]*a+ema*(1-a);mid[i]=ema;
+      double p[40];for(int jj=0;j<40;j++)p[j]=iClose(_Symbol,_Period,i+j);
+      double ema=p[39];double a=2.0/21;for(int jjj=38;j>=0;j--)ema=p[j]*a+ema*(1-a);mid[i]=ema;
 
       // ATR
-      double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      double atr=0;for(int jjjj=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
 
       // ADX趋势强度修正
-      double tStr=0;for(int j=0;j<InpADXPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j),pc=iClose(_Symbol,_Period,i+j+1);tStr+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));}tStr/=InpADXPeriod;double adxRatio=SafeDivide(tStr,atr,1);
+      double tStr=0;for(int jjjjj=0;j<InpADXPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j),pc=iClose(_Symbol,_Period,i+j+1);tStr+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));}tStr/=InpADXPeriod;double adxRatio=SafeDivide(tStr,atr,1);
 
       // 成交量修正
       double volAdj=SafeDivide((double)iVolume(_Symbol,_Period,i),avgVol,1);
@@ -56,7 +58,7 @@ int start() {
       upper[i]=ema+bandWidth;lower[i]=ema-bandWidth;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double volRatio=SafeDivide((double)iVolume(_Symbol,_Period,i),avgVol,1);
       double adxRatio2=SafeDivide(tStr,atr,1);

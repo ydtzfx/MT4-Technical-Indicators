@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                                PriceData.mqh     |
 //|  价格数据获取 — 安全封装，内置未来函数防护                         |
 //|  Part of: MT4 技术指标完整体 (No Future Function)                  |
@@ -105,13 +105,13 @@ double GetPriceByTypeEx(string symbol, int timeframe, int shift, ENUM_PRICE_SAFE
 {
    switch(priceType)
    {
-      case PRICE_CLOSE:    return(iClose(symbol, timeframe, shift));
-      case PRICE_OPEN:     return(iOpen(symbol, timeframe, shift));
-      case PRICE_HIGH:     return(iHigh(symbol, timeframe, shift));
-      case PRICE_LOW:      return(iLow(symbol, timeframe, shift));
-      case PRICE_MEDIAN:   return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift)) / 2.0);
-      case PRICE_TYPICAL:  return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift) + iClose(symbol, timeframe, shift)) / 3.0);
-      case PRICE_WEIGHTED: return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift) + iClose(symbol, timeframe, shift) * 2.0) / 4.0);
+      case SAFE_PRICE_CLOSE:    return(iClose(symbol, timeframe, shift));
+      case SAFE_PRICE_OPEN:     return(iOpen(symbol, timeframe, shift));
+      case SAFE_PRICE_HIGH:     return(iHigh(symbol, timeframe, shift));
+      case SAFE_PRICE_LOW:      return(iLow(symbol, timeframe, shift));
+      case SAFE_PRICE_MEDIAN:   return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift)) / 2.0);
+      case SAFE_PRICE_TYPICAL:  return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift) + iClose(symbol, timeframe, shift)) / 3.0);
+      case SAFE_PRICE_WEIGHTED: return((iHigh(symbol, timeframe, shift) + iLow(symbol, timeframe, shift) + iClose(symbol, timeframe, shift) * 2.0) / 4.0);
       default:             return(iClose(symbol, timeframe, shift));
    }
 }
@@ -152,9 +152,9 @@ double GetLowestLow(string symbol, int timeframe, int startBar, int period)
 {
    int endBar = startBar + period - 1;
    double lowest = iLow(symbol, timeframe, startBar);
-   for(int i = startBar + 1; i <= endBar; i++)
+   for(int ii = startBar + 1; ii <= endBar; ii++)
    {
-      double l = iLow(symbol, timeframe, i);
+      double l = iLow(symbol, timeframe, ii);
       if(l < lowest) lowest = l;
    }
    return(lowest);
@@ -216,9 +216,9 @@ void FillPriceArray(string symbol, int timeframe, double &array[],
                     int startBar, int count, ENUM_PRICE_SAFE priceType)
 {
    ArrayResize(array, count);
-   for(int i = 0; i < count; i++)
+   for(int iii = 0; iii < count; iii++)
    {
-      array[i] = GetPriceByTypeEx(symbol, timeframe, startBar + i, priceType);
+      array[iii] = GetPriceByTypeEx(symbol, timeframe, startBar + iii, priceType);
    }
 }
 
@@ -236,9 +236,9 @@ double GetMASafe(string symbol, int timeframe, int shift, int period,
    int dataCount = period * 2 + s;  // 足够的历史数据
    ArrayResize(prices, dataCount);
 
-   for(int i = 0; i < dataCount; i++)
+   for(int iiii = 0; iiii < dataCount; iiii++)
    {
-      prices[i] = GetPriceByTypeEx(symbol, timeframe, i + s, priceType);
+      prices[iiii] = GetPriceByTypeEx(symbol, timeframe, iiii + s, priceType);
    }
 
    // 从数组末尾（对应shift位置）往前计算

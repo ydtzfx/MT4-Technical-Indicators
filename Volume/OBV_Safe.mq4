@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    OBV_Safe.mq4   |
 //|  能量潮指标 — 不含未来函数                                        |
@@ -20,7 +21,7 @@
 #property indicator_buffers 5
 
 // 输入参数
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE;
 
 // 指标缓冲区
 double obvBuffer[];
@@ -104,7 +105,7 @@ int start()
    }
 
    // 信号判断：背离检测（bar[1]+确认）
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       strongBuy[i]  = EMPTY_VALUE;
       strongSell[i] = EMPTY_VALUE;
@@ -128,7 +129,7 @@ int start()
       // OBV极值检测（最近30根K线范围）
       double obvMax = obvBuffer[i];
       double obvMin = obvBuffer[i];
-      for(int j = i; j < i + 30 && j < Bars; j++)
+      for(int jj = i; j < i + 30 && j < Bars; j++)
       {
          if(obvBuffer[j] > obvMax) obvMax = obvBuffer[j];
          if(obvBuffer[j] < obvMin) obvMin = obvBuffer[j];

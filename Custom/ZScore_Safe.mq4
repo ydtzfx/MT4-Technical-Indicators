@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   ZScore_Safe.mq4 |
 //|  Z分数指标 — 统计偏离度指标                                        |
@@ -38,14 +39,14 @@ int start() {
 
    for(int i=limit;i>=1;i--){
       double sum=0;for(int j=0;j<InpPeriod;j++)sum+=iClose(_Symbol,_Period,i+j);double sma=sum/InpPeriod;
-      double sd=0;for(int j=0;j<InpPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
+      double sd=0;for(int jj=0;j<InpPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
       sd=MathSqrt(sd/InpPeriod);
       zScore[i]=sd>0?(iClose(_Symbol,_Period,i)-sma)/sd:0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<5;j++)s+=zScore[i+j];signal[i]=s/5;}
+   for(i=limit;i>=1;i++){double s=0;for(int jjj=0;j<5;j++)s+=zScore[i+j];signal[i]=s/5;}
 
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       bool zRising=zScore[i]>zScore[i+1]&&zScore[i+1]>zScore[i+2];
       bool zFalling=zScore[i]<zScore[i+1]&&zScore[i+1]<zScore[i+2];
       bool priceUp=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+3);

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            Alligator_Safe.mq4     |
 //|  鳄鱼线指标（Alligator）— 不含未来函数                              |
@@ -100,7 +101,7 @@ double CalcSMMA(double &prices[], int period, int startIdx)
    smma /= period;
 
    // 递推SMMA
-   for(int i = startIdx - 1; i >= 0; i--)
+   for(i = startIdx - 1; i >= 0; i--)
       smma = (prices[i] + smma * (period - 1.0)) / period;
 
    return(smma);
@@ -109,6 +110,7 @@ double CalcSMMA(double &prices[], int period, int startIdx)
 //+------------------------------------------------------------------+
 int start()
 {
+   int i;
    int counted_bars = IndicatorCounted();
    if(counted_bars < 0) counted_bars = 0;
    int limit = Bars - counted_bars;
@@ -116,7 +118,7 @@ int start()
    if(limit < 0) limit = 0;
 
    // 先初始化为空
-   for(int i = limit + InpJawShift; i >= -InpJawShift; i--)
+   for(i = limit + InpJawShift; i >= -InpJawShift; i--)
    {
       if(i >= 0)
       {
@@ -130,7 +132,7 @@ int start()
       }
    }
 
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       // 构建中位价数组
       int maxPeriod = InpJawPeriod + InpJawShift;
@@ -151,7 +153,7 @@ int start()
    }
 
    // 信号判断（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double jaw_i    = jawBuffer[i];
       double jaw_i1   = jawBuffer[i + 1];

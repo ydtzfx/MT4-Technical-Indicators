@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                   VolatilityTermStructure_Safe    |
 //|  波动率期限结构 — 原创指标                                         |
@@ -45,7 +47,7 @@ int start() {
       termSpread[i]=SafeDivide(100*(sVol-mVol),mVol,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // 波动率结构从贴水转为升水（市场平静下来）→ 可顺势交易
       if(termSpread[i+1]>10&&termSpread[i]<0&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=termSpread[i]-5;
       // 波动率结构从升水转为贴水（市场紧张起来）→ 可能变盘

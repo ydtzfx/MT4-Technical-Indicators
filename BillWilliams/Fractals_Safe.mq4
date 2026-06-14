@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                             Fractals_Safe.mq4     |
 //|  分形指标 — 不含未来函数                                          |
@@ -67,7 +68,7 @@ int start()
    // 分形检测 — 中间bar必须有N根确认bar在其右侧（历史方向）
    // i 是中间bar的索引，右侧有 InpFractalBars 根更近期的bar
    // 要求：i >= InpFractalBars（右侧bar已完成）
-   for(int i = limit; i >= InpFractalBars; i--)
+   for(i = limit; i >= InpFractalBars; i--)
    {
       double middleHigh = iHigh(_Symbol, _Period, i);
       double middleLow  = iLow(_Symbol, _Period, i);
@@ -92,7 +93,7 @@ int start()
       }
 
       // 严格模式：只检查严格大于/小于，不允许相等
-      for(int j = 1; j <= InpFractalBars; j++)
+      for(int jj = 1; j <= InpFractalBars; j++)
       {
          if(iHigh(_Symbol, _Period, i + j) == middleHigh)
             isUpFractal = false;

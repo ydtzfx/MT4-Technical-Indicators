@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          MarketScanner_Safe.mq4   |
 //|  市场扫描仪表盘 — 不含未来函数                                    |
@@ -39,27 +40,27 @@ int start() {
       if(rsi>60)totalScore+=20;else if(rsi>50)totalScore+=10;else if(rsi<40)totalScore-=20;else if(rsi<50)totalScore-=10;
 
       // MACD信号
-      double prices[100];for(int j=0;j<100;j++)prices[j]=iClose(_Symbol,_Period,i+j);
+      double prices[100];for(int jj=0;j<100;j++)prices[j]=iClose(_Symbol,_Period,i+j);
       double aF=2.0/(InpMACDFast+1),aS=2.0/(InpMACDSlow+1);
       double eF=prices[99],eS=prices[99];
-      for(int j=98;j>=0;j--){eF=prices[j]*aF+eF*(1-aF);eS=prices[j]*aS+eS*(1-aS);}
+      for(int jjj=98;j>=0;j--){eF=prices[j]*aF+eF*(1-aF);eS=prices[j]*aS+eS*(1-aS);}
       double macdLine=eF-eS;
       if(macdLine>0)totalScore+=(macdLine>0.0001?30:15);else totalScore-=(macdLine<-0.0001?30:15);
 
       // 均线排列
-      double ma10=0,ma20=0,ma60=0;for(int j=0;j<10;j++)ma10+=iClose(_Symbol,_Period,i+j);ma10/=10;
-      for(int j=0;j<20;j++)ma20+=iClose(_Symbol,_Period,i+j);ma20/=20;
-      for(int j=0;j<60;j++)ma60+=iClose(_Symbol,_Period,i+j);ma60/=60;
+      double ma10=0,ma20=0,ma60=0;for(int jjjj=0;j<10;j++)ma10+=iClose(_Symbol,_Period,i+j);ma10/=10;
+      for(int jjjjj=0;j<20;j++)ma20+=iClose(_Symbol,_Period,i+j);ma20/=20;
+      for(int jjjjjj=0;j<60;j++)ma60+=iClose(_Symbol,_Period,i+j);ma60/=60;
       if(ma10>ma20&&ma20>ma60)totalScore+=30;else if(ma10<ma20&&ma20<ma60)totalScore-=30;
 
       // 趋势强度（连续上涨天数）
-      int upDays=0;for(int j=0;j<5;j++)if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1))upDays++;
+      int upDays=0;for(int jjjjjjj=0;j<5;j++)if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1))upDays++;
       totalScore+=(upDays-2)*10;
 
       score[i]=MathMax(-100,MathMin(100,totalScore));
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       if(score[i+1]<-50&&score[i]>-50)buySignal[i]=-55;
       if(score[i+1]>50&&score[i]<50)sellSignal[i]=55;
    }

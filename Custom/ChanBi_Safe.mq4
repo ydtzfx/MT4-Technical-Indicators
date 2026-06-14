@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       ChanBi_Safe.mq4 缠论笔      |
 //|  缠论笔 — 顶底分型确认后连线                                      |
@@ -14,7 +15,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-300;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){upBi[i]=EMPTY_VALUE;dnBi[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    int topBars[],botBars[],topCnt=0,botCnt=0;ArrayResize(topBars,100);ArrayResize(botBars,100);
-   for(int i=Bars-InpFenxingBars-2;i>=InpFenxingBars;i--){
+   for(i=Bars-InpFenxingBars-2;i>=InpFenxingBars;i--){
       bool isTop=true,isBot=true;
       for(int j=1;j<=InpFenxingBars;j++){if(i+j<Bars&&iHigh(_Symbol,_Period,i+j)>=iHigh(_Symbol,_Period,i))isTop=false;if(i-j>=0&&iHigh(_Symbol,_Period,i-j)>=iHigh(_Symbol,_Period,i))isTop=false;if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isBot=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isBot=false;}
       if(isTop&&topCnt<99){topBars[topCnt]=i;topCnt++;}

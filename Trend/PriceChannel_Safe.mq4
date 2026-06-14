@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                           PriceChannel_Safe.mq4   |
 //|  价格通道 — 不含未来函数                                          |
@@ -34,11 +36,11 @@ int start() {
    for(int i=limit;i>=1;i--) {
       double hh=iHigh(_Symbol,_Period,i),ll=iLow(_Symbol,_Period,i);
       for(int j=1;j<InpPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
-      double trSum=0;for(int j=0;j<InpATRPeriod;j++)trSum+=GetTrueRange(_Symbol,_Period,i+j);double atr=trSum/InpATRPeriod;
+      double trSum=0;for(int jj=0;j<InpATRPeriod;j++)trSum+=GetTrueRange(_Symbol,_Period,i+j);double atr=trSum/InpATRPeriod;
       upper[i]=hh+InpATRMult*atr;lower[i]=ll-InpATRMult*atr;mid[i]=(upper[i]+lower[i])/2;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double rng=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
       // Strong signals first: multi-condition confirmation

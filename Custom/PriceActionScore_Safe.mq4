@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        PriceActionScore_Safe.mq4  |
 //|  Price Action综合评分 — 多K线形态加权评分                          |
@@ -36,7 +37,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       }
       paScore[i]=MathMax(-100,MathMin(100,score));buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){
+   for(i=limit;i>=2;i++){
       if(paScore[i+1]<-40&&paScore[i]>-40)buySignal[i]=-50;
       if(paScore[i+1]>40&&paScore[i]<40)sellSignal[i]=50;
    }

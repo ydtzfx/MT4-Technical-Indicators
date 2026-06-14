@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     KlingerOscillator_Safe.mq4    |
 //|  克林格振荡器（Klinger Oscillator）— 不含未来函数                 |
@@ -39,17 +40,17 @@ int start() {
       vf[i]=(double)v*MathAbs(2*dm/SafeDivide(cm,1,1)-1)*trend*100;
    }
    double aF=2.0/(InpFast+1),aS=2.0/(InpSlow+1);
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double eF=vf[i+InpSlow],eS=vf[i+InpSlow];
       for(int j=InpSlow-1;j>=0;j--){eF=vf[i+j]*aF+eF*(1-aF);eS=vf[i+j]*aS+eS*(1-aS);}
       koBuffer[i]=eF-eS;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    double aSig=2.0/(InpSignal+1);
-   for(int i=limit;i>=1;i--) {
-      double e=koBuffer[i+InpSignal];for(int j=InpSignal-1;j>=0;j--)e=koBuffer[i+j]*aSig+e*(1-aSig);
+   for(i=limit;i>=1;i--) {
+      double e=koBuffer[i+InpSignal];for(int jj=InpSignal-1;j>=0;j--)e=koBuffer[i+j]*aSig+e*(1-aSig);
       signalBuffer[i]=e;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       // Strong signals — multi-condition volume-specific confirmation
       bool koCrossAboveSignal=(koBuffer[i+1]<=signalBuffer[i+1]&&koBuffer[i]>signalBuffer[i]);
       bool koCrossBelowSignal=(koBuffer[i+1]>=signalBuffer[i+1]&&koBuffer[i]<signalBuffer[i]);

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          FundingRate_Safe.mq4     |
 //|  资金费率代理 — 用价格-现货偏离估算永续合约资金费率                  |
@@ -23,7 +24,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       oiChange[i]=volPrev>0?100.0*(volNow-volPrev)/volPrev:0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 资金费率从极端正值转负 = 多头拥挤后清算 → 卖出
       if(fr[i+1]>0.5&&fr[i]<-0.5)sellSignal[i]=fr[i]+0.5;
       // 资金费率从极端负值转正 = 空头拥挤后回补 → 买入

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        Accelerator_Safe.mq4       |
 //|  加速震荡指标（Accelerator Oscillator）— 不含未来函数             |
@@ -95,10 +96,10 @@ int start()
    }
 
    // 计算AC = AO - SMA(AO, 5)
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       double aoSum5 = 0.0;
-      for(int j = 0; j < 5; j++)
+      for(int jj = 0; j < 5; j++)
          aoSum5 += aoBuffer[i + j];
       double smaAO5 = aoSum5 / 5.0;
 
@@ -111,7 +112,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       // 基本买入条件
       bool buyCross = (acBuffer[i] > acBuffer[i+1] && acBuffer[i+1] > acBuffer[i+2] &&

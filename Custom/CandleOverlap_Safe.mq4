@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          CandleOverlap_Safe.mq4   |
 //|  K线重叠度 — 当前K线与前一根的重叠百分比                            |
@@ -21,7 +22,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double ov=MathMin(h,ph)-MathMax(l,pl);overlap[i]=pRange>0?MathMax(0,100*ov/pRange):0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 重叠率从极低(缺口/突破)回到正常水平=趋势确认后回踩
       if(overlap[i+1]<20&&overlap[i]>50)buySignal[i]=overlap[i]-5;
       // 重叠率持续>90=压缩盘整，突破后信号

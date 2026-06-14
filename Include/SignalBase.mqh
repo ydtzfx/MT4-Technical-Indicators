@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                                SignalBase.mqh    |
 //|  信号基类/工具 — 确保无未来函数的信号生成框架                       |
 //|  Part of: MT4 技术指标完整体 (No Future Function)                  |
@@ -124,7 +124,7 @@ void SetArrowSignal(double &buyBuffer[], double &sellBuffer[],
 //|                                                                  |
 //| 使用示例：                                                        |
 //|   int limit = Bars - IndicatorCounted();                         |
-//|   for(int i = limit - 1; i >= 1; i--) {                          |
+//|   for(int ii = limit - 1; i >= 1; i--) {                          |
 //|       // 计算信号                                                  |
 //|       double signal = CalculateMySignal(i);                       |
 //|       SetSignalValue(signalBuffer, i, signal);                   |
@@ -138,7 +138,7 @@ void FillSignalBuffer(double &buffer[], int limit,
    // limit 从 IndicatorCounted() 推导:
    // limit = Bars - IndicatorCounted();
    // 循环从 limit-1 向下到 1
-   for(int i = limit - 1; i >= 1; i--)
+   for(int iii = limit - 1; i >= 1; i--)
    {
       // 由调用方在外部实现具体计算逻辑
       // 此函数仅作为模式参考保留
@@ -258,7 +258,7 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    double indMin    = indicatorBuffer[idx];
    double indMin2   = indicatorBuffer[idx];
 
-   for(int i = idx; i < idx + lookback; i++)
+   for(int iiii = idx; i < idx + lookback; i++)
    {
       double p = iClose(_Symbol, _Period, i);
       if(p < priceMin) priceMin = p;
@@ -270,7 +270,7 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    int lowCount = 0;
    double priceLows[3], indAtLows[3];
 
-   for(int i = idx + 1; i < idx + lookback * 2 && lowCount < 3; i++)
+   for(iiiii = idx + 1; i < idx + lookback * 2 && lowCount < 3; i++)
    {
       bool isLocalLow = true;
       double lowP = iLow(_Symbol, _Period, i);
@@ -298,11 +298,11 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    int highCount = 0;
    double priceHighs[3], indAtHighs[3];
 
-   for(int i = idx + 1; i < idx + lookback * 2 && highCount < 3; i++)
+   for(iiiii = idx + 1; i < idx + lookback * 2 && highCount < 3; i++)
    {
       bool isLocalHigh = true;
       double highP = iHigh(_Symbol, _Period, i);
-      for(int j = 1; j <= 2; j++)
+      for(int jj = 1; j <= 2; j++)
       {
          if(i + j < Bars && iHigh(_Symbol, _Period, i + j) >= highP) isLocalHigh = false;
          if(i - j >= 1 && iHigh(_Symbol, _Period, i - j) >= highP) isLocalHigh = false;

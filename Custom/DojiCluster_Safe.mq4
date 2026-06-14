@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          DojiCluster_Safe.mq4     |
 //|  十字星集群 — 连续/密集十字星=重大变盘前兆                         |
@@ -19,7 +20,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       for(int j=0;j<InpLookback;j++){double r=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);double b=MathAbs(iClose(_Symbol,_Period,i+j)-iOpen(_Symbol,_Period,i+j));if(r>0&&b<r*InpDojiThreshold)dojiCnt++;}
       dojiDensity[i]=100.0*dojiCnt/InpLookback;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       // 十字星密度>40%=高度不确定→随后突破方向即趋势方向
       if(dojiDensity[i+2]>40&&dojiDensity[i]<20&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+2))buySignal[i]=dojiDensity[i]-10;
       if(dojiDensity[i+2]>40&&dojiDensity[i]<20&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+2))sellSignal[i]=dojiDensity[i]+10;

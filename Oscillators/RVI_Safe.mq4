@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    RVI_Safe.mq4   |
 //|  相对活力指数（RVI）— 不含未来函数                                |
@@ -44,16 +45,16 @@ int start() {
    }
    double a=2.0/(InpPeriod+1);
    double eNum[],eDen[];ArrayResize(eNum,Bars);ArrayResize(eDen,Bars);
-   for(int i=Bars-2;i>=1;i--){
+   for(i=Bars-2;i>=1;i--){
       if(i>=Bars-30){eNum[i]=num[i];eDen[i]=den[i];}
       else{eNum[i]=num[i]*a+eNum[i+1]*(1-a);eDen[i]=den[i]*a+eDen[i+1]*(1-a);}
    }
-   for(int i=limit;i>=1;i--){rvi[i]=SafeDivide(eNum[i],eDen[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=1;i--){rvi[i]=SafeDivide(eNum[i],eDen[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    double aS=2.0/5;
-   for(int i=limit;i>=1;i--){
-      double e=rvi[i+5];for(int j=4;j>=0;j--)e=rvi[i+j]*aS+e*(1-aS);signal[i]=e;
+   for(i=limit;i>=1;i--){
+      double e=rvi[i+5];for(int jj=4;j>=0;j--)e=rvi[i+j]*aS+e*(1-aS);signal[i]=e;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       double gap=MathAbs(rvi[i]-signal[i]);
       bool rviAboveZero=(rvi[i]>0);
       // 强买：零轴上方金叉 + 开口大

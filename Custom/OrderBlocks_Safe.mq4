@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
 //+------------------------------------------------------------------+
 //|                                            OrderBlocks_Safe.mq4   |
 //|  订单块检测（Order Blocks）— ICT/SMC 概念                         |
@@ -35,7 +37,7 @@ int start() {
    for(int i=limit;i>=0;i--){bullOB[i]=EMPTY_VALUE;bearOB[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    RemoveObjectsByPrefix("OB_");
 
-   for(int i=limit;i>=InpSwingLookback+2;i--){
+   for(i=limit;i>=InpSwingLookback+2;i--){
       double c=iClose(_Symbol,_Period,i),o=iOpen(_Symbol,_Period,i);
       double h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i);
 
@@ -57,12 +59,12 @@ int start() {
       }
 
       // === 检测看跌订单块 ===
-      bool wasUp=true;for(int j=1;j<=3;j++)if(iClose(_Symbol,_Period,i+j)<iClose(_Symbol,_Period,i+j+1))wasUp=false;
+      bool wasUp=true;for(int jj=1;j<=3;j++)if(iClose(_Symbol,_Period,i+j)<iClose(_Symbol,_Period,i+j+1))wasUp=false;
       bool isReversalDn=iClose(_Symbol,_Period,i-1)<iClose(_Symbol,_Period,i)&&iClose(_Symbol,_Period,i-2)<iClose(_Symbol,_Period,i-1);
       if(c>o&&wasUp&&isReversalDn){
          bearOB[i]=h+3*Point;
          if(InpShowOBZone){
-            string nm=OBJ_PREFIX+"OB_BEAR_"+IntegerToString(i);
+            nm=OBJ_PREFIX+"OB_BEAR_"+IntegerToString(i);
             ObjectCreate(nm,OBJ_RECTANGLE,0,iTime(_Symbol,_Period,i),o,iTime(_Symbol,_Period,i-2),c);
             ObjectSet(nm,OBJPROP_COLOR,clrTomato);ObjectSet(nm,OBJPROP_BACK,true);ObjectSet(nm,OBJPROP_WIDTH,2);
          }

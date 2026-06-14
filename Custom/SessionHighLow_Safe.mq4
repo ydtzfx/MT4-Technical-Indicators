@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          SessionHighLow_Safe.mq4  |
 //|  时段高低点 — 不含未来函数                                        |
@@ -40,7 +41,7 @@ int start() {
       } else {asianHi[i]=asianHi[i+1];asianLo[i]=asianLo[i+1];}
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // 突破时段高点
       if(c1<=asianHi[i+1]&&c>asianHi[i])buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;

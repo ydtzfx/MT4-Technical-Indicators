@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                               SwingIndex_Safe.mq4 |
 //|  摆动指数（Swing Index）— 不含未来函数                            |
@@ -41,7 +42,7 @@ int start() {
       cumSI+=si;asiBuffer[i]=cumSI;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i--) {
+   for(i=limit;i>=3;i--) {
       if(asiBuffer[i]>asiBuffer[i+1]&&asiBuffer[i+1]>asiBuffer[i+2]&&asiBuffer[i+2]>asiBuffer[i+3])buySignal[i]=asiBuffer[i]*0.95;
       if(asiBuffer[i]<asiBuffer[i+1]&&asiBuffer[i+1]<asiBuffer[i+2]&&asiBuffer[i+2]<asiBuffer[i+3])sellSignal[i]=asiBuffer[i]*1.05;
    }

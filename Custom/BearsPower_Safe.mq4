@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           BearsPower_Safe.mq4     |
 //|  空头力量指标（Bears Power）— 不含未来函数                         |
@@ -19,7 +20,7 @@
 #property indicator_buffers 6
 
 input int    InpBPPeriod  = 13;           // EMA周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;  // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE;  // 价格类型
 
 // 指标缓冲区
 double bpBuffer[];      // Bears Power 主线（柱状图）
@@ -99,7 +100,7 @@ int start()
 
       double ema = prices[InpBPPeriod * 2 - 1];
       double alpha = 2.0 / (InpBPPeriod + 1.0);
-      for(int j = InpBPPeriod * 2 - 2; j >= 0; j--)
+      for(int jj = InpBPPeriod * 2 - 2; j >= 0; j--)
          ema = prices[j] * alpha + ema * (1.0 - alpha);
 
       maBuffer[i] = ema;
@@ -112,7 +113,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       // 卖出信号：BearsPower从正转负（从EMA上方跌到下方）
       if(bpBuffer[i + 1] > 0.0 && bpBuffer[i] < 0.0)
@@ -162,11 +163,11 @@ int start()
    {
       double p0[];
       ArrayResize(p0, InpBPPeriod * 2);
-      for(int j = 0; j < InpBPPeriod * 2; j++)
+      for(int jjj = 0; j < InpBPPeriod * 2; j++)
          p0[j] = GetPriceByType(j, InpPriceType);
       double e0 = p0[InpBPPeriod * 2 - 1];
       double a0 = 2.0 / (InpBPPeriod + 1.0);
-      for(int j = InpBPPeriod * 2 - 2; j >= 0; j--)
+      for(int jjjj = InpBPPeriod * 2 - 2; j >= 0; j--)
          e0 = p0[j] * a0 + e0 * (1.0 - a0);
       bpBuffer[0] = iLow(_Symbol, _Period, 0) - e0;
       buySignal[0]   = EMPTY_VALUE;

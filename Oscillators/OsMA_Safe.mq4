@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   OsMA_Safe.mq4   |
 //|  移动平均振荡器 — 不含未来函数                                    |
@@ -22,7 +23,7 @@
 input int InpFastEMA  = 12;   // 快EMA周期
 input int InpSlowEMA  = 26;   // 慢EMA周期
 input int InpSignalSMA = 9;   // 信号线周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE;
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE;
 
 // 指标缓冲区
 double osmaBuffer[];
@@ -98,7 +99,7 @@ int start()
 
       // 快EMA
       double fastEMA = prices[histSize - 1];
-      for(int j = histSize - InpFastEMA; j >= 0; j--)
+      for(int jj = histSize - InpFastEMA; j >= 0; j--)
       {
          double alpha = 2.0 / (InpFastEMA + 1.0);
          fastEMA = prices[j] * alpha + fastEMA * (1.0 - alpha);
@@ -106,9 +107,9 @@ int start()
 
       // 慢EMA
       double slowEMA = prices[histSize - 1];
-      for(int j = histSize - InpSlowEMA; j >= 0; j--)
+      for(int jjj = histSize - InpSlowEMA; j >= 0; j--)
       {
-         double alpha = 2.0 / (InpSlowEMA + 1.0);
+         alpha = 2.0 / (InpSlowEMA + 1.0);
          slowEMA = prices[j] * alpha + slowEMA * (1.0 - alpha);
       }
 
@@ -119,10 +120,10 @@ int start()
    }
 
    // 对MACD做Signal平滑
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double sigSum = 0.0;
-      for(int j = 0; j < InpSignalSMA; j++)
+      for(int jjjj = 0; j < InpSignalSMA; j++)
          sigSum += osmaBuffer[i + j];
       double signalLine = sigSum / InpSignalSMA;
       osmaBuffer[i] = osmaBuffer[i] - signalLine;  // 变成真正的OsMA
@@ -131,7 +132,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool crossUp   = (osmaBuffer[i+1] < 0 && osmaBuffer[i] > 0);
       bool crossDown = (osmaBuffer[i+1] > 0 && osmaBuffer[i] < 0);

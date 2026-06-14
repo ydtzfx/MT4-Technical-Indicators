@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   PSY_Safe.mq4    |
 //|  心理线（PSY）— 不含未来函数                                      |
@@ -111,7 +112,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool priceUp = iClose(_Symbol, _Period, i) > iClose(_Symbol, _Period, i + 3);
       // Strong Buy: 极度悲观反转 + 价格上涨 + 连续形态
@@ -142,7 +143,7 @@ int start()
    if(Bars > 0)
    {
       int up0 = 0;
-      for(int j = 0; j < InpPSYPeriod; j++)
+      for(int jj = 0; j < InpPSYPeriod; j++)
       {
          if(iClose(_Symbol, _Period, j) > iClose(_Symbol, _Period, j + 1))
             up0++;

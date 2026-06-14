@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      VolumeOscillator_Safe.mq4    |
 //|  成交量振荡器 — 不含未来函数                                      |
@@ -34,13 +35,13 @@ int start() {
    for(int i=limit+InpSlow;i>=1;i--){ // 预计算EMA
       double eF=0,eS=0;for(int j=0;j<InpSlow*2;j++){double v=iVolume(_Symbol,_Period,i+j);eF+=v;eS+=v;}
       eF/=InpSlow*2;eS/=InpSlow*2;
-      for(int j=InpSlow*2-1;j>=0;j--){double v=iVolume(_Symbol,_Period,i+j);eF=v*aF+eF*(1-aF);eS=v*aS+eS*(1-aS);}
+      for(int jj=InpSlow*2-1;j>=0;j--){v=iVolume(_Symbol,_Period,i+j);eF=v*aF+eF*(1-aF);eS=v*aS+eS*(1-aS);}
       if(i<=limit){vo[i]=SafeDivide(100*(eF-eS),eS,0);strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       // Strong signal: multi-condition volume confirmation
       // Cond1: extreme VO surge (>40), Cond2: price direction, Cond3: close vs EMA(5) trend filter
-      double ma5=iMA(_Symbol,_Period,5,0,MODE_EMA,PRICE_CLOSE,i);
+      double ma5=iMA(_Symbol,_Period,5,0,MODE_EMA,SAFE_PRICE_CLOSE,i);
       if(vo[i]>40&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1)&&iClose(_Symbol,_Period,i)>ma5)
          strongBuy[i]=vo[i]*0.8;
       if(vo[i]>40&&iClose(_Symbol,_Period,i)<iClose(_Symbol,_Period,i+1)&&iClose(_Symbol,_Period,i)<ma5)

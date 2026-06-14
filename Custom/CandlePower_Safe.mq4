@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            CandlePower_Safe.mq4   |
 //|  K线力量：综合实体/影线/位置评估多空力量                           |
@@ -27,7 +28,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       power[i]=MathMax(-100,MathMin(100,bullP-bearP));
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       if(power[i+1]<-30&&power[i]>30&&power[i+2]<-20)buySignal[i]=-40;
       if(power[i+1]>30&&power[i]<-30&&power[i+2]>20)sellSignal[i]=40;
    }

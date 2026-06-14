@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            HeikinAshi_Safe.mq4    |
 //|  平均K线图（Heikin Ashi）— 不含未来函数                           |
@@ -40,10 +41,10 @@ int start() {
       else{haLow[i]=hal;haClose[i]=hah;haOpen[i]=0;haHigh[i]=0;}
    }
    // 信号：HA由阴转阳=买入，由阳转阴=卖出 (bar[1]+确认)
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
-      double o=iOpen(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i);
-      double hac=(o+h+l+c)/4;double hao=(haOpen[i+1]+haClose[i+1])/2;
+      o=iOpen(_Symbol,_Period,i);h=iHigh(_Symbol,_Period,i);l=iLow(_Symbol,_Period,i);c=iClose(_Symbol,_Period,i);
+      hac=(o+h+l+c)/4;hao=(haOpen[i+1]+haClose[i+1])/2;
       double prevHac=(iOpen(_Symbol,_Period,i+1)+iHigh(_Symbol,_Period,i+1)+iLow(_Symbol,_Period,i+1)+iClose(_Symbol,_Period,i+1))/4;
       double prevHao=(haOpen[i+2]+haClose[i+2])/2;
       if(prevHac<prevHao&&hac>hao)buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;  // 阴转阳

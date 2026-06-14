@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              ZeroLagEMA_Safe.mq4  |
 //|  零滞后EMA — 不含未来函数                                         |
@@ -36,8 +37,8 @@ int start() {
       if(i>=Bars-hist)zlema[i]=deLag;
       else zlema[i]=deLag*a+zlema[i+1]*(1-a);
    }
-   for(int i=limit;i>=1;i--){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=1;i--){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // strong signals: cross + ZLEMA slope confirmation (multi-condition grading)
       bool isBuyCross=(c1<=zlema[i+1]&&c>zlema[i]);

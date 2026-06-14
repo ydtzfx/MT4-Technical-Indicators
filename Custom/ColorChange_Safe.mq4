@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           ColorChange_Safe.mq4    |
 //|  K线变色 — 连续同色后第一根异色K线的意义                           |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){colorBull[i]=colorBear[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=3;i++){
       bool isBull=iClose(_Symbol,_Period,i)>iOpen(_Symbol,_Period,i);
       bool prevBull=iClose(_Symbol,_Period,i+1)>iOpen(_Symbol,_Period,i+1);
       if(isBull!=prevBull){

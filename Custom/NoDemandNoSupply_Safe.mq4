@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     NoDemandNoSupply_Safe.mq4     |
 //|  无需求/无供给 — Wyckoff VSA概念                                   |
@@ -14,7 +15,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){noDemand[i]=noSupply[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
    double avgV=0;for(int j=0;j<30;j++)avgV+=iVolume(_Symbol,_Period,limit+30+j);avgV/=30;
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       double o=iOpen(_Symbol,_Period,i),h=iHigh(_Symbol,_Period,i),l=iLow(_Symbol,_Period,i),c=iClose(_Symbol,_Period,i);
       double r=h-l,body=MathAbs(c-o);long v=iVolume(_Symbol,_Period,i);
       // 无需求：低量+窄体+上影线+价格上涨=买方匮乏→可能下跌

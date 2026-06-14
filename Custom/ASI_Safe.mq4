@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    ASI_Safe.mq4   |
 //|  振动升降指数 — 不含未来函数(信号逻辑)                              |
@@ -116,7 +117,7 @@ int start()
    }
 
    // 信号：突破前高/前低（bar[1]+确认）
-   for(int i = limit; i >= 3; i--)
+   for(i = limit; i >= 3; i--)
    {
       // ---- Strong Buy ----
       if(asiBuffer[i] > asiBuffer[i+1] && asiBuffer[i] > asiBuffer[i+2] &&

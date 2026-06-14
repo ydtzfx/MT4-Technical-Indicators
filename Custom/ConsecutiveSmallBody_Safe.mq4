@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                    ConsecutiveSmallBody_Safe.mq4  |
 //|  连续小实体 — 蓄力阶段，爆发前兆                                   |
@@ -12,7 +13,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,2,clrYellow);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){coil[i]=breakSignal[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpMinCount+2;i--){
+   for(i=limit;i>=InpMinCount+2;i--){
       int smallCnt=0;double maxR=0;
       for(int j=1;j<=InpMinCount+3;j++){double r=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);double b=MathAbs(iClose(_Symbol,_Period,i+j)-iOpen(_Symbol,_Period,i+j));if(r>0&&b<r*InpSmallBody)smallCnt++;if(j<=InpMinCount&&r>maxR)maxR=r;}
       if(smallCnt>=InpMinCount){coil[i+1]=iLow(_Symbol,_Period,i+1)-3*Point;

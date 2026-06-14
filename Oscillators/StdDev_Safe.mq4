@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                 StdDev_Safe.mq4   |
 //|  标准差指标（Standard Deviation）— 不含未来函数                   |
@@ -20,7 +21,7 @@
 #property indicator_buffers 5
 
 input int    InpStdDevPeriod = 20;      // 标准差周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input double InpVolThreshold = 2.0;     // 波动率爆发倍数
 
 // 指标缓冲区
@@ -93,7 +94,7 @@ int start()
 
       // 计算方差和标准差
       double sumSqDiff = 0.0;
-      for(int j = 0; j < InpStdDevPeriod; j++)
+      for(int jj = 0; j < InpStdDevPeriod; j++)
       {
          double diff = GetPriceByType(i + j, InpPriceType) - sma;
          sumSqDiff += diff * diff;
@@ -107,11 +108,11 @@ int start()
    }
 
    // --- 第2步：波动率爆发检测（需要足够的bar来计算均波动率）---
-   for(int i = limit; i >= 20; i--)
+   for(i = limit; i >= 20; i--)
    {
       // 计算近20根bar的平均标准差
       double avgStdDev = 0.0;
-      for(int j = 0; j < 20; j++)
+      for(int jjj = 0; j < 20; j++)
          avgStdDev += sdBuffer[i + j];
       avgStdDev /= 20.0;
 
@@ -151,11 +152,11 @@ int start()
    if(Bars > 0)
    {
       double s0 = 0.0;
-      for(int j = 0; j < InpStdDevPeriod; j++)
+      for(int jjjj = 0; j < InpStdDevPeriod; j++)
          s0 += GetPriceByType(j, InpPriceType);
       double sma0 = s0 / InpStdDevPeriod;
       double ss0 = 0.0;
-      for(int j = 0; j < InpStdDevPeriod; j++)
+      for(int jjjjj = 0; j < InpStdDevPeriod; j++)
       {
          double d = GetPriceByType(j, InpPriceType) - sma0;
          ss0 += d * d;

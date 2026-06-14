@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                        CandleTimeExhaustion_Safe  |
 //|  K线时间衰竭 — 盘整时间过长后的方向性突破                          |
@@ -15,10 +17,10 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){exhausted[i]=breakDir[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
    double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
-   for(int i=limit;i>=InpMaxBars;i--){
+   for(i=limit;i>=InpMaxBars;i--){
       // 寻找长时间的窄幅盘整
       int consBars=0;double rngHi=iHigh(_Symbol,_Period,i+1),rngLo=iLow(_Symbol,_Period,i+1);
-      for(int j=1;j<InpMaxBars;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>rngHi)rngHi=h;if(l<rngLo)rngLo=l;if((rngHi-rngLo)<atr*InpRangeThreshold)consBars++;else break;}
+      for(int jj=1;j<InpMaxBars;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>rngHi)rngHi=h;if(l<rngLo)rngLo=l;if((rngHi-rngLo)<atr*InpRangeThreshold)consBars++;else break;}
       if(consBars>=5){exhausted[consBars]=iLow(_Symbol,_Period,i)-3*Point;
          double c=iClose(_Symbol,_Period,i),range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
          if(c>rngHi&&range>atr)buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;

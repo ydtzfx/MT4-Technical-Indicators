@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            DarvasBox_Safe.mq4     |
 //|  达瓦斯箱体 — Nicolas Darvas的经典策略                            |
@@ -36,12 +37,12 @@ int start() {
       double h=iHigh(_Symbol,_Period,i);bool isNewHigh=true;
       for(int j=1;j<=InpSwingPeriod&&(i+j<Bars);j++){if(iHigh(_Symbol,_Period,i+j)>=h)isNewHigh=false;}
       if(isNewHigh&&h>currentBoxHi){
-         currentBoxHi=h;double l=iLow(_Symbol,_Period,i);for(int j=1;j<=InpSwingPeriod&&(i-j>=0);j++){if(iLow(_Symbol,_Period,i-j)<l)l=iLow(_Symbol,_Period,i-j);}
+         currentBoxHi=h;double l=iLow(_Symbol,_Period,i);for(int jj=1;j<=InpSwingPeriod&&(i-j>=0);j++){if(iLow(_Symbol,_Period,i-j)<l)l=iLow(_Symbol,_Period,i-j);}
          currentBoxLo=l;
       }
       if(i<=limit){boxHi[i]=currentBoxHi;boxLo[i]=currentBoxLo;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double hb=iHigh(_Symbol,_Period,i),lb=iLow(_Symbol,_Period,i);
       // Average range over swing period for momentum confirmation

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        CandleImbalance_Safe.mq4   |
 //|  K线失衡 — 窗口内阳线vs阴线的数量/幅度失衡度                       |
@@ -21,5 +22,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double rngBias=SafeDivide(100*(bullRange-bearRange),bullRange+bearRange,0);
       imbalance[i]=(cntBias+rngBias)/2;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i++){if(imbalance[i+1]<-40&&imbalance[i]>40)buySignal[i]=-50;if(imbalance[i+1]>40&&imbalance[i]<-40)sellSignal[i]=50;}
+   for(i=limit;i>=3;i++){if(imbalance[i+1]<-40&&imbalance[i]>40)buySignal[i]=-50;if(imbalance[i+1]>40&&imbalance[i]<-40)sellSignal[i]=50;}
    if(Bars>0){imbalance[0]=imbalance[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

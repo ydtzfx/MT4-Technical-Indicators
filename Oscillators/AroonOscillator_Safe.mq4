@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                     AroonOscillator_Safe.mq4      |
 //|  阿隆振荡器（Aroon Oscillator）— 不含未来函数                     |
@@ -39,7 +40,7 @@ int start() {
       aoBuffer[i]=100.0*(InpPeriod-hBars)/InpPeriod-100.0*(InpPeriod-lBars)/InpPeriod;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       // strong signals: cross + significant oscillator magnitude
       if(aoBuffer[i+1]<0&&aoBuffer[i]>0&&aoBuffer[i]>25)strongBuy[i]=-10;
       else if(aoBuffer[i+1]<0&&aoBuffer[i]>0)buySignal[i]=-5;

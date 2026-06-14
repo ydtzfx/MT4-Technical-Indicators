@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                  HullMA_Safe.mq4  |
 //|  Hull Moving Average — 不含未来函数                               |
@@ -28,18 +29,19 @@ int deinit(){return(0);}
 double WMA(double &p[],int per,int st){double s=0,w=0;for(int i=0;i<per;i++){int wt=per-i;s+=p[st+i]*wt;w+=wt;}return w>0?s/w:0;}
 
 int start() {
+   int i;
    int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;
    int sq=(int)MathSqrt(InpPeriod);int hist=InpPeriod*3;if(limit>Bars-2)limit=Bars-hist;if(limit<0)limit=0;
 
-   for(int i=limit;i>=1;i--) {
+   for(i=limit;i>=1;i--) {
       double pr[200];for(int j=0;j<hist&&(i+j<Bars);j++)pr[j]=iClose(_Symbol,_Period,i+j);
       double wmaN2=WMA(pr,InpPeriod/2,0),wmaN=WMA(pr,InpPeriod,0);
-      double diffVals[100];for(int j=0;j<sq*2&&(i+j<Bars);j++)diffVals[j]=2*WMA(pr,InpPeriod/2,j)-WMA(pr,InpPeriod,j);
+      double diffVals[100];for(int jj=0;j<sq*2&&(i+j<Bars);j++)diffVals[j]=2*WMA(pr,InpPeriod/2,j)-WMA(pr,InpPeriod,j);
       hma[i]=WMA(diffVals,sq,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
       strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // Strong Buy: price crosses above HMA + HMA uptrend confirmed (2 consecutive rises) + significant penetration
       if(c1<=hma[i+1]&&c>hma[i]&&hma[i]>hma[i+1]&&hma[i+1]>hma[i+2]&&(c-hma[i])>5*Point)

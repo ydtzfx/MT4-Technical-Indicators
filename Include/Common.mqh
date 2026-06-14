@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                                  Common.mqh       |
 //|  通用常量、枚举、辅助函数                                          |
 //|  Part of: MT4 技术指标完整体 (No Future Function)                  |
@@ -39,15 +39,16 @@ enum ENUM_MA_METHOD_SAFE
 //+------------------------------------------------------------------+
 //| 价格类型枚举                                                      |
 //+------------------------------------------------------------------+
+// 注意：使用 SAFE_PRICE_ 前缀避免与 MQL4 内置 PRICE_CLOSE/PRICE_OPEN 等冲突
 enum ENUM_PRICE_SAFE
 {
-   PRICE_CLOSE = 0,
-   PRICE_OPEN  = 1,
-   PRICE_HIGH  = 2,
-   PRICE_LOW   = 3,
-   PRICE_MEDIAN = 4,      // (High + Low) / 2
-   PRICE_TYPICAL = 5,     // (High + Low + Close) / 3
-   PRICE_WEIGHTED = 6     // (High + Low + Close + Close) / 4
+   SAFE_PRICE_CLOSE = 0,
+   SAFE_PRICE_OPEN  = 1,
+   SAFE_PRICE_HIGH  = 2,
+   SAFE_PRICE_LOW   = 3,
+   SAFE_PRICE_MEDIAN = 4,      // (High + Low) / 2
+   SAFE_PRICE_TYPICAL = 5,     // (High + Low + Close) / 3
+   SAFE_PRICE_WEIGHTED = 6     // (High + Low + Close + Close) / 4
 };
 
 //+------------------------------------------------------------------+
@@ -120,13 +121,13 @@ double GetPriceByType(int shift, ENUM_PRICE_SAFE priceType)
 {
    switch(priceType)
    {
-      case PRICE_CLOSE:    return(iClose(_Symbol, _Period, shift));
-      case PRICE_OPEN:     return(iOpen(_Symbol, _Period, shift));
-      case PRICE_HIGH:     return(iHigh(_Symbol, _Period, shift));
-      case PRICE_LOW:      return(iLow(_Symbol, _Period, shift));
-      case PRICE_MEDIAN:   return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift)) / 2.0);
-      case PRICE_TYPICAL:  return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift) + iClose(_Symbol, _Period, shift)) / 3.0);
-      case PRICE_WEIGHTED: return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift) + iClose(_Symbol, _Period, shift) * 2.0) / 4.0);
+      case SAFE_PRICE_CLOSE:    return(iClose(_Symbol, _Period, shift));
+      case SAFE_PRICE_OPEN:     return(iOpen(_Symbol, _Period, shift));
+      case SAFE_PRICE_HIGH:     return(iHigh(_Symbol, _Period, shift));
+      case SAFE_PRICE_LOW:      return(iLow(_Symbol, _Period, shift));
+      case SAFE_PRICE_MEDIAN:   return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift)) / 2.0);
+      case SAFE_PRICE_TYPICAL:  return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift) + iClose(_Symbol, _Period, shift)) / 3.0);
+      case SAFE_PRICE_WEIGHTED: return((iHigh(_Symbol, _Period, shift) + iLow(_Symbol, _Period, shift) + iClose(_Symbol, _Period, shift) * 2.0) / 4.0);
       default:             return(iClose(_Symbol, _Period, shift));
    }
 }
@@ -139,36 +140,38 @@ double CalculateMA(double &prices[], int period, ENUM_MA_METHOD_SAFE method, int
    if(period <= 0) return(0.0);
 
    double result = 0.0;
+   // 在函数顶部声明循环变量，避免 switch-case 间重定义 (MQL4 无块作用域)
+   int i, j, startIdx;
+   double sum, ema, smma, alpha, lwmaSum, weightSum, initSumEma, initSumSmma;
+   int weight;
 
    switch(method)
    {
       case MA_SMA:
       {
-         double sum = 0.0;
-         for(int i = shift; i < shift + period; i++)
+         sum = 0.0;
+         for(i = shift; i < shift + period; i++)
             sum += prices[i];
          result = sum / period;
          break;
       }
       case MA_EMA:
       {
-         // EMA 从当前 shift 往前递推
-         // 初始 SMA 作为种子
-         double ema = 0.0;
-         int startIdx = shift + period;
-         for(int i = startIdx; i >= shift; i--)
+         ema = 0.0;
+         startIdx = shift + period;
+         for(i = startIdx; i >= shift; i--)
          {
             if(i == startIdx)
             {
                // 计算初始SMA
-               double initSum = 0.0;
-               for(int j = i; j < i + period; j++)
-                  initSum += prices[j];
-               ema = initSum / period;
+               initSumEma = 0.0;
+               for(j = i; j < i + period; j++)
+                  initSumEma += prices[j];
+               ema = initSumEma / period;
             }
             else
             {
-               double alpha = 2.0 / (period + 1.0);
+               alpha = 2.0 / (period + 1.0);
                ema = prices[i] * alpha + ema * (1.0 - alpha);
             }
          }
@@ -177,21 +180,19 @@ double CalculateMA(double &prices[], int period, ENUM_MA_METHOD_SAFE method, int
       }
       case MA_SMMA:
       {
-         // SMMA = 对EMA进行再次平滑
-         double smma = 0.0;
-         int startIdx = shift + period;
-         for(int i = startIdx; i >= shift; i--)
+         smma = 0.0;
+         startIdx = shift + period;  // reuse function-level startIdx
+         for(i = startIdx; i >= shift; i--)
          {
             if(i == startIdx)
             {
-               double initSum = 0.0;
-               for(int j = i; j < i + period; j++)
-                  initSum += prices[j];
-               smma = initSum / period;
+               initSumSmma = 0.0;
+               for(j = i; j < i + period; j++)
+                  initSumSmma += prices[j];
+               smma = initSumSmma / period;
             }
             else
             {
-               // SMMA: 新值 * (1/period) + 前值 * ((period-1)/period)
                smma = (prices[i] + smma * (period - 1.0)) / period;
             }
          }
@@ -200,10 +201,10 @@ double CalculateMA(double &prices[], int period, ENUM_MA_METHOD_SAFE method, int
       }
       case MA_LWMA:
       {
-         double lwmaSum = 0.0;
-         double weightSum = 0.0;
-         int weight = 1;
-         for(int i = shift + period - 1; i >= shift; i--)
+         lwmaSum = 0.0;
+         weightSum = 0.0;
+         weight = 1;
+         for(i = shift + period - 1; i >= shift; i--)
          {
             lwmaSum += prices[i] * weight;
             weightSum += weight;
@@ -400,10 +401,11 @@ void AlertSell(string indicator, double price, string reason="") {
 // 仅在首次触发时报警（使用静态变量跟踪）
 bool IsFirstTrigger(string &triggerId, int barIndex) {
    static string lastTriggers[20];static int lastBars[20];
-   for(int i=0;i<20;i++) {
+   int i;
+   for(i=0;i<20;i++) {
       if(lastTriggers[i]==triggerId&&lastBars[i]==barIndex) return false;
    }
-   for(int i=18;i>=0;i--) {lastTriggers[i+1]=lastTriggers[i];lastBars[i+1]=lastBars[i];}
+   for(i=18;i>=0;i--) {lastTriggers[i+1]=lastTriggers[i];lastBars[i+1]=lastBars[i];}
    lastTriggers[0]=triggerId;lastBars[0]=barIndex;
    return true;
 }

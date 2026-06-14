@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      ChaikinVolatility_Safe.mq4   |
 //|  蔡金波动率（Chaikin Volatility）— 不含未来函数                   |
@@ -33,13 +34,13 @@ int start() {
    double emaHL[],rangeDay[];ArrayResize(emaHL,Bars);ArrayResize(rangeDay,Bars);
    for(int i=Bars-2;i>=1;i--)rangeDay[i]=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
    double a=2.0/(InpPeriod+1);
-   for(int i=Bars-2;i>=1;i--){if(i>=Bars-30)emaHL[i]=rangeDay[i];else emaHL[i]=rangeDay[i]*a+emaHL[i+1]*(1-a);}
-   for(int i=limit;i>=1;i--){
+   for(i=Bars-2;i>=1;i--){if(i>=Bars-30)emaHL[i]=rangeDay[i];else emaHL[i]=rangeDay[i]*a+emaHL[i+1]*(1-a);}
+   for(i=limit;i>=1;i--){
       double prev=emaHL[i+InpROC];cv[i]=prev>0?100*(emaHL[i]-prev)/prev:0;
       strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    // 波动率变化不直接产生买卖信号，只标记波动率拐点
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       // Strong signals (multi-condition confirmation)
       if(cv[i+1]<-25&&cv[i]>cv[i+1]&&(cv[i]-cv[i+1])>2)strongBuy[i]=cv[i]-2;  // 更强波动率萎缩后强劲回升
       else if(cv[i+1]<-20&&cv[i]>cv[i+1])buySignal[i]=cv[i]-2;               // 波动率极度萎缩后回升

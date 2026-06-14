@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            McGinleyDynamic_Safe.mq4|
 //|  麦金利动态均线（McGinley Dynamic）— 不含未来函数                 |
@@ -35,8 +36,8 @@ int start() {
       else{double r=md[i+1]>0?c/md[i+1]:1;md[i]=md[i+1]+(c-md[i+1])/MathMax(InpPeriod*MathPow(r,4),1.0);}
       if(i<=limit){buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
-   for(int i=limit;i>=2;i--){
-      double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
+   for(i=limit;i>=2;i--){
+      c=iClose(_Symbol,_Period,i);double c1=iClose(_Symbol,_Period,i+1);
       strongBuy[i]=EMPTY_VALUE; strongSell[i]=EMPTY_VALUE;
       bool buyCross=c1<=md[i+1]&&c>md[i];
       bool sellCross=c1>=md[i+1]&&c<md[i];

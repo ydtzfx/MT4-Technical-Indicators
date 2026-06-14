@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              Ichimoku_Safe.mq4    |
 //|  一目均衡表（Ichimoku Kinko Hyo）— 不含未来函数                    |
@@ -128,7 +129,7 @@ int start()
       senkouBBuffer[i + InpKijun] = EMPTY_VALUE;
    }
 
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       // === Tenkan-sen: (Highest(N1) + Lowest(N1)) / 2 ===
       if(i + InpTenkan - 1 < Bars)
@@ -150,10 +151,10 @@ int start()
       {
          double highestK = iHigh(_Symbol, _Period, i);
          double lowestK  = iLow(_Symbol, _Period, i);
-         for(int j = i; j < i + InpKijun; j++)
+         for(int jj = i; j < i + InpKijun; j++)
          {
-            double h = iHigh(_Symbol, _Period, j);
-            double l = iLow(_Symbol, _Period, j);
+            h = iHigh(_Symbol, _Period, j);
+            l = iLow(_Symbol, _Period, j);
             if(h > highestK) highestK = h;
             if(l < lowestK)  lowestK  = l;
          }
@@ -171,10 +172,10 @@ int start()
       {
          double highestS = iHigh(_Symbol, _Period, i);
          double lowestS  = iLow(_Symbol, _Period, i);
-         for(int j = i; j < i + InpSenkou; j++)
+         for(int jjj = i; j < i + InpSenkou; j++)
          {
-            double h = iHigh(_Symbol, _Period, j);
-            double l = iLow(_Symbol, _Period, j);
+            h = iHigh(_Symbol, _Period, j);
+            l = iLow(_Symbol, _Period, j);
             if(h > highestS) highestS = h;
             if(l < lowestS)  lowestS  = l;
          }
@@ -191,7 +192,7 @@ int start()
    }
 
    // === 信号判断（bar[1]+确认）— 增强分级 ===
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool crossUp   = (tenkanBuffer[i+1] <= kijunBuffer[i+1] && tenkanBuffer[i] > kijunBuffer[i]);
       bool crossDown = (tenkanBuffer[i+1] >= kijunBuffer[i+1] && tenkanBuffer[i] < kijunBuffer[i]);

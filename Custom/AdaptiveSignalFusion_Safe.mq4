@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                   AdaptiveSignalFusion_Safe.mq4   |
 //|  自适应信号融合器 — 原创复合指标                                   |
@@ -44,20 +46,20 @@ int start() {
       double rsiSignal=(rsi-50)*2; // 映射到[-100,100]
 
       // === MACD计算 ===
-      double p[100];for(int j=0;j<100;j++)p[j]=iClose(_Symbol,_Period,i+j);
+      double p[100];for(int jj=0;j<100;j++)p[j]=iClose(_Symbol,_Period,i+j);
       double aF=2.0/(InpMACDFast+1),aS=2.0/(InpMACDSlow+1),eF=0,eS=0;
-      for(int j=99;j>=0;j--){if(j==99){eF=p[j];eS=p[j];}else{eF=p[j]*aF+eF*(1-aF);eS=p[j]*aS+eS*(1-aS);}}
+      for(int jjj=99;j>=0;j--){if(j==99){eF=p[j];eS=p[j];}else{eF=p[j]*aF+eF*(1-aF);eS=p[j]*aS+eS*(1-aS);}}
       double macd=eF-eS;double macdSignal=macd>0?MathMin(100,macd*5000):MathMax(-100,macd*5000);
 
       // === Stochastic计算 ===
       double hh=iHigh(_Symbol,_Period,i),ll=iLow(_Symbol,_Period,i);
-      for(int j=0;j<InpStochK;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
+      for(int jjjj=0;j<InpStochK;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
       double stoch=SafeDivide(100*(iClose(_Symbol,_Period,i)-ll),hh-ll,50);
       double stochSignal=(stoch-50)*2;
 
       // === 波动率权重计算（基于ATR相对于其均值的偏离）===
-      double atr5=0,atr20=0;for(int j=0;j<5;j++)atr5+=GetTrueRange(_Symbol,_Period,i+j);
-      for(int j=0;j<20;j++)atr20+=GetTrueRange(_Symbol,_Period,i+j);atr5/=5;atr20/=20;
+      double atr5=0,atr20=0;for(int jjjjj=0;j<5;j++)atr5+=GetTrueRange(_Symbol,_Period,i+j);
+      for(int jjjjjj=0;j<20;j++)atr20+=GetTrueRange(_Symbol,_Period,i+j);atr5/=5;atr20/=20;
       double volRatio=SafeDivide(atr5,atr20,1); // >1=高波动，<1=低波动
 
       double wRSI,wMACD,wStoch;
@@ -73,12 +75,12 @@ int start() {
 
       // Signal line = EMA of fusion
       double sE=fusionLine[i+5];double aSig=2.0/6;
-      for(int j=4;j>=0;j--)sE=fusionLine[i+j]*aSig+sE*(1-aSig);
+      for(int jjjjjjj=4;j>=0;j--)sE=fusionLine[i+j]*aSig+sE*(1-aSig);
       signalLine[i]=sE;
 
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(fusionLine[i+1]<=signalLine[i+1]&&fusionLine[i]>signalLine[i]&&fusionLine[i]>-30)buySignal[i]=fusionLine[i]-5;
       if(fusionLine[i+1]>=signalLine[i+1]&&fusionLine[i]<signalLine[i]&&fusionLine[i]<30)sellSignal[i]=fusionLine[i]+5;
       // 极端信号直接触发

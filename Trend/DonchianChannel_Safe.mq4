@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       DonchianChannel_Safe.mq4    |
 //|  唐奇安通道 — 不含未来函数                                        |
@@ -39,7 +40,7 @@ int start() {
       upper[i]=hh;lower[i]=ll;middle[i]=(hh+ll)/2;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   if(InpShowSignals) for(int i=limit;i>=2;i--) {
+   if(InpShowSignals) for(i=limit;i>=2;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double range = upper[i]-lower[i];
       bool tightRange = (range < iATR(_Symbol,_Period,14,i)*3); // 窄幅盘整后突破更强

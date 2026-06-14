@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                   VolumeDeltaDivergence_Safe.mq4  |
 //|  量价Delta背离 — 原创复合指标                                      |
@@ -44,13 +45,13 @@ int start() {
 
    // 累积Delta
    double delta[];ArrayResize(delta,Bars);double cumD=0;
-   for(int i=Bars-2;i>=1;i--){double r=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);cumD+=r>Point?((iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i))/r*iVolume(_Symbol,_Period,i)):0;delta[i]=cumD;}
+   for(i=Bars-2;i>=1;i--){double r=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);cumD+=r>Point?((iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i))/r*iVolume(_Symbol,_Period,i)):0;delta[i]=cumD;}
 
    // 累积MFI（资金流）
    double mfi[];ArrayResize(mfi,Bars);double cumM=0;
-   for(int i=Bars-2;i>=1;i--){double tp=(iHigh(_Symbol,_Period,i)+iLow(_Symbol,_Period,i)+iClose(_Symbol,_Period,i))/3;cumM+=tp*iVolume(_Symbol,_Period,i);mfi[i]=cumM;}
+   for(i=Bars-2;i>=1;i--){double tp=(iHigh(_Symbol,_Period,i)+iLow(_Symbol,_Period,i)+iClose(_Symbol,_Period,i))/3;cumM+=tp*iVolume(_Symbol,_Period,i);mfi[i]=cumM;}
 
-   for(int i=limit;i>=1;i++){
+   for(i=limit;i>=1;i++){
       double pNow=iClose(_Symbol,_Period,i),pPrev=iClose(_Symbol,_Period,i+InpDivPeriod);
       double dScore=0,oScore=0,mScore=0;
 
@@ -70,7 +71,7 @@ int start() {
       divScore[i]=(dScore+oScore+mScore)/3; // 三组平均
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i++){
+   for(i=limit;i>=2;i++){
       if(divScore[i+1]<-66&&divScore[i]>-66)buySignal[i]=-70;
       if(divScore[i+1]>66&&divScore[i]<66)sellSignal[i]=70;
    }

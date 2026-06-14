@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          HurstExponent_Safe.mq4   |
 //|  赫斯特指数（Hurst Exponent）— 分形统计指标                       |
@@ -44,11 +45,11 @@ int start() {
       for(int s=0;s<4;s++){
          int subN=sizes[s];if(subN>InpPeriod)continue;
          for(int start=0;start<InpPeriod-subN;start+=subN/2){
-            double mean=0;for(int j=0;j<subN;j++)mean+=returns[start+j];mean/=subN;
+            double mean=0;for(int jj=0;j<subN;j++)mean+=returns[start+j];mean/=subN;
             double dev[];ArrayResize(dev,subN);double cumDev=0;
-            double maxDD=0,minDD=999;for(int j=0;j<subN;j++){cumDev+=returns[start+j]-mean;dev[j]=cumDev;if(cumDev>maxDD)maxDD=cumDev;if(cumDev<minDD)minDD=cumDev;}
+            double maxDD=0,minDD=999;for(int jjj=0;j<subN;j++){cumDev+=returns[start+j]-mean;dev[j]=cumDev;if(cumDev>maxDD)maxDD=cumDev;if(cumDev<minDD)minDD=cumDev;}
             double range=maxDD-minDD;
-            double std=0;for(int j=0;j<subN;j++)std+=(returns[start+j]-mean)*(returns[start+j]-mean);std=MathSqrt(std/subN);
+            double std=0;for(int jjjj=0;j<subN;j++)std+=(returns[start+j]-mean)*(returns[start+j]-mean);std=MathSqrt(std/subN);
             if(std>0){sumRS+=MathLog(range/std)/MathLog(subN);nLevels++;}
          }
       }
@@ -56,7 +57,7 @@ int start() {
       trendStr[i]=(hurst[i]-0.5)*200; // 正=趋势倾向，负=回归倾向
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c3=iClose(_Symbol,_Period,i+3);
       bool priceUp=c>c3,priceDown=c<c3;
       // Strong Buy: Hurst翻多 + 趋势强度正 + 价格上涨

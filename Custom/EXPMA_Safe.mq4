@@ -1,4 +1,5 @@
-﻿//+------------------------------------------------------------------+
+﻿#include "../Include/Common.mqh"
+//+------------------------------------------------------------------+
 //|                                                  EXPMA_Safe.mq4   |
 //|  鎸囨暟骞冲潎绾匡紙EXPMA锛夆€?涓嶅惈鏈潵鍑芥暟                                |
 //|  Part of: MT4 鎶€鏈寚鏍囧畬鏁翠綋 (No Future Function)                  |
@@ -39,24 +40,26 @@ int deinit(){return(0);}
 
 double CalcEMA(double &p[],int period,int idx){
    double e=0;for(int i=idx+period;i<idx+period*2;i++)e+=p[i];e/=period;
-   double a=2.0/(period+1);for(int i=idx+period-1;i>=idx;i--)e=p[i]*a+e*(1-a);return e;
+   double a=2.0/(period+1);for(i=idx+period-1;i>=idx;i--)e=p[i]*a+e*(1-a);return e;
 }
 
 int start() {
+   int i;
+   int j;
    int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;
    int maxP=InpEMA5;if(limit>Bars-2)limit=Bars-maxP*3;if(limit<0)limit=0;
    int hist=maxP*3;
 
    // 璁＄畻5鏉MA
-   for(int i=limit;i>=1;i--) {
-      double p[360];for(int j=0;j<hist&&(i+j<Bars);j++)p[j]=iClose(_Symbol,_Period,i+j);
+   for(i=limit;i>=1;i--) {
+      double p[360];for(j=0;j<hist&&(i+j<Bars);j++)p[j]=iClose(_Symbol,_Period,i+j);
       e1[i]=CalcEMA(p,InpEMA1,0);e2[i]=CalcEMA(p,InpEMA2,0);e3[i]=CalcEMA(p,InpEMA3,0);
       e4[i]=CalcEMA(p,InpEMA4,0);e5[i]=CalcEMA(p,InpEMA5,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
 
    // 淇″彿锛坆ar[1]+纭锛?
-   if(InpShowSignals) for(int i=limit;i>=1;i--) {
+   if(InpShowSignals) for(i=limit;i>=1;i--) {
       bool alignUp=(e1[i]>e2[i]&&e2[i]>e3[i]&&e3[i]>e4[i]);    // 多头排列
       bool alignDn=(e1[i]<e2[i]&&e2[i]<e3[i]&&e3[i]<e4[i]);    // 空头排列
       bool fullAlignUp=(e1[i]>e2[i]&&e2[i]>e3[i]&&e3[i]>e4[i]&&e4[i]>e5[i]);  // 全排列多头
@@ -87,7 +90,7 @@ int start() {
 
    // 鍒锋柊bar[0]
    if(Bars>0){
-      double p0[360];for(int j=0;j<hist;j++)p0[j]=iClose(_Symbol,_Period,j);
+      double p0[360];for(int jj=0;j<hist;j++)p0[j]=iClose(_Symbol,_Period,j);
       e1[0]=CalcEMA(p0,InpEMA1,0);e2[0]=e2[1];e3[0]=e3[1];e4[0]=e4[1];e5[0]=e5[1];
       buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;
    }

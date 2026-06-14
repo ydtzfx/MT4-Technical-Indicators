@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              PairsRatio_Safe.mq4  |
 //|  配对交易比率 — 统计套利指标                                       |
@@ -43,12 +44,12 @@ int start() {
       // 计算比率的ZScore
       if(i+InpPeriod<Bars){
          double sum=0;for(int j=0;j<InpPeriod;j++)sum+=ratioRaw[i+j];double mean=sum/InpPeriod;
-         double sd=0;for(int j=0;j<InpPeriod;j++){double d=ratioRaw[i+j]-mean;sd+=d*d;}
+         double sd=0;for(int jj=0;j<InpPeriod;j++){double d=ratioRaw[i+j]-mean;sd+=d*d;}
          sd=MathSqrt(sd/InpPeriod);ratioZ[i]=sd>0?(ratio-mean)/sd:0;
       }
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // 比率Z<-2 = 当前品种相对被低估 → 做多当前品种
       if(ratioZ[i+1]<-2&&ratioZ[i]>-2)buySignal[i]=-2.5;
       // 比率Z>2 = 当前品种相对被高估 → 做空当前品种

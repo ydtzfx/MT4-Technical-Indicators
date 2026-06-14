@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              Envelopes_Safe.mq4   |
 //|  包络线指标 — 不含未来函数                                        |
@@ -23,7 +24,7 @@
 input int    InpMAPeriod    = 14;         // MA周期
 input double InpDeviation   = 0.5;        // 偏离百分比(%)
 input ENUM_MA_METHOD_SAFE InpMAMethod = MA_SMA; // MA类型
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input color  InpUpperColor  = clrRoyalBlue;  // 上轨颜色
 input color  InpLowerColor  = clrRoyalBlue;  // 下轨颜色
 
@@ -108,7 +109,7 @@ int start()
    }
 
    // 信号：bar[1]+ 确认 — 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double close_i    = iClose(_Symbol, _Period, i);
       double close_i1   = iClose(_Symbol, _Period, i + 1);

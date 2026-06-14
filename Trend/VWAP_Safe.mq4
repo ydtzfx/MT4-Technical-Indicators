@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   VWAP_Safe.mq4   |
 //|  成交量加权平均价（Anchored VWAP）— 不含未来函数                  |
@@ -34,7 +35,7 @@ int start() {
    int startB=InpStartBars>0?InpStartBars:0;
    if(startB==0){for(int i=0;i<500;i++){if(iTime(_Symbol,PERIOD_D1,0)==iTime(_Symbol,_Period,i)){startB=i;break;}}}
 
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       double sumPV=0,sumV=0;
       for(int j=i;j<=startB&&j<Bars;j++){
          double tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;
@@ -43,17 +44,17 @@ int start() {
       vwap[i]=SafeDivide(sumPV,sumV,iClose(_Symbol,_Period,i));
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double o=iOpen(_Symbol,_Period,i);
-      long v=iVolume(_Symbol,_Period,i),v1=iVolume(_Symbol,_Period,i+1);
+      long cVol=iVolume(_Symbol,_Period,i),v1=iVolume(_Symbol,_Period,i+1);
       // Strong buy: cross above VWAP + volume spike (>1.5x) + bullish candle
-      if(c1<=vwap[i+1]&&c>vwap[i]&&v>v1*1.5&&c>o){
+      if(c1<=vwap[i+1]&&c>vwap[i]&&cVol>v1*1.5&&c>o){
          strongBuy[i]=iLow(_Symbol,_Period,i)-5*Point;
          buySignal[i]=iLow(_Symbol,_Period,i)-5*Point;
       }
       // Strong sell: cross below VWAP + volume spike (>1.5x) + bearish candle
-      else if(c1>=vwap[i+1]&&c<vwap[i]&&v>v1*1.5&&c<o){
+      else if(c1>=vwap[i+1]&&c<vwap[i]&&cVol>v1*1.5&&c<o){
          strongSell[i]=iHigh(_Symbol,_Period,i)+5*Point;
          sellSignal[i]=iHigh(_Symbol,_Period,i)+5*Point;
       }

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            SmartMoneyFlow_Safe.mq4|
 //|  聪明钱流向 — 原创指标                                            |
@@ -72,14 +73,14 @@ int start() {
       }
 
       // === 检测4：连续高量推升/打压=聪明钱持续介入 ===
-      int consecVol=0;for(int j=0;j<3;j++)if(iVolume(_Symbol,_Period,i+j)>avgVol*1.2)consecVol++;
+      int consecVol=0;for(int jj=0;j<3;j++)if(iVolume(_Symbol,_Period,i+j)>avgVol*1.2)consecVol++;
       if(consecVol>=2){if(c>iClose(_Symbol,_Period,i+3))smfScore+=20;else smfScore-=20;}
 
       smfLine[i]=MathMax(-100,MathMin(100,smfScore));
       intensity[i]=MathAbs(smfLine[i]);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(smfLine[i+1]<-40&&smfLine[i]>-40)buySignal[i]=-50;
       if(smfLine[i+1]>40&&smfLine[i]<40)sellSignal[i]=50;
       if(smfLine[i+1]<smfLine[i+2]&&smfLine[i]>smfLine[i+1]&&smfLine[i]<-20)buySignal[i]=smfLine[i]-5;

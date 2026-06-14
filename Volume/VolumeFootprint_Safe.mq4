@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                       VolumeFootprint_Safe.mq4    |
 //|  成交量足迹图 — 每根bar内部的价格-成交量分布                       |
@@ -24,7 +25,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       if(i<=limit){bidVol[i]=buyV;askVol[i]=sellV;delta[i]=buyV-sellV;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}else{sumBuyV+=buyV;sumSellV+=sellV;sumDelta+=MathAbs(buyV-sellV);warmupCount++;}
    }
    double avgBuyV=warmupCount>0?sumBuyV/warmupCount:1,avgSellV=warmupCount>0?sumSellV/warmupCount:1,avgDelta=warmupCount>0?sumDelta/warmupCount:1;
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // Strong buy: delta flip + volume surge + extreme delta + bullish candle
 	      if(delta[i+1]<0&&delta[i]>0&&bidVol[i]>avgBuyV*1.8&&delta[i]>avgDelta*2&&iClose(_Symbol,_Period,i)>iOpen(_Symbol,_Period,i))strongBuy[i]=delta[i];
 	      else if(delta[i+1]<0&&delta[i]>0&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=delta[i]*0.5;

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   TEMA_Safe.mq4   |
 //|  三重指数移动平均（TEMA）— 不含未来函数                            |
@@ -38,19 +39,19 @@ int start() {
    }
    // EMA2 = EMA of EMA1
    double e2[];ArrayResize(e2,Bars);
-   for(int i=Bars-2;i>=0;i--){
+   for(i=Bars-2;i>=0;i--){
       if(i>=Bars-hist)e2[i]=e1[i];
       else e2[i]=e1[i]*a+e2[i+1]*(1-a);
    }
    // EMA3 = EMA of EMA2
    double e3[];ArrayResize(e3,Bars);
-   for(int i=Bars-2;i>=0;i--){
+   for(i=Bars-2;i>=0;i--){
       if(i>=Bars-hist)e3[i]=e2[i];
       else e3[i]=e2[i]*a+e3[i+1]*(1-a);
    }
    // TEMA = 3*EMA1 - 3*EMA2 + EMA3
-   for(int i=limit;i>=1;i--){tema[i]=3*e1[i]-3*e2[i]+e3[i];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=1;i--){tema[i]=3*e1[i]-3*e2[i]+e3[i];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       // Strong signals: cross + TEMA slope confirmation + price above/below TEMA
       if(c1<=tema[i+1]&&c>tema[i]&&tema[i]>tema[i+1]&&c>tema[i])strongBuy[i]=iLow(_Symbol,_Period,i)-10*Point;

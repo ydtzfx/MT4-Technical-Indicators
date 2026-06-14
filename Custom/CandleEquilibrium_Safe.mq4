@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                        CandleEquilibrium_Safe.mq4 |
 //|  K线均衡点 — N根K线价格重合的中心区域                              |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_LINE,STYLE_DASH,2,clrYellow);SetIndexBuffer(0,eq
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-100;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){equiHi[i]=equiLo[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpPeriod;i--){
+   for(i=limit;i>=InpPeriod;i--){
       // 均衡区域：N根K线的价格交集(重叠最多的区间)
       double hi=iHigh(_Symbol,_Period,i),lo=iLow(_Symbol,_Period,i);
       for(int j=1;j<InpPeriod;j++){if(iHigh(_Symbol,_Period,i+j)<hi)hi=iHigh(_Symbol,_Period,i+j);if(iLow(_Symbol,_Period,i+j)>lo)lo=iLow(_Symbol,_Period,i+j);}

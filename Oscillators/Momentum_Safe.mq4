@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                              Momentum_Safe.mq4    |
 //|  动量指标 — 不含未来函数                                          |
@@ -21,7 +22,7 @@
 
 // 输入参数
 input int InpMomPeriod = 14;   // 动量周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 input bool InpUseRatio = false;  // false=差值, true=比率*100
 
 // 指标缓冲区
@@ -92,7 +93,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       if(InpUseRatio)
       {

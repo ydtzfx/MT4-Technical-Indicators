@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   CCPV_Safe.mq4   |
 //|  收盘位置价值（CCPV）— K线收盘位置分析                              |
@@ -19,8 +20,8 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double r=h-l;ccpv[i]=r>0?100*(c-l)/r:50; // 收盘在K线范围内的百分比位置
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i++){double s=0;for(int j=0;j<InpPeriod;j++)s+=ccpv[i+j];signal[i]=s/InpPeriod;}
-   for(int i=limit;i>=3;i++){
+   for(i=limit;i>=1;i++){double s=0;for(int j=0;j<InpPeriod;j++)s+=ccpv[i+j];signal[i]=s/InpPeriod;}
+   for(i=limit;i>=3;i++){
       // CCPV从低位回升 = 买方开始掌控
       if(ccpv[i+1]<30&&ccpv[i]>30&&iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1))buySignal[i]=25;
       // CCPV从高位回落 = 卖方开始掌控

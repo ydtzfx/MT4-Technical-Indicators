@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          StreakReversal_Safe.mq4  |
 //|  连阳连阴反转 — 连续同向K线后的反转信号                            |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){streakBuy[i]=streakSell[i]=weakBuy[i]=weakSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpStreakThreshold;i++){
+   for(i=limit;i>=InpStreakThreshold;i++){
       // 统计连续阴阳
       int bullStreak=0,bearStreak=0;
       for(int j=1;j<=InpStreakThreshold+2;j++){if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1)){bullStreak++;bearStreak=0;}else{bearStreak++;bullStreak=0;}}
@@ -23,7 +24,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
          if(body>range*0.5)streakBuy[i]=iLow(_Symbol,_Period,i)-8*Point;else weakBuy[i]=iLow(_Symbol,_Period,i)-12*Point;}
       // 连阳后首根阴线=反转向下
       if(bullStreak>=InpStreakThreshold&&iClose(_Symbol,_Period,i)<iOpen(_Symbol,_Period,i)){
-         double body=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i)),range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
+         body=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i));range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
          if(body>range*0.5)streakSell[i]=iHigh(_Symbol,_Period,i)+8*Point;else weakSell[i]=iHigh(_Symbol,_Period,i)+12*Point;}
    }
    return(0);}

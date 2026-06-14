@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                            ForceIndex_Safe.mq4    |
 //|  强力指数（Force Index）— 不含未来函数                            |
@@ -95,7 +96,7 @@ int start()
    }
 
    // --- 第2步：平滑FI ---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       double rawVals[];
       int count = 0;
@@ -115,7 +116,7 @@ int start()
    }
 
    // --- 第3步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // --- 强信号：多条件确认（任意满足2条即强信号）---
       // 条件A：FI零轴穿越

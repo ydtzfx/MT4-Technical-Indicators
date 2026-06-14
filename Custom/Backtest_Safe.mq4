@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                             Backtest_Safe.mq4     |
 //|  信号回测统计模块 — 原创分析指标                                   |
@@ -36,7 +38,7 @@ int start() {
       int wins=0,losses=0,totalTrades=0;double sumRR=0;
       double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
 
-      for(int j=InpTestBars;j>=1;j--){
+      for(int jj=InpTestBars;j>=1;j--){
          int testBar=i+j;if(testBar>=Bars)continue;
          double c=iClose(_Symbol,_Period,testBar),o=iOpen(_Symbol,_Period,testBar);
          bool isBuy=c>o; // 简化信号：阳线买入，阴线卖出
@@ -65,7 +67,7 @@ int start() {
       avgRR[i]=wins>0?sumRR/wins:0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(winRate[i+1]<40&&winRate[i]>55)buySignal[i]=winRate[i]-5;  // 系统胜率回升=信号
       if(winRate[i+1]>70&&winRate[i]<55)sellSignal[i]=winRate[i]+5; // 系统胜率回落
    }

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                      DayOfWeekSeasonality_Safe    |
 //|  周日历效应 — 原创统计指标                                        |
@@ -52,7 +53,7 @@ int start() {
       confidence[i]=winRate;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 季节性强正期望+高胜率
       if(seasonal[i]>5&&confidence[i]>65)buySignal[i]=seasonal[i]-2;
       // 季节性强负期望+高胜率

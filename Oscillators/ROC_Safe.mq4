@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    ROC_Safe.mq4   |
 //|  变化率指标（Rate of Change）— 不含未来函数                        |
@@ -22,7 +23,7 @@
 #property indicator_level1 0
 
 input int    InpROCPeriod = 12;         // ROC周期
-input ENUM_PRICE_SAFE InpPriceType = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE InpPriceType = SAFE_PRICE_CLOSE; // 价格类型
 
 // 指标缓冲区
 double rocBuffer[];     // ROC主线
@@ -102,7 +103,7 @@ int start()
    }
 
    // --- 第2步：信号判断（bar[1]+确认）---
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // ---- 零轴穿越 — 买入 ----
       // 强信号：穿越零轴且ROC值>2.0（强劲动量）

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                         OpenInterest_Safe.mq4     |
 //|  持仓量分析 — 成交量与价格联动分析                                  |
@@ -21,7 +22,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       priceVol[i]=(c>cPrev?1:-1)*MathAbs(oiSignal[i]);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 价涨量增=多头增仓 → 强买入
       if(iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+1)&&oiSignal[i]>oiSignal[i+1]*1.5)buySignal[i]=oiSignal[i]*0.5;
       // 价跌量增=空头增仓

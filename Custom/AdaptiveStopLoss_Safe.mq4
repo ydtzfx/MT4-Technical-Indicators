@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                        AdaptiveStopLoss_Safe.mq4  |
 //|  自适应止损计算器 — 原创指标                                       |
@@ -37,19 +39,19 @@ int start() {
       double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
 
       // 因子1：近期波动率 vs 长期波动率
-      double atr5=0,atr50=0;for(int j=0;j<5;j++)atr5+=GetTrueRange(_Symbol,_Period,i+j);
-      for(int j=0;j<50&&(i+j<Bars);j++)atr50+=GetTrueRange(_Symbol,_Period,i+j);atr5/=5;atr50/=50;
+      double atr5=0,atr50=0;for(int jj=0;j<5;j++)atr5+=GetTrueRange(_Symbol,_Period,i+j);
+      for(int jjj=0;j<50&&(i+j<Bars);j++)atr50+=GetTrueRange(_Symbol,_Period,i+j);atr5/=5;atr50/=50;
       double volAdj=SafeDivide(atr5,atr50,1);volAdj=MathMax(0.7,MathMin(1.5,volAdj));
 
       // 因子2：ADX趋势强度
       double trS=0,pdS=0,mdS=0;
-      for(int j=0;j<14;j++){int s=i+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pdS+=up;if(dn>up&&dn>0)mdS+=dn;}
+      for(int jjjj=0;j<14;j++){int s=i+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pdS+=up;if(dn>up&&dn>0)mdS+=dn;}
       double adx=SafeDivide(100*MathAbs(pdS-mdS),pdS+mdS,0);
       double trendAdj=adx>30?1.2:(adx>20?1.0:0.8); // 强趋势放宽，盘整收紧
 
       // 因子3：支撑阻力距离
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1);
-      for(int j=2;j<20;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
+      for(int jjjjj=2;j<20;j++){h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
       double c=iClose(_Symbol,_Period,i);
       double srDist=MathMin(c-ll,hh-c)/atr; // 到最近S/R的ATR距离
       double srAdj=MathMax(0.5,MathMin(1.5,srDist/InpBaseStopMult));
@@ -62,7 +64,7 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    // 标记最优入场区：止损适中+趋势明确
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       if(stopATR[i]>1.5&&stopATR[i]<3.0&&stopATR[i]<stopATR[i+1])buySignal[i]=stopATR[i];
       if(stopATR[i]>3.5)sellSignal[i]=stopATR[i]; // 止损过大=高波动，谨慎
    }

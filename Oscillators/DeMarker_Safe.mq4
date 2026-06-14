@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                               DeMarker_Safe.mq4   |
 //|  DeMarker指标 — 不含未来函数                                      |
@@ -104,7 +105,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）— 增强分级
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       bool exitDeepOS  = (demBuffer[i+1] <= 0.15 && demBuffer[i] > 0.15);
       bool exitOS      = (demBuffer[i+1] <= 0.3  && demBuffer[i] > 0.3);

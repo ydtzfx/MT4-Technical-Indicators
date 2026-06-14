@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                          SuperTrend_Safe.mq4      |
 //|  超级趋势指标 — 不含未来函数                                      |
@@ -59,8 +61,8 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    // 信号：趋势转换确认(bar[1]+) — 增强分级
-   for(int i=limit;i>=1;i--) {
-      double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+   for(i=limit;i>=1;i--) {
+      atr=0;for(int jj=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
       double dist=MathAbs((upTrend[i]!=EMPTY_VALUE?upTrend[i]:downTrend[i])-iClose(_Symbol,_Period,i));
       bool strongBreak = (dist > atr * InpMultiplier * 0.8); // 价格远离趋势线=趋势强劲
       // 强买：趋势转多 + 大幅突破

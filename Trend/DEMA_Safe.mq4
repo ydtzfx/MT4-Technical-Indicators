@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   DEMA_Safe.mq4   |
 //|  双重指数移动平均（DEMA）— 不含未来函数                            |
@@ -34,8 +35,8 @@ int start() {
       if(i>=Bars-hist){e1[i]=iClose(_Symbol,_Period,i);e2[i]=e1[i];}
       else{e1[i]=iClose(_Symbol,_Period,i)*a+e1[i+1]*(1-a);e2[i]=e1[i]*a+e2[i+1]*(1-a);}
    }
-   for(int i=limit;i>=1;i--){dema[i]=2*e1[i]-e2[i];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=1;i--){dema[i]=2*e1[i]-e2[i];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
+   for(i=limit;i>=2;i--){
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
       double o=iOpen(_Symbol,_Period,i);
       bool isBuyCross=(c1<=dema[i+1]&&c>dema[i]);

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                           ThreeLineStrike.mq4     |
 //|  三线出击模板 — 组合趋势+震荡指标综合信号                          |
@@ -92,7 +93,7 @@ double CalcEMAAt(double &prices[], int period, int shift)
    ema /= period;
 
    double alpha = 2.0 / (period + 1.0);
-   for(int i = size - period - 1 - shift; i >= 0; i--)
+   for(i = size - period - 1 - shift; i >= 0; i--)
       ema = prices[i] * alpha + ema * (1.0 - alpha);
 
    return(ema);
@@ -101,6 +102,7 @@ double CalcEMAAt(double &prices[], int period, int shift)
 //+------------------------------------------------------------------+
 int start()
 {
+   int i;
    int counted_bars = IndicatorCounted();
    if(counted_bars < 0) counted_bars = 0;
    int limit = Bars - counted_bars;
@@ -109,7 +111,7 @@ int start()
 
    int histSize = InpSlowPeriod * 3;
 
-   for(int i = limit; i >= 0; i--)
+   for(i = limit; i >= 0; i--)
    {
       if(i + histSize >= Bars)
       {
@@ -137,7 +139,7 @@ int start()
    }
 
    // 信号（bar[1]+确认）
-   for(int i = limit; i >= 1; i--)
+   for(i = limit; i >= 1; i--)
    {
       // 多头排列检查
       bool isBullishAlign = (fastBuffer[i] > midBuffer[i] && midBuffer[i] > slowBuffer[i]);

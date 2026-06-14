@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    DPO_Safe.mq4   |
 //|  去趋势价格振荡器（DPO）— 不含未来函数                             |
@@ -35,7 +36,7 @@ int start() {
       double sma=s/InpPeriod;dpo[i]=iClose(_Symbol,_Period,i)-sma;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(int i=limit;i>=1;i--){
+   for(i=limit;i>=1;i--){
       if(dpo[i+1]<0&&dpo[i]>0){
          if(dpo[i]>Point*50&&dpo[i+2]<0)strongBuy[i]=dpo[i]-0.0002;
          else buySignal[i]=dpo[i]-0.0001;

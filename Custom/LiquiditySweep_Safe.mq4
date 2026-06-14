@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                          LiquiditySweep_Safe.mq4  |
 //|  流动性清扫（Liquidity Sweep / Stop Hunt）— ICT/SMC                |
@@ -34,7 +35,7 @@ int start() {
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){bullSweep[i]=EMPTY_VALUE;bearSweep[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
 
-   for(int i=limit;i>=InpSwingPeriod+InpReturnBars;i--){
+   for(i=limit;i>=InpSwingPeriod+InpReturnBars;i--){
       // 找近期摆动高点（潜在流动性池）
       double swingHigh=iHigh(_Symbol,_Period,i+1),swingLow=iLow(_Symbol,_Period,i+1);
       for(int j=2;j<=InpSwingPeriod;j++){
@@ -43,7 +44,7 @@ int start() {
       }
 
       // === 看涨Sweep：价格跌破摆动低点后迅速回归 ===
-      for(int j=1;j<=InpReturnBars;j++){
+      for(int jj=1;j<=InpReturnBars;j++){
          if(iLow(_Symbol,_Period,i+j-1)<swingLow-2*Point){ // 跌破
             bool recovered=true;
             for(int k=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)<=swingLow)recovered=false;
@@ -58,10 +59,10 @@ int start() {
       }
 
       // === 看跌Sweep：价格突破摆动高点后迅速回落 ===
-      for(int j=1;j<=InpReturnBars;j++){
+      for(int jjj=1;j<=InpReturnBars;j++){
          if(iHigh(_Symbol,_Period,i+j-1)>swingHigh+2*Point){
-            bool recovered=true;
-            for(int k=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)>=swingHigh)recovered=false;
+            recovered=true;
+            for(int kk=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)>=swingHigh)recovered=false;
             if(recovered&&iClose(_Symbol,_Period,i)<swingHigh){
                bearSweep[i+j-1]=swingHigh+5*Point;
                sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;

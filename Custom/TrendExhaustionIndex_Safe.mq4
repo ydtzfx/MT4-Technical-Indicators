@@ -1,3 +1,5 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                     TrendExhaustionIndex_Safe.mq4 |
 //|  趋势衰竭指数 — 原创指标                                           |
@@ -53,15 +55,15 @@ int start() {
       // === 维度2：成交量背离 ===
       // 价格沿趋势走但成交量递减
       double volSum1=0,volSum2=0;
-      for(int j=0;j<InpLookback/2;j++)volSum1+=iVolume(_Symbol,_Period,i+j);
-      for(int j=InpLookback/2;j<InpLookback;j++)volSum2+=iVolume(_Symbol,_Period,i+j);
+      for(int jj=0;j<InpLookback/2;j++)volSum1+=iVolume(_Symbol,_Period,i+j);
+      for(int jjj=InpLookback/2;j<InpLookback;j++)volSum2+=iVolume(_Symbol,_Period,i+j);
       double volRatio=SafeDivide(volSum1,volSum2,1); // <1=近期缩量
       double volScore=MathMax(0,100-100*volRatio);     // 缩量越严重=越高
 
       // === 维度3：波动率收缩 ===
       double atr3=0,atr10=0;
-      for(int j=0;j<3;j++)atr3+=GetTrueRange(_Symbol,_Period,i+j);
-      for(int j=0;j<InpLookback;j++)atr10+=GetTrueRange(_Symbol,_Period,i+j);
+      for(int jjjj=0;j<3;j++)atr3+=GetTrueRange(_Symbol,_Period,i+j);
+      for(int jjjjj=0;j<InpLookback;j++)atr10+=GetTrueRange(_Symbol,_Period,i+j);
       atr3/=3;atr10/=InpLookback;
       double atrRatio=SafeDivide(atr3,atr10,1);
       double volScore2=MathMax(0,100-100*atrRatio);
@@ -72,7 +74,7 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    // 信号：衰竭交叉 (bar[1]+确认)
-   for(int i=limit;i>=2;i--){
+   for(i=limit;i>=2;i--){
       // 衰竭从高位回落至30以下 = 趋势恢复健康→买入
       if(exhaust[i+1]>30&&exhaust[i]<=30)buySignal[i]=exhaust[i]-5;
       // 衰竭从低位上升至60以上 = 趋势走向衰竭→卖出

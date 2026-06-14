@@ -1,3 +1,6 @@
+﻿#include "../Include/Common.mqh"
+#include "../Include/Drawing.mqh"
+#include "../Include/PriceData.mqh"
 //+------------------------------------------------------------------+
 //|                                          FairValueGap_Safe.mq4    |
 //|  公允价值缺口（FVG）— ICT/SMC 概念                                |
@@ -36,7 +39,7 @@ int start() {
    double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
    double minGap=InpMinGapPct*atr/100;
 
-   for(int i=limit;i>=3;i--){
+   for(i=limit;i>=3;i--){
       // === 看涨FVG：当前阳线的低点 > 前前K线的高点（之间有价格缺口）===
       double h0=iHigh(_Symbol,_Period,i),l0=iLow(_Symbol,_Period,i);
       double h2=iHigh(_Symbol,_Period,i+2),l2=iLow(_Symbol,_Period,i+2);
@@ -50,22 +53,22 @@ int start() {
       // === 看跌FVG：当前阴线的高点 < 前前K线的低点 ===
       if(iClose(_Symbol,_Period,i)<iOpen(_Symbol,_Period,i)&&h0<l2&&(l2-h0)>minGap){
          bearFVG[i]=h0+3*Point;
-         string nm=OBJ_PREFIX+"FVG_BEAR_"+IntegerToString(i);
+         nm=OBJ_PREFIX+"FVG_BEAR_"+IntegerToString(i);
          ObjectCreate(nm,OBJ_RECTANGLE,0,iTime(_Symbol,_Period,i),l2,iTime(_Symbol,_Period,i),h0);
          ObjectSet(nm,OBJPROP_COLOR,clrTomato);ObjectSet(nm,OBJPROP_BACK,true);
       }
    }
 
    // 检测回补：价格回踩FVG区域
-   for(int i=limit;i>=5;i--){
-      for(int j=3;j<20;j++){ // 检查近期的FVG
+   for(i=limit;i>=5;i--){
+      for(int jj=3;j<20;j++){ // 检查近期的FVG
          int fvgBar=i+j;
          if(bullFVG[fvgBar]!=EMPTY_VALUE){
             double gapTop=iLow(_Symbol,_Period,fvgBar),gapBot=iHigh(_Symbol,_Period,fvgBar+2);
             if(iLow(_Symbol,_Period,i)<=gapTop&&iLow(_Symbol,_Period,i)>=gapBot)filledBuy[i]=gapBot-5*Point;
          }
          if(bearFVG[fvgBar]!=EMPTY_VALUE){
-            double gapBot=iHigh(_Symbol,_Period,fvgBar),gapTop=iLow(_Symbol,_Period,fvgBar+2);
+            gapBot=iHigh(_Symbol,_Period,fvgBar);gapTop=iLow(_Symbol,_Period,fvgBar+2);
             if(iHigh(_Symbol,_Period,i)>=gapBot&&iHigh(_Symbol,_Period,i)<=gapTop)filledSell[i]=gapTop+5*Point;
          }
       }

@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                   NR7_Safe.mq4   |
 //|  NR7/NR4 — 窄幅波动收缩（即将突破）                                 |
@@ -13,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,clrYellow);SetIndexBuffer(0,
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){nr[i]=expansion[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
-   for(int i=limit;i>=InpNR;i--){
+   for(i=limit;i>=InpNR;i--){
       double range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);bool isNR=true;
       for(int j=1;j<InpNR;j++){if((iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j))<range)isNR=false;}
       if(isNR){nr[i]=iLow(_Symbol,_Period,i)-3*Point;expansion[i]=range;}

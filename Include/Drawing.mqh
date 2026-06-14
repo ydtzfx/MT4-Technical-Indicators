@@ -1,4 +1,4 @@
-//+------------------------------------------------------------------+
+﻿//+------------------------------------------------------------------+
 //|                                                  Drawing.mqh     |
 //|  绘图工具 — 箭头、线条、文字标签的标准化管理                        |
 //|  Part of: MT4 技术指标完整体 (No Future Function)                  |
@@ -204,9 +204,9 @@ void RemoveObjectsByPrefix(string prefix)
 {
    string fullPrefix = OBJ_PREFIX + prefix;
    int total = ObjectsTotal();
-   for(int i = total - 1; i >= 0; i--)
+   for(int ii = total - 1; ii >= 0; ii--)
    {
-      string name = ObjectName(i);
+      string name = ObjectName(ii);
       if(StringFind(name, fullPrefix) == 0)
       {
          ObjectDelete(name);
@@ -233,10 +233,11 @@ void RemoveArrowsOnBar(int barIndex)
 void UpdateLatestArrow(string symbol, int timeframe,
                        double &buyBuffer[], double &sellBuffer[])
 {
+   string name;
    // 更新最新的买入信号箭头（bar[1]）
    if(buyBuffer[1] != EMPTY_VALUE)
    {
-      string name = OBJ_PREFIX + "BUY_1";
+      name = OBJ_PREFIX + "BUY_1";
       if(ObjectFind(name) >= 0)
       {
          ObjectSet(name, OBJPROP_PRICE1, buyBuffer[1]);
@@ -246,7 +247,7 @@ void UpdateLatestArrow(string symbol, int timeframe,
    // 更新最新的卖出信号箭头（bar[1]）
    if(sellBuffer[1] != EMPTY_VALUE)
    {
-      string name = OBJ_PREFIX + "SELL_1";
+      name = OBJ_PREFIX + "SELL_1";
       if(ObjectFind(name) >= 0)
       {
          ObjectSet(name, OBJPROP_PRICE1, sellBuffer[1]);

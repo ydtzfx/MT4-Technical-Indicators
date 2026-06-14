@@ -1,3 +1,4 @@
+﻿#include "../Include/Common.mqh"
 //+------------------------------------------------------------------+
 //|                                                    MA_Safe.mq4   |
 //|  多类型移动平均线（SMA / EMA / SMMA / LWMA）                       |
@@ -24,7 +25,7 @@
 // 输入参数
 input int                  InpMAPeriod    = 14;         // MA周期
 input ENUM_MA_METHOD_SAFE InpMAMethod    = MA_EMA;     // MA类型
-input ENUM_PRICE_SAFE      InpPriceType   = PRICE_CLOSE; // 价格类型
+input ENUM_PRICE_SAFE      InpPriceType   = SAFE_PRICE_CLOSE; // 价格类型
 input int                  InpMA2Period   = 50;         // 辅助长周期MA(0=不显示)
 input color                InpLineColor   = clrDodgerBlue; // MA线颜色
 input int                  InpLineWidth   = 2;          // MA线宽度
@@ -154,7 +155,7 @@ int start()
       {
          double prices2[];
          ArrayResize(prices2, InpMA2Period * 2);
-         for(int j = 0; j < InpMA2Period * 2; j++)
+         for(int jj = 0; j < InpMA2Period * 2; j++)
             prices2[j] = GetPriceByType(i + j, InpPriceType);
          ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
       }
@@ -165,7 +166,7 @@ int start()
    {
       double prices0[];
       ArrayResize(prices0, InpMAPeriod * 2);
-      for(int j = 0; j < InpMAPeriod * 2; j++)
+      for(int jjj = 0; j < InpMAPeriod * 2; j++)
          prices0[j] = GetPriceByType(j, InpPriceType);
       maBuffer[0] = CalculateMA(prices0, InpMAPeriod, InpMAMethod, 0);
       ma2Buffer[0] = (InpMA2Period > 0) ? ma2Buffer[1] : 0;
