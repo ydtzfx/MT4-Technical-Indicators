@@ -1,0 +1,55 @@
+name: P0.5 Real MetaEditor Compile
+
+on:
+  push:
+    branches: [fix/p0-correctness]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.set.outputs.files }}
+      count: ${{ steps.set.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        shell: bash
+        run: |
+          files=$(find BillWilliams Custom Oscillators Templates Trend Volume -type f -name '*.mq4' -print | sort | jq -R -s -c 'split("\n")[:-1]')
+          count=$(echo "$files" | jq 'length')
+          echo "production mq4 count=$count"
+          test "$count" -eq 201
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+  compile:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        file: ${{ fromJson(needs.discover.outputs.files) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile ${{ matrix.file }} with real MT4 MetaEditor
+        uses: mhriemers/metatrader-compile@v1.0.1
+        with:
+          version: '4'
+          files: ${{ matrix.file }}
+          include: '.'
+
+  probe-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile no-repaint probe
+        uses: mhriemers/metatrader-compile@v1.0.1
+        with:
+          version: '4'
+          files: Tests/P0_5_NoRepaintProbe.mq4
+          include: '.'
