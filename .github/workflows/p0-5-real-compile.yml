@@ -101,8 +101,14 @@ jobs:
           from pathlib import Path
 
           lock = json.loads(Path("Tools/ci/mt4-compiler.lock.json").read_text())
-          compile_report = json.loads(Path("gate/compile/compile-report.json").read_text())
-          probe_report = json.loads(Path("gate/probe/compile-report.json").read_text())
+          compile_candidates = list(Path("gate/compile").rglob("compile-report.json"))
+          probe_candidates = list(Path("gate/probe").rglob("compile-report.json"))
+          if len(compile_candidates) != 1:
+              raise SystemExit(f"Expected exactly one compile report, found {len(compile_candidates)}: {compile_candidates}")
+          if len(probe_candidates) != 1:
+              raise SystemExit(f"Expected exactly one probe report, found {len(probe_candidates)}: {probe_candidates}")
+          compile_report = json.loads(compile_candidates[0].read_text())
+          probe_report = json.loads(probe_candidates[0].read_text())
 
           failures = []
 
