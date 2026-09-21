@@ -36,7 +36,7 @@ int start() {
    for(i=limit;i>=1;i--) {
       double pr[200];for(int j=0;j<hist&&(i+j<Bars);j++)pr[j]=iClose(_Symbol,_Period,i+j);
       double wmaN2=WMA(pr,InpPeriod/2,0),wmaN=WMA(pr,InpPeriod,0);
-      double diffVals[100];for(int jj=0;j<sq*2&&(i+j<Bars);j++)diffVals[j]=2*WMA(pr,InpPeriod/2,j)-WMA(pr,InpPeriod,j);
+      double diffVals[100];for(int j=0;j<sq*2&&(i+j<Bars);j++)diffVals[j]=2*WMA(pr,InpPeriod/2,j)-WMA(pr,InpPeriod,j);
       hma[i]=WMA(diffVals,sq,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
       strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;

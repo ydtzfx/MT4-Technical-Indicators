@@ -143,7 +143,7 @@ int start()
    if(Bars > 0)
    {
       int up0 = 0;
-      for(int jj = 0; j < InpPSYPeriod; j++)
+      for(int j = 0; j < InpPSYPeriod; j++)
       {
          if(iClose(_Symbol, _Period, j) > iClose(_Symbol, _Period, j + 1))
             up0++;

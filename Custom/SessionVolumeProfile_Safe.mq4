@@ -55,7 +55,7 @@ int start() {
 
       // 欧盘VWAP
       sumPV=0;sumV=0;cnt=0;
-      for(int jj=i;j<Bars;j++){
+      for(int j=i;j<Bars;j++){
          tj=iTime(_Symbol,_Period,j);hj=TimeHour(tj);
          if(hj>=InpEUStart&&hj<InpEUEnd){tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
          if(cnt>0&&(hj>=InpEUEnd||j-i>500))break;
@@ -64,7 +64,7 @@ int start() {
 
       // 美盘VWAP
       sumPV=0;sumV=0;cnt=0;
-      for(int jjj=i;j<Bars;j++){
+      for(int j=i;j<Bars;j++){
          tj=iTime(_Symbol,_Period,j);hj=TimeHour(tj);
          if(hj>=InpUSStart&&hj<InpUSEnd){tp=(iHigh(_Symbol,_Period,j)+iLow(_Symbol,_Period,j)+iClose(_Symbol,_Period,j))/3;v=iVolume(_Symbol,_Period,j);sumPV+=tp*v;sumV+=v;cnt++;}
          if(cnt>0&&(hj>=InpUSEnd||j-i>500))break;

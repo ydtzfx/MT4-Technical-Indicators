@@ -95,7 +95,7 @@ int start()
 
       // Mean Deviation
       double meanDev = 0.0;
-      for(int jj = 0; j < InpCCIPeriod; j++)
+      for(int j = 0; j < InpCCIPeriod; j++)
          meanDev += MathAbs(tp[j] - smaTP);
       meanDev /= InpCCIPeriod;
 

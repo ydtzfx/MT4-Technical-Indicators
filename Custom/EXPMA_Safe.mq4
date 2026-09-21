@@ -90,7 +90,7 @@ int start() {
 
    // 鍒锋柊bar[0]
    if(Bars>0){
-      double p0[360];for(int jj=0;j<hist;j++)p0[j]=iClose(_Symbol,_Period,j);
+      double p0[360];for(int j=0;j<hist;j++)p0[j]=iClose(_Symbol,_Period,j);
       e1[0]=CalcEMA(p0,InpEMA1,0);e2[0]=e2[1];e3[0]=e3[1];e4[0]=e4[1];e5[0]=e5[1];
       buySignal[0]=sellSignal[0]=EMPTY_VALUE;strongBuy[0]=strongSell[0]=EMPTY_VALUE;
    }

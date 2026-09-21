@@ -14,7 +14,7 @@ double bodyMom[],buySignal[],sellSignal[];
 int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,bodyMom);SetIndexLabel(0,"Body Momentum");SetIndexStyle(1,DRAW_ARROW,STYLE_SOLID,2,CLR_BUY_SIGNAL);SetIndexBuffer(1,buySignal);SetIndexArrow(1,ARROW_BUY);SetIndexEmptyValue(1,EMPTY_VALUE);SetIndexStyle(2,DRAW_ARROW,STYLE_SOLID,2,CLR_SELL_SIGNAL);SetIndexBuffer(2,sellSignal);SetIndexArrow(2,ARROW_SELL);SetIndexEmptyValue(2,EMPTY_VALUE);IndicatorDigits(0);IndicatorShortName("BodyMom_Safe");return(0);}
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-50;if(limit<0)limit=0;
-   for(int i=limit;i>=1;i++){
+   for(int i=limit;i>=1;i--){
       double b=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i));
       double b1=MathAbs(iClose(_Symbol,_Period,i+1)-iOpen(_Symbol,_Period,i+1));
       double b2=MathAbs(iClose(_Symbol,_Period,i+2)-iOpen(_Symbol,_Period,i+2));
@@ -25,7 +25,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       bodyMom[i]=isUp?MathAbs(change):-MathAbs(change);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=3;i++){
+   for(i=limit;i>=3;i--){
       // 阳线实体连续扩大=买方加速
       if(bodyMom[i+2]>20&&bodyMom[i+1]>30&&bodyMom[i]>40)buySignal[i]=bodyMom[i]-10;
       // 阴线实体连续扩大=卖方加速

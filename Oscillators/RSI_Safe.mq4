@@ -105,7 +105,7 @@ int start()
       double avgLoss = (changes[startIdx] < 0) ? -changes[startIdx] : 0.0;
 
       double alpha = 2.0 / (InpRSIPeriod + 1.0);
-      for(int jj = startIdx - 1; j >= 0; j--)
+      for(int j = startIdx - 1; j >= 0; j--)
       {
          if(changes[j] > 0)
          {
@@ -147,7 +147,7 @@ int start()
       if(p1<p2&&p2<p3&&r1>r2&&r2>r3&&r1<50) { buySignal[i]=5.0; buyConditions+=2; }
 
       // 条件3：RSI与均线交叉（RSI的短期趋势转多）
-      double rsiMA=0; for(int jjj=0;j<5;j++)rsiMA+=rsiBuffer[i+j]*0.2;
+      double rsiMA=0; for(int j=0;j<5;j++)rsiMA+=rsiBuffer[i+j]*0.2;
       if(rsiBuffer[i+1]<=rsiMA&&rsiBuffer[i]>rsiMA&&rsiBuffer[i]<50)
          { buyConditions++; }
 

@@ -40,7 +40,7 @@ int start() {
       raw[i]=SafeDivide(100*num,den,0);if(dp<0)raw[i]=-raw[i];
    }
    for(i=limit;i>=1;i--){
-      double s=0;for(int jj=0;j<InpSmooth;j++)s+=raw[i+j];pfe[i]=s/InpSmooth;
+      double s=0;for(int j=0;j<InpSmooth;j++)s+=raw[i+j];pfe[i]=s/InpSmooth;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(i=limit;i>=1;i--){

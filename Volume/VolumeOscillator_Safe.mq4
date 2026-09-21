@@ -35,7 +35,7 @@ int start() {
    for(int i=limit+InpSlow;i>=1;i--){ // 预计算EMA
       double eF=0,eS=0;for(int j=0;j<InpSlow*2;j++){double v=iVolume(_Symbol,_Period,i+j);eF+=v;eS+=v;}
       eF/=InpSlow*2;eS/=InpSlow*2;
-      for(int jj=InpSlow*2-1;j>=0;j--){v=iVolume(_Symbol,_Period,i+j);eF=v*aF+eF*(1-aF);eS=v*aS+eS*(1-aS);}
+      for(int j=InpSlow*2-1;j>=0;j--){v=iVolume(_Symbol,_Period,i+j);eF=v*aF+eF*(1-aF);eS=v*aS+eS*(1-aS);}
       if(i<=limit){vo[i]=SafeDivide(100*(eF-eS),eS,0);strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
    for(i=limit;i>=1;i--){

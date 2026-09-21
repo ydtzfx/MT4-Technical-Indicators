@@ -116,7 +116,7 @@ int start()
    for(i = limit; i >= 0; i--)
    {
       double sum = 0.0;
-      for(int jj = 0; j < InpSlowing; j++)
+      for(int j = 0; j < InpSlowing; j++)
       {
          if(i + j < ArraySize(rawK))
             sum += rawK[i + j];
@@ -129,7 +129,7 @@ int start()
    {
       double kPrices[];
       ArrayResize(kPrices, InpDPeriod * 2);
-      for(int jjj = 0; j < InpDPeriod * 2; j++)
+      for(int j = 0; j < InpDPeriod * 2; j++)
          kPrices[j] = kBuffer[i + j];
 
       dBuffer[i] = CalculateMA(kPrices, InpDPeriod, InpMAMethod, 0);

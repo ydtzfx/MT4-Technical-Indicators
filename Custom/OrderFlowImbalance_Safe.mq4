@@ -49,11 +49,11 @@ int start() {
       delta[i]=rawDelta;
       // EMA平滑
       double aS=2.0/(InpSmooth+1);
-      double eSm=delta[i+InpSmooth];for(int jj=InpSmooth-1;j>=0;j--)eSm=delta[i+j]*aS+eSm*(1-aS);
+      double eSm=delta[i+InpSmooth];for(int j=InpSmooth-1;j>=0;j--)eSm=delta[i+j]*aS+eSm*(1-aS);
       ofi[i]=eSm;signal[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    // 信号线
-   for(i=limit;i>=1;i++){s=0;for(int jjj=0;j<InpSmooth;j++)s+=ofi[i+j];signal[i]=s/InpSmooth;}
+   for(i=limit;i>=1;i--){s=0;for(int j=0;j<InpSmooth;j++)s+=ofi[i+j];signal[i]=s/InpSmooth;}
    for(i=limit;i>=2;i--){
       if(ofi[i+1]<=signal[i+1]&&ofi[i]>signal[i]&&ofi[i]>0)buySignal[i]=ofi[i]*0.8;
       if(ofi[i+1]>=signal[i+1]&&ofi[i]<signal[i]&&ofi[i]<0)sellSignal[i]=ofi[i]*1.2;

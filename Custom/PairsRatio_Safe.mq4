@@ -44,7 +44,7 @@ int start() {
       // 计算比率的ZScore
       if(i+InpPeriod<Bars){
          double sum=0;for(int j=0;j<InpPeriod;j++)sum+=ratioRaw[i+j];double mean=sum/InpPeriod;
-         double sd=0;for(int jj=0;j<InpPeriod;j++){double d=ratioRaw[i+j]-mean;sd+=d*d;}
+         double sd=0;for(int j=0;j<InpPeriod;j++){double d=ratioRaw[i+j]-mean;sd+=d*d;}
          sd=MathSqrt(sd/InpPeriod);ratioZ[i]=sd>0?(ratio-mean)/sd:0;
       }
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;

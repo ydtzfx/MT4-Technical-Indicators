@@ -37,7 +37,7 @@ int FindSwingLow(int start,int lookback){
    int i,j;
    for(i=start+1;i<start+lookback;i++){
       bool isLow=true;
-      for(int jj=1;j<=3;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
+      for(int j=1;j<=3;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=iLow(_Symbol,_Period,i))isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=iLow(_Symbol,_Period,i))isLow=false;}
       if(isLow)return i;
    }
    return -1;

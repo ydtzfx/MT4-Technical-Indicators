@@ -14,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,phase)
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-50;if(limit<0)limit=0;
    double avgR=0;for(int j=0;j<20;j++)avgR+=iHigh(_Symbol,_Period,limit+10+j)-iLow(_Symbol,_Period,limit+10+j);avgR/=20;
-   for(int i=limit;i>=1;i++){
+   for(int i=limit;i>=1;i--){
       double r=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i),b=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i));
       double upW=(iHigh(_Symbol,_Period,i)-MathMax(iOpen(_Symbol,_Period,i),iClose(_Symbol,_Period,i)))/MathMax(r,_Point);
       double loW=(MathMin(iOpen(_Symbol,_Period,i),iClose(_Symbol,_Period,i))-iLow(_Symbol,_Period,i))/MathMax(r,_Point);
@@ -26,5 +26,5 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       else phase[i]=0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=3;i++){if(phase[i+1]==0&&phase[i]==1)buySignal[i]=0.5;if(phase[i+1]==0&&phase[i]==-1)sellSignal[i]=-0.5;}
+   for(i=limit;i>=3;i--){if(phase[i+1]==0&&phase[i]==1)buySignal[i]=0.5;if(phase[i+1]==0&&phase[i]==-1)sellSignal[i]=-0.5;}
    if(Bars>0){phase[0]=phase[1];buySignal[0]=sellSignal[0]=EMPTY_VALUE;}return(0);}

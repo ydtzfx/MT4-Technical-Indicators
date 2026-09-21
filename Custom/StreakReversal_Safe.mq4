@@ -14,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_ARROW,STYLE_SOLID,3,CLR_BUY_SIGNAL);SetIndexBuff
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){streakBuy[i]=streakSell[i]=weakBuy[i]=weakSell[i]=EMPTY_VALUE;}
-   for(i=limit;i>=InpStreakThreshold;i++){
+   for(i=limit;i>=InpStreakThreshold;i--){
       // 统计连续阴阳
       int bullStreak=0,bearStreak=0;
       for(int j=1;j<=InpStreakThreshold+2;j++){if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1)){bullStreak++;bearStreak=0;}else{bearStreak++;bullStreak=0;}}

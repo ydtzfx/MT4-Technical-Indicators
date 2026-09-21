@@ -94,7 +94,7 @@ int start()
 
       // 计算方差和标准差
       double sumSqDiff = 0.0;
-      for(int jj = 0; j < InpStdDevPeriod; j++)
+      for(int j = 0; j < InpStdDevPeriod; j++)
       {
          double diff = GetPriceByType(i + j, InpPriceType) - sma;
          sumSqDiff += diff * diff;
@@ -112,7 +112,7 @@ int start()
    {
       // 计算近20根bar的平均标准差
       double avgStdDev = 0.0;
-      for(int jjj = 0; j < 20; j++)
+      for(int j = 0; j < 20; j++)
          avgStdDev += sdBuffer[i + j];
       avgStdDev /= 20.0;
 
@@ -152,11 +152,11 @@ int start()
    if(Bars > 0)
    {
       double s0 = 0.0;
-      for(int jjjj = 0; j < InpStdDevPeriod; j++)
+      for(int j = 0; j < InpStdDevPeriod; j++)
          s0 += GetPriceByType(j, InpPriceType);
       double sma0 = s0 / InpStdDevPeriod;
       double ss0 = 0.0;
-      for(int jjjjj = 0; j < InpStdDevPeriod; j++)
+      for(int j = 0; j < InpStdDevPeriod; j++)
       {
          double d = GetPriceByType(j, InpPriceType) - sma0;
          ss0 += d * d;

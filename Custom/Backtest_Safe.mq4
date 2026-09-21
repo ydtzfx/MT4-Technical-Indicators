@@ -38,7 +38,7 @@ int start() {
       int wins=0,losses=0,totalTrades=0;double sumRR=0;
       double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
 
-      for(int jj=InpTestBars;j>=1;j--){
+      for(int j=InpTestBars;j>=1;j--){
          int testBar=i+j;if(testBar>=Bars)continue;
          double c=iClose(_Symbol,_Period,testBar),o=iOpen(_Symbol,_Period,testBar);
          bool isBuy=c>o; // 简化信号：阳线买入，阴线卖出
@@ -46,9 +46,9 @@ int start() {
          double tp=isBuy?entry+InpTpMult*atr:entry-InpTpMult*atr;
          double sl=isBuy?entry-InpSlMult*atr:entry+InpSlMult*atr;
 
-         // 在后续bar中检查止盈止损
+         // 仅检查截至历史决策时点 i 已经发生的后续bar，禁止读取 i 之后的未来结果
          bool hitTP=false,hitSL=false;
-         for(int k=testBar-1;k>=0;k--){
+         for(int k=testBar-1;k>=i;k--){
             if(isBuy){
                if(iHigh(_Symbol,_Period,k)>=tp){hitTP=true;break;}
                if(iLow(_Symbol,_Period,k)<=sl){hitSL=true;break;}

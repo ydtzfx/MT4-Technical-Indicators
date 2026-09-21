@@ -45,11 +45,11 @@ int start() {
       vwt[i]=SafeDivide(sumPV,sumV,iClose(_Symbol,_Period,i));
 
       // 信号线
-      double s=0;for(int jj=0;j<InpSignal;j++)s+=vwt[i+j];signal[i]=s/InpSignal;
+      double s=0;for(int j=0;j<InpSignal;j++)s+=vwt[i+j];signal[i]=s/InpSignal;
 
       // 置信度 = 近期成交量 / 均量（高量=趋势更可靠）
-      double curV=0,avgV=0;for(int jjj=0;j<5;j++)curV+=iVolume(_Symbol,_Period,i+j);curV/=5;
-      for(int jjjj=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,i+j);avgV/=20;
+      double curV=0,avgV=0;for(int j=0;j<5;j++)curV+=iVolume(_Symbol,_Period,i+j);curV/=5;
+      for(int j=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,i+j);avgV/=20;
       confidence[i]=MathMin(100,SafeDivide(curV,avgV,1)*50);
 
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;

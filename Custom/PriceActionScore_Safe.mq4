@@ -37,7 +37,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       }
       paScore[i]=MathMax(-100,MathMin(100,score));buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=2;i++){
+   for(i=limit;i>=2;i--){
       if(paScore[i+1]<-40&&paScore[i]>-40)buySignal[i]=-50;
       if(paScore[i+1]>40&&paScore[i]<40)sellSignal[i]=50;
    }

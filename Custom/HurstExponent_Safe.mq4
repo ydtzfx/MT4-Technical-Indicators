@@ -45,11 +45,11 @@ int start() {
       for(int s=0;s<4;s++){
          int subN=sizes[s];if(subN>InpPeriod)continue;
          for(int start=0;start<InpPeriod-subN;start+=subN/2){
-            double mean=0;for(int jj=0;j<subN;j++)mean+=returns[start+j];mean/=subN;
+            double mean=0;for(int j=0;j<subN;j++)mean+=returns[start+j];mean/=subN;
             double dev[];ArrayResize(dev,subN);double cumDev=0;
-            double maxDD=0,minDD=999;for(int jjj=0;j<subN;j++){cumDev+=returns[start+j]-mean;dev[j]=cumDev;if(cumDev>maxDD)maxDD=cumDev;if(cumDev<minDD)minDD=cumDev;}
+            double maxDD=0,minDD=999;for(int j=0;j<subN;j++){cumDev+=returns[start+j]-mean;dev[j]=cumDev;if(cumDev>maxDD)maxDD=cumDev;if(cumDev<minDD)minDD=cumDev;}
             double range=maxDD-minDD;
-            double std=0;for(int jjjj=0;j<subN;j++)std+=(returns[start+j]-mean)*(returns[start+j]-mean);std=MathSqrt(std/subN);
+            double std=0;for(int j=0;j<subN;j++)std+=(returns[start+j]-mean)*(returns[start+j]-mean);std=MathSqrt(std/subN);
             if(std>0){sumRS+=MathLog(range/std)/MathLog(subN);nLevels++;}
          }
       }

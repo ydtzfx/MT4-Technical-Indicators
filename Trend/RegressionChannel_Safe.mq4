@@ -43,7 +43,7 @@ int start() {
       double intercept=SafeDivide(sumY-slope*sumX,n,0);
       // 标准差
       double seSum=0;
-      for(int jj=0;j<n;j++){double yPred=slope*j+intercept;double diff=iClose(_Symbol,_Period,i+j)-yPred;seSum+=diff*diff;}
+      for(int j=0;j<n;j++){double yPred=slope*j+intercept;double diff=iClose(_Symbol,_Period,i+j)-yPred;seSum+=diff*diff;}
       double stdErr=MathSqrt(seSum/n);
       // 当前点（j=0）的回归值
       mid[i]=intercept;upper[i]=mid[i]+InpK*stdErr;lower[i]=mid[i]-InpK*stdErr;

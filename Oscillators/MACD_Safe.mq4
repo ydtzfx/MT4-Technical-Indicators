@@ -150,7 +150,7 @@ int start()
       double macdVals[];
       ArrayResize(macdVals, InpSignalSMA * 2);
       int count = 0;
-      for(int jj = 0; j < InpSignalSMA * 2; j++)
+      for(int j = 0; j < InpSignalSMA * 2; j++)
       {
          if(i + j < ArraySize(macdBuffer))
             macdVals[count++] = macdBuffer[i + j];
@@ -158,12 +158,12 @@ int start()
       if(count >= InpSignalSMA)
       {
          double ema = 0.0;
-         for(int jjj = 0; j < InpSignalSMA; j++)
+         for(int j = 0; j < InpSignalSMA; j++)
             ema += macdVals[j];
          ema /= InpSignalSMA;
 
          double alphaSig = 2.0 / (InpSignalSMA + 1.0);
-         for(int jjjj = InpSignalSMA; j < count; j++)
+         for(int j = InpSignalSMA; j < count; j++)
             ema = macdVals[j] * alphaSig + ema * (1.0 - alphaSig);
 
          signalBuffer[i] = ema;

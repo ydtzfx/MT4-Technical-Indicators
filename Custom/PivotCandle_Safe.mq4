@@ -21,8 +21,8 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
          // 枢纽K线确认反转：后续跌破枢纽K线低点
          for(int k=i-1;k>=1;k--){if(iLow(_Symbol,_Period,k)<iLow(_Symbol,_Period,i)){sellSignal[k]=iHigh(_Symbol,_Period,k)+10*Point;break;}}}
       double l=iLow(_Symbol,_Period,i);bool isLow=true;
-      for(int jj=1;j<=InpSwingBars;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=l)isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=l)isLow=false;}
+      for(int j=1;j<=InpSwingBars;j++){if(i+j<Bars&&iLow(_Symbol,_Period,i+j)<=l)isLow=false;if(i-j>=0&&iLow(_Symbol,_Period,i-j)<=l)isLow=false;}
       if(isLow){pivotLow[i]=l-5*Point;
-         for(int kk=i-1;k>=1;k--){if(iHigh(_Symbol,_Period,k)>iHigh(_Symbol,_Period,i)){buySignal[k]=iLow(_Symbol,_Period,k)-10*Point;break;}}}
+         for(int k=i-1;k>=1;k--){if(iHigh(_Symbol,_Period,k)>iHigh(_Symbol,_Period,i)){buySignal[k]=iLow(_Symbol,_Period,k)-10*Point;break;}}}
    }
    return(0);}

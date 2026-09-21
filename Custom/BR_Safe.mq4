@@ -146,7 +146,7 @@ int start()
    if(Bars > 0)
    {
       double sH = 0.0, sL = 0.0;
-      for(int jj = 0; j < InpBRPeriod; j++)
+      for(int j = 0; j < InpBRPeriod; j++)
       {
          double pc = iClose(_Symbol, _Period, j + 1);
          double h  = iHigh(_Symbol, _Period, j);

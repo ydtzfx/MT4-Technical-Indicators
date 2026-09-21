@@ -87,7 +87,7 @@ int start()
       double alpha = 2.0 / (InpATRPeriod + 1.0);
 
       // 继续EMA递推到当前位置
-      for(int jj = InpATRPeriod; j < InpATRPeriod * 2; j++)
+      for(int j = InpATRPeriod; j < InpATRPeriod * 2; j++)
       {
          int shift2 = i + j;
          if(shift2 < Bars)
@@ -113,7 +113,7 @@ int start()
       {
          // 计算20周期均ATR作为基准
          double avgATR20 = 0.0;
-         for(int jjj = 0; j < 20; j++)
+         for(int j = 0; j < 20; j++)
             avgATR20 += atrBuffer[i + j];
          avgATR20 /= 20.0;
 

@@ -131,25 +131,27 @@ $c -match "0 error"  # True = success
 
 ## MQL4 Gotchas
 
-### C89 Function-Scope Variables (CRITICAL)
-MQL4 uses C89 scoping rules: variables declared anywhere in a function body (including inside `for` loops and `{ }` blocks) are scoped to the entire function. **Never declare the same variable name twice in the same function.**
+### Block Scope for Local Variables (CRITICAL)
+
+Current MQL4 (Build 600+) uses **block scope** for local variables. A variable declared in a `for` initializer is scoped to that loop, so reusing the same loop variable name in a later, separate loop is valid.
 
 ```mql4
-// WRONG — MQL4 treats both i as same scope:
-int start() {
-    for (int i = 0; i < 10; i++) { ... }
-    for (int i = 5; i < 15; i++) { ... }  // ERROR: 'i' already defined
-}
+// VALID — each i belongs to its own for-loop scope:
+for(int i = 0; i < 10; i++) { ... }
+for(int i = 5; i < 15; i++) { ... }
 
-// RIGHT — declare once at function top, reuse:
-int start() {
-    int i;
-    for (i = 0; i < 10; i++) { ... }
-    for (i = 5; i < 15; i++) { ... }
-}
+// INVALID — declaration/control variable mismatch:
+for(int jj = 0; j < 10; j++) { ... }
+
+// INVALID — descending condition with increment:
+for(int i = limit; i >= 1; i++) { ... }
 ```
 
-This applies to ALL variable names including `j`, `jj`, `jjj`, `h`, `l`, `c`, `v`, `s`, `atr`, etc. The project uses `ii`, `iii`, `iiii`, `jj`, `jjj`, `jjjj`, `jjjjj`, `jjjjjj`, `jjjjjjj` as distinct names to avoid conflicts across nested loops within the same function.
+**Loop safety rules:**
+- The initializer, condition, increment/decrement, and body must use the same intended control variable.
+- For descending loops such as `i >= 1`, use `i--`; for ascending loops such as `i <= end`, use `i++`.
+- Do not rename only the declaration to avoid a supposed function-scope conflict.
+- Prefer declaring the loop variable directly in the `for` initializer unless the same variable must be used after the loop.
 
 ### No C-Style Pointer Arrays
 MQL4 does NOT support `double *arr[] = {buf1, buf2, ...}`. Each buffer must be individually declared and bound with SetIndexBuffer. Files that originally used pointer arrays (GuppyMMA, MTF_RSI, CandlePatternScanner, RainbowMA) have been rewritten with individual buffer declarations.

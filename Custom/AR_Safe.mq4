@@ -153,7 +153,7 @@ int start()
    if(Bars > 0)
    {
       double sumH0 = 0.0, sumL0 = 0.0;
-      for(int jj = 0; j < InpARPeriod; j++)
+      for(int j = 0; j < InpARPeriod; j++)
       {
          double o = iOpen(_Symbol, _Period, j);
          double h = iHigh(_Symbol, _Period, j);

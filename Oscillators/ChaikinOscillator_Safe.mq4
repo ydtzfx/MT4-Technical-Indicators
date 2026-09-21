@@ -122,7 +122,7 @@ int start()
 
       // 慢EMA
       double emaSlow = adl[i + InpSlow];
-      for(int jj = InpSlow - 1; j >= 0; j--)
+      for(int j = InpSlow - 1; j >= 0; j--)
          emaSlow = adl[i + j] * alphaSlow + emaSlow * (1.0 - alphaSlow);
 
       choBuffer[i] = emaFast - emaSlow;

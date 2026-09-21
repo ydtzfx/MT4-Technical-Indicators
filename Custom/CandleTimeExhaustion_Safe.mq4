@@ -20,7 +20,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    for(i=limit;i>=InpMaxBars;i--){
       // 寻找长时间的窄幅盘整
       int consBars=0;double rngHi=iHigh(_Symbol,_Period,i+1),rngLo=iLow(_Symbol,_Period,i+1);
-      for(int jj=1;j<InpMaxBars;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>rngHi)rngHi=h;if(l<rngLo)rngLo=l;if((rngHi-rngLo)<atr*InpRangeThreshold)consBars++;else break;}
+      for(int j=1;j<InpMaxBars;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>rngHi)rngHi=h;if(l<rngLo)rngLo=l;if((rngHi-rngLo)<atr*InpRangeThreshold)consBars++;else break;}
       if(consBars>=5){exhausted[consBars]=iLow(_Symbol,_Period,i)-3*Point;
          double c=iClose(_Symbol,_Period,i),range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
          if(c>rngHi&&range>atr)buySignal[i]=iLow(_Symbol,_Period,i)-8*Point;

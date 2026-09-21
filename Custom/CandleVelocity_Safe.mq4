@@ -21,7 +21,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       accel[i]=velocity[i]-velocity[i+1];
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=3;i++){
+   for(i=limit;i>=3;i--){
       // 速度从负转正=方向改变
       if(velocity[i+1]<-20&&velocity[i]>20)buySignal[i]=-30;
       // 加速度持续放大=趋势加强

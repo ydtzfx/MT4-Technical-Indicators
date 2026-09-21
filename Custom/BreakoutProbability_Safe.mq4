@@ -47,8 +47,8 @@ int start() {
    for(int i=limit;i>=1;i--){
       // 找局部高低点作为"突破参考位"
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1);
-      for(int jj=2;j<InpLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
-      double atr=0;for(int jjj=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
+      for(int j=2;j<InpLookback;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
+      double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
 
       double c=iClose(_Symbol,_Period,i);
       double breakUp=SafeDivide(c-hh,atr,0);   // 向上突破幅度(ATR倍数)
@@ -66,7 +66,7 @@ int start() {
 
          // 前期测试：检查该价位是否被多次触碰
          int touches=0;
-         for(int jjjj=2;j<InpLookback;j++){
+         for(int j=2;j<InpLookback;j++){
             h=iHigh(_Symbol,_Period,i+j);
             if(isUp&&MathAbs(h-hh)<atr*0.5)touches++;
             else if(!isUp&&MathAbs(iLow(_Symbol,_Period,i+j)-ll)<atr*0.5)touches++;
@@ -74,7 +74,7 @@ int start() {
          double testScore=MathMin(100,touches*25);
 
          // ADX趋势强度
-         double adxS=0;for(int jjjjj=0;j<14;j++)adxS+=GetTrueRange(_Symbol,_Period,i+j);adxS/=14;
+         double adxS=0;for(int j=0;j<14;j++)adxS+=GetTrueRange(_Symbol,_Period,i+j);adxS/=14;
          double adxA=SafeDivide(adxS,atr,0);double trendScore=MathMin(100,adxA*50);
 
          probVal=0.35*volConf+0.3*sizeScore+0.2*testScore+0.15*trendScore;
