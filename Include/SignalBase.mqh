@@ -128,8 +128,8 @@ void SetArrowSignal(double &buyBuffer[], double &sellBuffer[],
 //|       double signal = CalculateMySignal(i);                       |
 //|       SetSignalValue(signalBuffer, i, signal);                   |
 //|   }                                                              |
-//|   // 仅刷新 bar[0] 显示值，不修改信号                              |
-//|   signalBuffer[0] = CalculateMySignal(0);                         |
+//|   // 严格模式下 bar[0] 永远为空，不生成交易信号                    |
+//|   signalBuffer[0] = EMPTY_VALUE;                                  |
 //+------------------------------------------------------------------+
 void FillSignalBuffer(double &buffer[], int limit,
                       double &prices[], int priceCount)

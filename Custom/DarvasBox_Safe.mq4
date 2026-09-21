@@ -37,7 +37,7 @@ int start() {
       double h=iHigh(_Symbol,_Period,i);bool isNewHigh=true;
       for(int j=1;j<=InpSwingPeriod&&(i+j<Bars);j++){if(iHigh(_Symbol,_Period,i+j)>=h)isNewHigh=false;}
       if(isNewHigh&&h>currentBoxHi){
-         currentBoxHi=h;double l=iLow(_Symbol,_Period,i);for(int j=1;j<=InpSwingPeriod&&(i-j>=0);j--){if(iLow(_Symbol,_Period,i-j)<l)l=iLow(_Symbol,_Period,i-j);}
+         currentBoxHi=h;double l=iLow(_Symbol,_Period,i);for(int j=1;j<=InpSwingPeriod&&(i-j>=0);j++){if(iLow(_Symbol,_Period,i-j)<l)l=iLow(_Symbol,_Period,i-j);}
          currentBoxLo=l;
       }
       if(i<=limit){boxHi[i]=currentBoxHi;boxLo[i]=currentBoxLo;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
