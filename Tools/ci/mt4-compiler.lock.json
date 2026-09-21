@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "policy": "P0.5 MT4 compiler lock",
+  "mt4_image": "docker.io/mhriemers/metatrader-4@sha256:ed6c3abb2188ac178f183e30bd03cb85c7f2bf8abebfdffa70c070ff2fb1ad74",
+  "wine_image": "docker.io/mhriemers/wine@sha256:88fe77b8ad68b4a3a09a9e858aaee6d33aa07533c99da47c7d88fd76e7edac58",
+  "compiler_binary": "/metaeditor.exe",
+  "provenance": {
+    "observed_action": "mhriemers/metatrader-compile@v1.0.1",
+    "observed_action_commit": "468685ad27dba5c57ea3e14701690caa3972330c",
+    "locked_from_verified_run": "35639028711"
+  }
+}

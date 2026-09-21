@@ -1,55 +1,163 @@
-name: P0.5 Real MetaEditor Compile
+name: P0.5 MT4 Verification
 
 on:
   push:
     branches: [fix/p0-correctness]
+  pull_request:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: p0-5-mt4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  discover:
-    runs-on: ubuntu-latest
-    outputs:
-      files: ${{ steps.set.outputs.files }}
-      count: ${{ steps.set.outputs.count }}
+  compile:
+    name: Compile / 201 production indicators
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
-      - id: set
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Compile with locked MT4 MetaEditor
+        id: compile
+        continue-on-error: true
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            BillWilliams
+            Custom
+            Oscillators
+            Templates
+            Trend
+            Volume
+          expected-count: '201'
+          report-dir: artifacts/p0-5/compile
+          include: '.'
+
+      - name: Upload compile evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-compile-report-${{ github.sha }}
+          path: artifacts/p0-5/compile
+          if-no-files-found: error
+          retention-days: 30
+
+  probe:
+    name: Compile / no-repaint probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Compile probe with locked MT4 MetaEditor
+        id: probe
+        continue-on-error: true
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '1'
+          report-dir: artifacts/p0-5/probe
+          include: '.'
+
+      - name: Upload probe evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-probe-report-${{ github.sha }}
+          path: artifacts/p0-5/probe
+          if-no-files-found: error
+          retention-days: 30
+
+  required-gate:
+    name: P0.5 / Required Gate
+    needs: [compile, probe]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout policy lock
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download compile report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-compile-report-${{ github.sha }}
+          path: gate/compile
+
+      - name: Download probe report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-probe-report-${{ github.sha }}
+          path: gate/probe
+
+      - name: Enforce compiler lock and 201/201
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          lock = json.loads(Path("Tools/ci/mt4-compiler.lock.json").read_text())
+          compile_report = json.loads(Path("gate/compile/compile-report.json").read_text())
+          probe_report = json.loads(Path("gate/probe/compile-report.json").read_text())
+
+          failures = []
+
+          expected = {
+              "expected_count": 201,
+              "discovered_count": 201,
+              "passed_count": 201,
+              "failed_count": 0,
+              "errors_total": 0,
+              "parser_failures": 0,
+          }
+          for key, value in expected.items():
+              if compile_report.get(key) != value:
+                  failures.append(f"compile {key}: expected {value}, got {compile_report.get(key)}")
+
+          if compile_report.get("status") != "PASS":
+              failures.append(f"compile status: {compile_report.get('status')}")
+
+          if probe_report.get("status") != "PASS":
+              failures.append(f"probe status: {probe_report.get('status')}")
+          if probe_report.get("expected_count") != 1 or probe_report.get("passed_count") != 1:
+              failures.append("no-repaint probe did not compile 1/1")
+          if probe_report.get("errors_total") != 0:
+              failures.append(f"probe errors: {probe_report.get('errors_total')}")
+
+          for report_name, report in [("compile", compile_report), ("probe", probe_report)]:
+              if report.get("compiler_image") != lock["mt4_image"]:
+                  failures.append(f"{report_name} compiler image does not match lock")
+              if report.get("wine_image") != lock["wine_image"]:
+                  failures.append(f"{report_name} wine image does not match lock")
+
+          if compile_report.get("compiler_sha256") != probe_report.get("compiler_sha256"):
+              failures.append("compiler binary SHA256 differs between production and probe jobs")
+
+          summary = [
+              "# P0.5 Required Gate",
+              "",
+              f"- Production compile: **{compile_report.get('passed_count')}/201**",
+              f"- Compile errors: **{compile_report.get('errors_total')}**",
+              f"- Compile warnings: **{compile_report.get('warnings_total')}**",
+              f"- Probe compile: **{probe_report.get('passed_count')}/1**",
+              f"- MetaEditor SHA256: `{compile_report.get('compiler_sha256')}`",
+              f"- Compiler image lock: `{lock['mt4_image']}`",
+          ]
+          Path("gate-summary.md").write_text("\n".join(summary) + "\n")
+
+          if failures:
+              raise SystemExit("P0.5 gate failed:\n- " + "\n- ".join(failures))
+
+      - name: Publish gate summary
+        if: always()
         shell: bash
         run: |
-          files=$(find BillWilliams Custom Oscillators Templates Trend Volume -type f -name '*.mq4' -print | sort | jq -R -s -c 'split("\n")[:-1]')
-          count=$(echo "$files" | jq 'length')
-          echo "production mq4 count=$count"
-          test "$count" -eq 201
-          echo "files=$files" >> "$GITHUB_OUTPUT"
-          echo "count=$count" >> "$GITHUB_OUTPUT"
-
-  compile:
-    needs: discover
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 20
-      matrix:
-        file: ${{ fromJson(needs.discover.outputs.files) }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compile ${{ matrix.file }} with real MT4 MetaEditor
-        uses: mhriemers/metatrader-compile@v1.0.1
-        with:
-          version: '4'
-          files: ${{ matrix.file }}
-          include: '.'
-
-  probe-compile:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compile no-repaint probe
-        uses: mhriemers/metatrader-compile@v1.0.1
-        with:
-          version: '4'
-          files: Tests/P0_5_NoRepaintProbe.mq4
-          include: '.'
+          if [ -f gate-summary.md ]; then
+            cat gate-summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
