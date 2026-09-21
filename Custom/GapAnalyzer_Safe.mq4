@@ -54,7 +54,7 @@ int start() {
    if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){gapUp[i]=EMPTY_VALUE;gapDn[i]=EMPTY_VALUE;gapFilled[i]=EMPTY_VALUE;gapUnfilled[i]=EMPTY_VALUE;}
 
-   double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
+   double atr=0;for(j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,limit+10+j);atr/=14;
 
    for(i=limit;i>=5;i--){
       double gap=iOpen(_Symbol,_Period,i)-iClose(_Symbol,_Period,i+1);
