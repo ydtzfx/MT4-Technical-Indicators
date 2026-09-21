@@ -44,7 +44,7 @@ int start() {
       }
 
       // === 看涨Sweep：价格跌破摆动低点后迅速回归 ===
-      for(int j=1;j<=InpReturnBars;j++){
+      for(j=1;j<=InpReturnBars;j++){
          if(iLow(_Symbol,_Period,i+j-1)<swingLow-2*Point){ // 跌破
             bool recovered=true;
             for(int k=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)<=swingLow)recovered=false;
@@ -59,10 +59,10 @@ int start() {
       }
 
       // === 看跌Sweep：价格突破摆动高点后迅速回落 ===
-      for(int j=1;j<=InpReturnBars;j++){
+      for(j=1;j<=InpReturnBars;j++){
          if(iHigh(_Symbol,_Period,i+j-1)>swingHigh+2*Point){
             recovered=true;
-            for(int k=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)>=swingHigh)recovered=false;
+            for(k=0;k<j;k++)if(iClose(_Symbol,_Period,i+k)>=swingHigh)recovered=false;
             if(recovered&&iClose(_Symbol,_Period,i)<swingHigh){
                bearSweep[i+j-1]=swingHigh+5*Point;
                sellSignal[i]=iHigh(_Symbol,_Period,i)+10*Point;

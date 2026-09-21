@@ -42,21 +42,21 @@ int start() {
       double rsi=SafeDivide(100*aG,aG+aL,50);score+=(rsi>60?2:rsi>50?1:rsi<40?-2:rsi<50?-1:0);
 
       // 2. MACD (>0=+1, 金叉=+2)
-      double p[100];for(int j=0;j<100;j++)p[j]=iClose(_Symbol,_Period,i+j);
-      double fE=0,sE=0;for(int j=99;j>=0;j--){if(j==99){fE=p[j];sE=p[j];}else{double aF=2.0/13,aS=2.0/27;fE=p[j]*aF+fE*(1-aF);sE=p[j]*aS+sE*(1-aS);}}
+      double p[100];for(j=0;j<100;j++)p[j]=iClose(_Symbol,_Period,i+j);
+      double fE=0,sE=0;for(j=99;j>=0;j--){if(j==99){fE=p[j];sE=p[j];}else{double aF=2.0/13,aS=2.0/27;fE=p[j]*aF+fE*(1-aF);sE=p[j]*aS+sE*(1-aS);}}
       double macd=fE-sE;if(macd>0)score+=macd>0.0001?2:1;else score-=macd<-0.0001?2:1;
 
       // 3. Stochastic (<20=+2, >80=-2)
-      double stH=iHigh(_Symbol,_Period,i),stL=iLow(_Symbol,_Period,i);for(int j=0;j<5;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>stH)stH=h;if(l<stL)stL=l;}
+      double stH=iHigh(_Symbol,_Period,i),stL=iLow(_Symbol,_Period,i);for(j=0;j<5;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>stH)stH=h;if(l<stL)stL=l;}
       double stoch=SafeDivide(100*(iClose(_Symbol,_Period,i)-stL),stH-stL,50);score+=(stoch<20?2:stoch<30?1:stoch>80?-2:stoch>70?-1:0);
 
       // 4. ADX (>30且+DI>-DI=+1)
-      double tS=0,ps=0,ms=0;for(int j=0;j<14;j++){int s=i+j;double hi=iHigh(_Symbol,_Period,s),lo=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);tS+=MathMax(hi-lo,MathMax(MathAbs(hi-pc),MathAbs(lo-pc)));double up=hi-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-lo;if(up>dn&&up>0)ps+=up;if(dn>up&&dn>0)ms+=dn;}
+      double tS=0,ps=0,ms=0;for(j=0;j<14;j++){int s=i+j;double hi=iHigh(_Symbol,_Period,s),lo=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);tS+=MathMax(hi-lo,MathMax(MathAbs(hi-pc),MathAbs(lo-pc)));double up=hi-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-lo;if(up>dn&&up>0)ps+=up;if(dn>up&&dn>0)ms+=dn;}
       double adx=SafeDivide(100*MathAbs(ps-ms),ps+ms,0);if(adx>25)score+=(ps>ms?1:-1);
 
       // 5. MA排列 (MA10>MA20>MA50=+2)
-      double ma10=0,ma20=0,ma50=0;for(int j=0;j<10;j++)ma10+=iClose(_Symbol,_Period,i+j);ma10/=10;
-      for(int j=0;j<20;j++)ma20+=iClose(_Symbol,_Period,i+j);ma20/=20;
+      double ma10=0,ma20=0,ma50=0;for(j=0;j<10;j++)ma10+=iClose(_Symbol,_Period,i+j);ma10/=10;
+      for(j=0;j<20;j++)ma20+=iClose(_Symbol,_Period,i+j);ma20/=20;
       for(j=0;j<50;j++)ma50+=iClose(_Symbol,_Period,i+j);ma50/=50;
       score+=(ma10>ma20&&ma20>ma50?2:ma10>ma20?1:ma10<ma20&&ma20<ma50?-2:ma10<ma20?-1:0);
 

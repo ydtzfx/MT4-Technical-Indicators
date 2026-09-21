@@ -25,7 +25,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    // "冲击衰减"=事后价格是否延续跳空方向
    for(i=limit;i>=3;i--){
       double dir=surprise[i]>0?1:-1;
-      int persist=0;for(int j=0;j<5;j++){if((iClose(_Symbol,_Period,i-j)-iClose(_Symbol,_Period,i+1))*dir>0)persist++;}
+      int persist=0;for(j=0;j<5;j++){if((iClose(_Symbol,_Period,i-j)-iClose(_Symbol,_Period,i+1))*dir>0)persist++;}
       impact[i]=persist*20; // 冲击延续度
       if(surprise[i]>30&&impact[i]>60)buySignal[i]=impact[i]-10;  // 正向超预期+持续=强多
       if(surprise[i]<-30&&impact[i]>60)sellSignal[i]=impact[i]+10; // 负向超预期+持续=强空

@@ -100,7 +100,7 @@ int start()
       {
          // 检查偏离度
          double prevLow = 0;
-         for(int j = confirmedIdx + 1; j < confirmedIdx + InpDepth; j++)
+         for(j = confirmedIdx + 1; j < confirmedIdx + InpDepth; j++)
          {
             if(lowPoints[j] != EMPTY_VALUE)
             {
@@ -120,7 +120,7 @@ int start()
       bool isLow = true;
       double lowVal = iLow(_Symbol, _Period, confirmedIdx);
 
-      for(int j = 1; j <= InpDepth; j++)
+      for(j = 1; j <= InpDepth; j++)
       {
          if(confirmedIdx + j < Bars && iLow(_Symbol, _Period, confirmedIdx + j) <= lowVal)
             isLow = false;
@@ -131,7 +131,7 @@ int start()
       if(isLow)
       {
          double prevHigh = 999999;
-         for(int j = confirmedIdx + 1; j < confirmedIdx + InpDepth; j++)
+         for(j = confirmedIdx + 1; j < confirmedIdx + InpDepth; j++)
          {
             if(highPoints[j] != EMPTY_VALUE)
             {

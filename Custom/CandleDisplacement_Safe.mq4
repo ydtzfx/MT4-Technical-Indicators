@@ -18,7 +18,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-50;if(limit<0)limit=0;
    for(int i=limit;i>=1;i--){
       double sum=0;for(int j=1;j<=InpPeriod;j++)sum+=iClose(_Symbol,_Period,i+j);double ref=sum/InpPeriod;
-      double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
+      double atr=0;for(j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
       displace[i]=SafeDivide(100*(iClose(_Symbol,_Period,i)-ref),atr,0);
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }

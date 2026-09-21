@@ -38,7 +38,7 @@ int start() {
       int wins=0,losses=0,totalTrades=0;double sumRR=0;
       double atr=0;for(int j=0;j<14;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=14;
 
-      for(int j=InpTestBars;j>=1;j--){
+      for(j=InpTestBars;j>=1;j--){
          int testBar=i+j;if(testBar>=Bars)continue;
          double c=iClose(_Symbol,_Period,testBar),o=iOpen(_Symbol,_Period,testBar);
          bool isBuy=c>o; // 简化信号：阳线买入，阴线卖出

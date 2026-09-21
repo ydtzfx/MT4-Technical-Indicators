@@ -100,7 +100,7 @@ int start()
 
       double ema = prices[InpBPPeriod * 2 - 1];
       double alpha = 2.0 / (InpBPPeriod + 1.0);
-      for(int j = InpBPPeriod * 2 - 2; j >= 0; j--)
+      for(j = InpBPPeriod * 2 - 2; j >= 0; j--)
          ema = prices[j] * alpha + ema * (1.0 - alpha);
 
       maBuffer[i] = ema;
@@ -163,11 +163,11 @@ int start()
    {
       double p0[];
       ArrayResize(p0, InpBPPeriod * 2);
-      for(int j = 0; j < InpBPPeriod * 2; j++)
+      for(j = 0; j < InpBPPeriod * 2; j++)
          p0[j] = GetPriceByType(j, InpPriceType);
       double e0 = p0[InpBPPeriod * 2 - 1];
       double a0 = 2.0 / (InpBPPeriod + 1.0);
-      for(int j = InpBPPeriod * 2 - 2; j >= 0; j--)
+      for(j = InpBPPeriod * 2 - 2; j >= 0; j--)
          e0 = p0[j] * a0 + e0 * (1.0 - a0);
       bpBuffer[0] = iLow(_Symbol, _Period, 0) - e0;
       buySignal[0]   = EMPTY_VALUE;

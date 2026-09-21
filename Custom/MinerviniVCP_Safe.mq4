@@ -38,7 +38,7 @@ int start() {
          if(i+j>=Bars)break;
          double h=iHigh(_Symbol,_Period,i+j);bool isHigh=true;
          for(int k=1;k<=InpSwingBars/2;k++){if(i+j+k<Bars&&iHigh(_Symbol,_Period,i+j+k)>=h)isHigh=false;if(i+j-k>=0&&iHigh(_Symbol,_Period,i+j-k)>=h)isHigh=false;}
-         if(isHigh&&pbCount<5){double pullback=h-iLow(_Symbol,_Period,i+j);for(int k=0;k<InpSwingBars;k++){if(i+j+k<Bars){double l=iLow(_Symbol,_Period,i+j+k);if(l<iLow(_Symbol,_Period,i+j))pullback=h-l;}}pullbacks[pbCount++]=pullback;}
+         if(isHigh&&pbCount<5){double pullback=h-iLow(_Symbol,_Period,i+j);for(k=0;k<InpSwingBars;k++){if(i+j+k<Bars){double l=iLow(_Symbol,_Period,i+j+k);if(l<iLow(_Symbol,_Period,i+j))pullback=h-l;}}pullbacks[pbCount++]=pullback;}
       }
 
       // 检测收缩：每轮回调幅度递减
@@ -47,7 +47,7 @@ int start() {
          int contractionCnt=0;
          for(int p=0;p<pbCount-1;p++)if(pullbacks[p+1]<pullbacks[p]*0.8)contractionCnt++;
          // 成交量也检查是否在收缩
-         double volNow=iVolume(_Symbol,_Period,i),volAvg=0;for(int j=0;j<20;j++)volAvg+=iVolume(_Symbol,_Period,i+j);volAvg/=20;
+         double volNow=iVolume(_Symbol,_Period,i),volAvg=0;for(j=0;j<20;j++)volAvg+=iVolume(_Symbol,_Period,i+j);volAvg/=20;
          double volRatio=volAvg>0?volNow/volAvg:1;
 
          vcpVal=contractionCnt*25; // 每次收缩25分

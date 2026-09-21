@@ -47,7 +47,7 @@ int start() {
    }
    double aSig=2.0/(InpSignal+1);
    for(i=limit;i>=1;i--) {
-      double e=koBuffer[i+InpSignal];for(int j=InpSignal-1;j>=0;j--)e=koBuffer[i+j]*aSig+e*(1-aSig);
+      double e=koBuffer[i+InpSignal];for(j=InpSignal-1;j>=0;j--)e=koBuffer[i+j]*aSig+e*(1-aSig);
       signalBuffer[i]=e;
    }
    for(i=limit;i>=1;i--) {

@@ -42,7 +42,7 @@ int start() {
       // 分桶统计概率
       double bins[];ArrayResize(bins,InpBins);ArrayInitialize(bins,0);
       double binWidth=(maxC-minC)/InpBins;if(binWidth<Point)binWidth=Point;
-      for(int j=0;j<InpPeriod;j++){
+      for(j=0;j<InpPeriod;j++){
          int b=(int)((changes[j]-minC)/binWidth);b=MathMax(0,MathMin(InpBins-1,b));bins[b]++;
       }
 
@@ -51,7 +51,7 @@ int start() {
       entropy[i]=H;change[i]=entropy[i+1]-entropy[i]; // 正=熵下降（有序化）
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=1;i--){double s=0;for(int j=0;j<5;j++)s+=entropy[i+j];smoothEntropy[i]=s/5;}
+   for(i=limit;i>=1;i--){double s=0;for(j=0;j<5;j++)s+=entropy[i+j];smoothEntropy[i]=s/5;}
 
    for(i=limit;i>=3;i--){
       // 熵从高位骤降 = 市场从无序进入有序 → 跟趋势

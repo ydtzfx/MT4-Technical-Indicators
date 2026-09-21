@@ -17,7 +17,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       double r=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i),v=iVolume(_Symbol,_Period,i);
       double avgR=0,avgV=0,sdR=0,sdV=0;
       for(int j=0;j<InpAvgPeriod;j++){double rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);avgR+=rj;avgV+=iVolume(_Symbol,_Period,i+j);}avgR/=InpAvgPeriod;avgV/=InpAvgPeriod;
-      for(int j=0;j<InpAvgPeriod;j++){rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);sdR+=(rj-avgR)*(rj-avgR);sdV+=(iVolume(_Symbol,_Period,i+j)-avgV)*(iVolume(_Symbol,_Period,i+j)-avgV);}
+      for(j=0;j<InpAvgPeriod;j++){rj=iHigh(_Symbol,_Period,i+j)-iLow(_Symbol,_Period,i+j);sdR+=(rj-avgR)*(rj-avgR);sdV+=(iVolume(_Symbol,_Period,i+j)-avgV)*(iVolume(_Symbol,_Period,i+j)-avgV);}
       sdR=MathSqrt(sdR/InpAvgPeriod);sdV=MathSqrt(sdV/InpAvgPeriod);
       volZ[i]=sdV>0?(v-avgV)/sdV:0;spreadZ[i]=sdR>0?(r-avgR)/sdR:0;
       bool isUp=iClose(_Symbol,_Period,i)>iOpen(_Symbol,_Period,i);

@@ -38,7 +38,7 @@ int start() {
    for(int i=limit+InpPeriod;i>=1;i--) {
       double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
       double hh=iHigh(_Symbol,_Period,i),ll=iLow(_Symbol,_Period,i);
-      for(int j=1;j<InpPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
+      for(j=1;j<InpPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
       double ls=hh-InpMultiplier*atr,ss=ll+InpMultiplier*atr;
       if(i==limit+InpPeriod){isLong=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+InpPeriod);prevStop=isLong?ls:ss;}
       else{if(isLong){prevStop=MathMax(ls,prevStop);if(iClose(_Symbol,_Period,i)<prevStop){isLong=false;prevStop=ss;}}else{prevStop=MathMin(ss,prevStop);if(iClose(_Symbol,_Period,i)>prevStop){isLong=true;prevStop=ls;}}}
@@ -46,7 +46,7 @@ int start() {
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    for(i=limit;i>=2;i--) {
-      atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      atr=0;for(j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
       double gap = MathAbs(longStop[i] - shortStop[i]);
       bool wideFlip = (gap > atr * 2); // 止损间距大=趋势转折剧烈
       if(shortStop[i+1]!=EMPTY_VALUE&&longStop[i]!=EMPTY_VALUE&&wideFlip)strongBuy[i]=iLow(_Symbol,_Period,i)-15*Point;

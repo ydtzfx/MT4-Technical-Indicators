@@ -39,14 +39,14 @@ int start() {
 
    for(int i=limit;i>=1;i--){
       // EMA中线
-      double p[40];for(int j=0;j<40;j++)p[j]=iClose(_Symbol,_Period,i+j);
-      double ema=p[39];double a=2.0/21;for(int j=38;j>=0;j--)ema=p[j]*a+ema*(1-a);mid[i]=ema;
+      double p[40];for(j=0;j<40;j++)p[j]=iClose(_Symbol,_Period,i+j);
+      double ema=p[39];double a=2.0/21;for(j=38;j>=0;j--)ema=p[j]*a+ema*(1-a);mid[i]=ema;
 
       // ATR
-      double atr=0;for(int j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      double atr=0;for(j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
 
       // ADX趋势强度修正
-      double tStr=0;for(int j=0;j<InpADXPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j),pc=iClose(_Symbol,_Period,i+j+1);tStr+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));}tStr/=InpADXPeriod;double adxRatio=SafeDivide(tStr,atr,1);
+      double tStr=0;for(j=0;j<InpADXPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j),pc=iClose(_Symbol,_Period,i+j+1);tStr+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));}tStr/=InpADXPeriod;double adxRatio=SafeDivide(tStr,atr,1);
 
       // 成交量修正
       double volAdj=SafeDivide((double)iVolume(_Symbol,_Period,i),avgVol,1);

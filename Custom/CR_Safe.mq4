@@ -147,10 +147,10 @@ int start()
    {
       // a均线 = SMA(CR, InpMAa)
       double sa = 0.0, sb = 0.0, sc = 0.0, sd = 0.0;
-      for(int j = 0; j < InpMAa; j++) sa += crBuffer[i + j];
-      for(int j = 0; j < InpMAb; j++) sb += crBuffer[i + j];
-      for(int j = 0; j < InpMAc; j++) sc += crBuffer[i + j];
-      for(int j = 0; j < InpMAd; j++) sd += crBuffer[i + j];
+      for(j = 0; j < InpMAa; j++) sa += crBuffer[i + j];
+      for(j = 0; j < InpMAb; j++) sb += crBuffer[i + j];
+      for(j = 0; j < InpMAc; j++) sc += crBuffer[i + j];
+      for(j = 0; j < InpMAd; j++) sd += crBuffer[i + j];
 
       maA[i] = sa / InpMAa;
       maB[i] = sb / InpMAb;
@@ -194,7 +194,7 @@ int start()
    if(Bars > 0)
    {
       double sH0 = 0.0, sL0 = 0.0;
-      for(int j = 0; j < InpCRPeriod; j++)
+      for(j = 0; j < InpCRPeriod; j++)
       {
          double pm = (iHigh(_Symbol, _Period, j + 1) + iLow(_Symbol, _Period, j + 1) + iClose(_Symbol, _Period, j + 1)) / 3.0;
          sH0 += MathMax(iHigh(_Symbol, _Period, j) - pm, 0.0);

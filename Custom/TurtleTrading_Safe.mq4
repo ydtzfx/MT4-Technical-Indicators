@@ -40,9 +40,9 @@ int start() {
    for(int i=limit;i>=1;i--){
       double eHi=iHigh(_Symbol,_Period,i+1),eLo=iLow(_Symbol,_Period,i+1),xHi=iHigh(_Symbol,_Period,i+1),xLo=iLow(_Symbol,_Period,i+1);
       for(int j=2;j<=InpEntry;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>eHi)eHi=h;if(l<eLo)eLo=l;}
-      for(int j=1;j<=InpExit;j++){h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);if(h>xHi)xHi=h;if(l<xLo)xLo=l;}
+      for(j=1;j<=InpExit;j++){h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);if(h>xHi)xHi=h;if(l<xLo)xLo=l;}
       entryHi[i]=eHi;entryLo[i]=eLo;exitHi[i]=xHi;exitLo[i]=xLo;
-      double atr=0;for(int j=0;j<InpATR;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATR;atrVal[i]=atr;
+      double atr=0;for(j=0;j<InpATR;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATR;atrVal[i]=atr;
       posSize[i]=SafeDivide(0.01*iClose(_Symbol,_Period,i),2*atr,0); // 1%风险仓位
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }

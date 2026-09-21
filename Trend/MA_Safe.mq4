@@ -155,7 +155,7 @@ int start()
       {
          double prices2[];
          ArrayResize(prices2, InpMA2Period * 2);
-         for(int j = 0; j < InpMA2Period * 2; j++)
+         for(j = 0; j < InpMA2Period * 2; j++)
             prices2[j] = GetPriceByType(i + j, InpPriceType);
          ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
       }
@@ -166,7 +166,7 @@ int start()
    {
       double prices0[];
       ArrayResize(prices0, InpMAPeriod * 2);
-      for(int j = 0; j < InpMAPeriod * 2; j++)
+      for(j = 0; j < InpMAPeriod * 2; j++)
          prices0[j] = GetPriceByType(j, InpPriceType);
       maBuffer[0] = CalculateMA(prices0, InpMAPeriod, InpMAMethod, 0);
       ma2Buffer[0] = (InpMA2Period > 0) ? ma2Buffer[1] : 0;

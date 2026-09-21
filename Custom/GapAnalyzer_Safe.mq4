@@ -38,7 +38,7 @@ int ClassifyGap(int bar,bool isUp,double gapSize,double atr){
    // 计算成交量
    double vR=SafeDivide((double)iVolume(_Symbol,_Period,bar),(double)iVolume(_Symbol,_Period,bar+10),1);
    // 计算ADX
-   double trS=0,pS=0,mS=0;for(int j=0;j<10;j++){int s=bar+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pS+=up;if(dn>up&&dn>0)mS+=dn;}
+   double trS=0,pS=0,mS=0;for(j=0;j<10;j++){int s=bar+j;double h=iHigh(_Symbol,_Period,s),l=iLow(_Symbol,_Period,s),pc=iClose(_Symbol,_Period,s+1);trS+=MathMax(h-l,MathMax(MathAbs(h-pc),MathAbs(l-pc)));double up=h-iHigh(_Symbol,_Period,s+1),dn=iLow(_Symbol,_Period,s+1)-l;if(up>dn&&up>0)pS+=up;if(dn>up&&dn>0)mS+=dn;}
    double adx=SafeDivide(100*MathAbs(pS-mS),pS+mS,0);
 
    if(adx<20)return 1; // Common
@@ -67,7 +67,7 @@ int start() {
 
          // 判断是否已被回补（价格回到缺口内）
          bool filled=false;
-         for(int j=0;j<i;j++){
+         for(j=0;j<i;j++){
             if(gap>0&&iLow(_Symbol,_Period,j)<=iClose(_Symbol,_Period,i+1))filled=true;
             else if(gap<0&&iHigh(_Symbol,_Period,j)>=iClose(_Symbol,_Period,i+1))filled=true;
          }

@@ -151,7 +151,7 @@ int start()
       {
          double highestK = iHigh(_Symbol, _Period, i);
          double lowestK  = iLow(_Symbol, _Period, i);
-         for(int j = i; j < i + InpKijun; j++)
+         for(j = i; j < i + InpKijun; j++)
          {
             h = iHigh(_Symbol, _Period, j);
             l = iLow(_Symbol, _Period, j);
@@ -172,7 +172,7 @@ int start()
       {
          double highestS = iHigh(_Symbol, _Period, i);
          double lowestS  = iLow(_Symbol, _Period, i);
-         for(int j = i; j < i + InpSenkou; j++)
+         for(j = i; j < i + InpSenkou; j++)
          {
             h = iHigh(_Symbol, _Period, j);
             l = iLow(_Symbol, _Period, j);

@@ -26,8 +26,8 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
    for(int i=Bars-2;i>=1;i--){int up=0;for(int j=0;j<5;j++)if(iClose(_Symbol,_Period,i+j)>iClose(_Symbol,_Period,i+j+1))up++;upRatio[i]=up/5.0;}
    double aS=2.0/(InpShort+1),aL=2.0/(InpLong+1);
    for(i=limit;i>=1;i--){
-      double eS=0,eL=0;for(int j=0;j<InpLong*2;j++){eS+=upRatio[i+j];eL+=upRatio[i+j];}eS/=(InpLong*2);eL/=(InpLong*2);
-      for(int j=InpLong*2-1;j>=0;j--){eS=upRatio[i+j]*aS+eS*(1-aS);eL=upRatio[i+j]*aL+eL*(1-aL);}
+      double eS=0,eL=0;for(j=0;j<InpLong*2;j++){eS+=upRatio[i+j];eL+=upRatio[i+j];}eS/=(InpLong*2);eL/=(InpLong*2);
+      for(j=InpLong*2-1;j>=0;j--){eS=upRatio[i+j]*aS+eS*(1-aS);eL=upRatio[i+j]*aL+eL*(1-aL);}
       mcOsc[i]=eS-eL;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    for(i=limit;i>=2;i--){

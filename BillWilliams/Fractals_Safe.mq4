@@ -93,7 +93,7 @@ int start()
       }
 
       // 严格模式：只检查严格大于/小于，不允许相等
-      for(int j = 1; j <= InpFractalBars; j++)
+      for(j = 1; j <= InpFractalBars; j++)
       {
          if(iHigh(_Symbol, _Period, i + j) == middleHigh)
             isUpFractal = false;

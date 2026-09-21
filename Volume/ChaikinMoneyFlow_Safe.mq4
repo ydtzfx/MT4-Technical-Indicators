@@ -130,7 +130,7 @@ int start()
       // 计算平均成交量用于激增检测
       double avgVol = 0.0;
       int volCount = 0;
-      for(int j = 1; j <= InpCMFPeriod; j++)
+      for(j = 1; j <= InpCMFPeriod; j++)
       {
          int vShift = i + j;
          if(vShift < Bars) { avgVol += (double)iVolume(_Symbol, _Period, vShift); volCount++; }

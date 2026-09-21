@@ -54,10 +54,10 @@ int start() {
    }
    // 残差的ZScore
    for(i=limit;i>=1;i--){
-      double sum=0;for(int j=0;j<InpHalfLife;j++)sum+=spread[i+j];double mean=sum/InpHalfLife;
-      double sd=0;for(int j=0;j<InpHalfLife;j++){double d=spread[i+j]-mean;sd+=d*d;}
+      double sum=0;for(j=0;j<InpHalfLife;j++)sum+=spread[i+j];double mean=sum/InpHalfLife;
+      double sd=0;for(j=0;j<InpHalfLife;j++){double d=spread[i+j]-mean;sd+=d*d;}
       sd=MathSqrt(sd/InpHalfLife);residualZ[i]=sd>0?(spread[i]-mean)/sd:0;
-      double s=0;for(int j=0;j<5;j++)s+=residualZ[i+j];signalLine[i]=s/5;
+      double s=0;for(j=0;j<5;j++)s+=residualZ[i+j];signalLine[i]=s/5;
    }
    for(i=limit;i>=2;i--){
       if(residualZ[i+1]<-2&&residualZ[i]>-2)buySignal[i]=-2.5;

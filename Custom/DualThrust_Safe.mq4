@@ -38,7 +38,7 @@ int start() {
    for(int i=limit;i>=1;i--){
       double hh=iHigh(_Symbol,_Period,i+1),ll=iLow(_Symbol,_Period,i+1),hc=iClose(_Symbol,_Period,i+1),lc=iClose(_Symbol,_Period,i+1);
       for(int j=2;j<=InpPeriod;j++){double h=iHigh(_Symbol,_Period,i+j),l=iLow(_Symbol,_Period,i+j);if(h>hh)hh=h;if(l<ll)ll=l;}
-      for(int j=1;j<=InpPeriod;j++){double c=iClose(_Symbol,_Period,i+j);if(c>hc)hc=c;if(c<lc)lc=c;}
+      for(j=1;j<=InpPeriod;j++){double c=iClose(_Symbol,_Period,i+j);if(c>hc)hc=c;if(c<lc)lc=c;}
       double range=MathMax(hh-lc,hc-ll);
       double open=iOpen(_Symbol,_Period,i);
       buyLine[i]=open+InpK1*range;sellLine[i]=open-InpK2*range;upper[i]=hh;lower[i]=ll;

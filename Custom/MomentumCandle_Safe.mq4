@@ -15,7 +15,7 @@ int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    for(int i=limit;i>=0;i--){momBull[i]=momBear[i]=buySignal[i]=sellSignal[i]=EMPTY_VALUE;}
    double avgR=0;for(int j=0;j<20;j++)avgR+=iHigh(_Symbol,_Period,limit+10+j)-iLow(_Symbol,_Period,limit+10+j);avgR/=20;
-   double avgV=0;for(int j=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,limit+10+j);avgV/=20;
+   double avgV=0;for(j=0;j<20;j++)avgV+=iVolume(_Symbol,_Period,limit+10+j);avgV/=20;
    for(i=limit;i>=3;i--){
       double range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i),body=MathAbs(iClose(_Symbol,_Period,i)-iOpen(_Symbol,_Period,i));
       double vol=iVolume(_Symbol,_Period,i);double cPos=(iClose(_Symbol,_Period,i)-iLow(_Symbol,_Period,i))/MathMax(range,Point);

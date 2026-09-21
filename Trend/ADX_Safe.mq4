@@ -147,7 +147,7 @@ int start()
       double emaMinusDM = minusDMVals[InpADXPeriod * 2 - 1];
 
       double alpha = 2.0 / (InpADXPeriod + 1.0);
-      for(int j = InpADXPeriod * 2 - 2; j >= 0; j--)
+      for(j = InpADXPeriod * 2 - 2; j >= 0; j--)
       {
          emaTR      = trVals[j] * alpha + emaTR * (1.0 - alpha);
          emaPlusDM  = plusDMVals[j] * alpha + emaPlusDM * (1.0 - alpha);
@@ -180,7 +180,7 @@ int start()
    for(i = Bars - InpADXPeriod * 3 - 1; i >= 1; i--)
    {
       double ema = adxBuffer[i + InpADXPeriod - 1];
-      for(int j = InpADXPeriod - 2; j >= 0; j--)
+      for(j = InpADXPeriod - 2; j >= 0; j--)
       {
          ema = adxBuffer[i + j] * alphaADX + ema * (1.0 - alphaADX);
       }

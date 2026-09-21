@@ -99,7 +99,7 @@ int start()
    for(i = limit; i >= 0; i--)
    {
       double aoSum5 = 0.0;
-      for(int j = 0; j < 5; j++)
+      for(j = 0; j < 5; j++)
          aoSum5 += aoBuffer[i + j];
       double smaAO5 = aoSum5 / 5.0;
 

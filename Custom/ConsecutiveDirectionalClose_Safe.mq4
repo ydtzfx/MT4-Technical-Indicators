@@ -19,7 +19,7 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       int buyCnt=0,sellCnt=0;
       // 统计连续收盘在开盘上方(阳线方向)或下方的K线数
       for(int j=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)>iOpen(_Symbol,_Period,i+j))buyCnt++;else break;}
-      for(int j=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)<iOpen(_Symbol,_Period,i+j))sellCnt++;else break;}
+      for(j=0;j<InpMaxCount;j++){if(iClose(_Symbol,_Period,i+j)<iOpen(_Symbol,_Period,i+j))sellCnt++;else break;}
       consec[i]=buyCnt>0?buyCnt:(sellCnt>0?-sellCnt:0);streak[i]=buyCnt+sellCnt;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }

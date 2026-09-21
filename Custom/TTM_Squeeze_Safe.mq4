@@ -39,18 +39,18 @@ int start() {
    for(int i=limit;i>=1;i--) {
       // Bollinger Bands width
       double sum=0;for(int j=0;j<InpBBPeriod;j++)sum+=iClose(_Symbol,_Period,i+j);
-      double sma=sum/InpBBPeriod;double sd=0;for(int j=0;j<InpBBPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
+      double sma=sum/InpBBPeriod;double sd=0;for(j=0;j<InpBBPeriod;j++){double d=iClose(_Symbol,_Period,i+j)-sma;sd+=d*d;}
       sd=MathSqrt(sd/InpBBPeriod);double bbWidth=InpBBMult*sd*2;
 
       // Keltner Channel width
-      double trSum=0;for(int j=0;j<InpATRPeriod;j++)trSum+=GetTrueRange(_Symbol,_Period,i+j);
+      double trSum=0;for(j=0;j<InpATRPeriod;j++)trSum+=GetTrueRange(_Symbol,_Period,i+j);
       double atr=trSum/InpATRPeriod;double kcWidth=InpKCMult*atr*2;
 
       // Momentum
-      double ema20=0;for(int j=0;j<InpBBPeriod;j++)ema20+=iClose(_Symbol,_Period,i+j);ema20/=InpBBPeriod;
-      double a20=2.0/(InpBBPeriod+1);for(int j=InpBBPeriod-1;j>=0;j--)ema20=iClose(_Symbol,_Period,i+j)*a20+ema20*(1-a20);
-      double ema10=0;for(int j=0;j<10;j++)ema10+=iClose(_Symbol,_Period,i+j);ema10/=10;
-      double a10=2.0/11;for(int j=9;j>=0;j--)ema10=iClose(_Symbol,_Period,i+j)*a10+ema10*(1-a10);
+      double ema20=0;for(j=0;j<InpBBPeriod;j++)ema20+=iClose(_Symbol,_Period,i+j);ema20/=InpBBPeriod;
+      double a20=2.0/(InpBBPeriod+1);for(j=InpBBPeriod-1;j>=0;j--)ema20=iClose(_Symbol,_Period,i+j)*a20+ema20*(1-a20);
+      double ema10=0;for(j=0;j<10;j++)ema10+=iClose(_Symbol,_Period,i+j);ema10/=10;
+      double a10=2.0/11;for(j=9;j>=0;j--)ema10=iClose(_Symbol,_Period,i+j)*a10+ema10*(1-a10);
       momBuffer[i]=ema10-ema20;
 
       bool squeeze=(bbWidth<kcWidth);

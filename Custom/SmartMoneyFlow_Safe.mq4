@@ -73,7 +73,7 @@ int start() {
       }
 
       // === 检测4：连续高量推升/打压=聪明钱持续介入 ===
-      int consecVol=0;for(int j=0;j<3;j++)if(iVolume(_Symbol,_Period,i+j)>avgVol*1.2)consecVol++;
+      int consecVol=0;for(j=0;j<3;j++)if(iVolume(_Symbol,_Period,i+j)>avgVol*1.2)consecVol++;
       if(consecVol>=2){if(c>iClose(_Symbol,_Period,i+3))smfScore+=20;else smfScore-=20;}
 
       smfLine[i]=MathMax(-100,MathMin(100,smfScore));

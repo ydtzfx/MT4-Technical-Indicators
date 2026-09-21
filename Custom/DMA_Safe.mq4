@@ -56,7 +56,7 @@ int start() {
    }
    // AMA = MA of DIF
    for(i=limit;i>=1;i--) {
-      double d[60];int c=0;for(int j=0;j<InpM*2&&(i+j<Bars);j++)d[c++]=difBuffer[i+j];
+      double d[60];int c=0;for(j=0;j<InpM*2&&(i+j<Bars);j++)d[c++]=difBuffer[i+j];
       if(c>=InpM)amaBuffer[i]=CalculateMA(d,InpM,InpMAMethod,0);
    }
    // 步骤2: 信号（bar[1]+确认）
@@ -77,7 +77,7 @@ int start() {
    }
    // 步骤3: 刷新bar[0]
    if(Bars>0){
-      double p0[200];for(int j=0;j<200;j++)p0[j]=iClose(_Symbol,_Period,j);
+      double p0[200];for(j=0;j<200;j++)p0[j]=iClose(_Symbol,_Period,j);
       difBuffer[0]=CalculateMA(p0,InpShort,InpMAMethod,0)-CalculateMA(p0,InpLong,InpMAMethod,0);
       amaBuffer[0]=amaBuffer[1];buySignal[0]=EMPTY_VALUE;sellSignal[0]=EMPTY_VALUE;strongBuyBuffer[0]=EMPTY_VALUE;strongSellBuffer[0]=EMPTY_VALUE;
    }
