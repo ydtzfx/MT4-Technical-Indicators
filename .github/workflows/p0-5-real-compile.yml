@@ -1,8 +1,6 @@
 name: P0.5 MT4 Verification
 
 on:
-  push:
-    branches: [fix/p0-correctness]
   pull_request:
     branches: [master]
   workflow_dispatch:
