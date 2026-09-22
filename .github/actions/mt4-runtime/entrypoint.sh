@@ -77,7 +77,7 @@ echo "working directory: $mt4"
 set +e
 (
   cd "$mt4"
-  timeout 180 bash -c 'wine "./terminal.exe" /skipupdate /portable "$1" & wineserver -w' _ "$cfg_rel"
+  timeout 180 bash -c 'wine "./terminal.exe" /skipupdate /portable "/config:$1" & wineserver -w' _ "$cfg_rel"
 )
 terminal_rc=$?
 set -e
