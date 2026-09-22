@@ -95,24 +95,23 @@ void Compare()
    }
 }
 
-int init()
+int OnInit()
 {
    fileHandle=FileOpen("p0_5_no_repaint.csv",FILE_CSV|FILE_WRITE,',');
    if(fileHandle!=INVALID_HANDLE)FileWrite(fileHandle,"kind","channel","bar_time","before","after","checks","violations","transitions","start_calls","eligible_calls","min_bars","max_bars");
-   return(0);
+   return(INIT_SUCCEEDED);
 }
 
-int deinit()
+void OnDeinit(const int reason)
 {
    if(fileHandle!=INVALID_HANDLE)
    {
       FileWrite(fileHandle,"SUMMARY","","","","",checks,violations,transitions,startCalls,eligibleCalls,minBarsSeen,maxBarsSeen);
       FileClose(fileHandle);
    }
-   return(0);
 }
 
-int start()
+void ProcessTick()
 {
    startCalls++;
    if(Bars<minBarsSeen)minBarsSeen=Bars;
@@ -129,5 +128,9 @@ int start()
    }
    Capture();
    initialized=true;
-   return(0);
+}
+
+void OnTick()
+{
+   ProcessTick();
 }
