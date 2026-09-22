@@ -211,7 +211,7 @@ jobs:
             cp /opt/project/Tests/P0_5_NoRepaintProbe.ex4 "$exp/"
           '
 
-          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             -e BT_DAYS=1-22             "$image"             run_backtest -v -t               -e P0_5_NoRepaintProbe               -p EURUSD -y 2018 -m 3 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
+          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             "$image"             run_backtest -v -t               -e P0_5_NoRepaintProbe               -p EURUSD -y 2018 -m 3 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
 
       - name: Restore workspace ownership after Strategy Tester
         if: always()

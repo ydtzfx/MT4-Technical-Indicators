@@ -7,6 +7,7 @@
 
 input int InpTrackedBars = 8;
 input int InpWarmupBars = 600;
+input int InpTargetTransitions = 384;
 input int InpMinTransitions = 20;
 input double InpTolerance = 0.00000001;
 
@@ -120,6 +121,7 @@ void ProcessTick()
    if(Bars<InpWarmupBars)return;
    if(Bars<InpTrackedBars+2)return;
    eligibleCalls++;
+   if(initialized && transitions>=InpTargetTransitions)return;
    datetime t=Time[0];
    if(t==0 || t==lastBarTime)return;
    lastBarTime=t;
