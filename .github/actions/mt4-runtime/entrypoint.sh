@@ -17,6 +17,11 @@ cp /github/workspace/Custom/MTF_RSI_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
 cp /github/workspace/Custom/Backtest_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
 cp /github/workspace/Tests/P0_5_NoRepaintProbe.ex4 "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
 cp "$history_dir"/*.hst "$mt4/history/default/"
+# Also inject deterministic history into every preconfigured broker/server history directory.
+while IFS= read -r server_dir; do
+  [[ "$server_dir" == "$mt4/history/default" ]] && continue
+  cp "$history_dir"/*.hst "$server_dir/" || true
+done < <(find "$mt4/history" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | sort)
 
 rm -f "$mt4/tester/files/p0_5_no_repaint.csv"
 rm -f "$mt4/p0_5_report.htm" "$mt4/p0_5_report.gif"
@@ -42,8 +47,16 @@ echo "=== MT4 runtime ==="
 ls -l "$mt4/terminal.exe" "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
 echo "=== injected histories ==="
 ls -lh "$mt4/history/default"/EURUSD*.hst
-echo "=== history/default metadata ==="
-find "$mt4/history/default" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort | head -100
+echo "=== history/server layout ==="
+find "$mt4/history" -maxdepth 2 -type f -printf '%p %s bytes\n' 2>/dev/null | sort | head -200
+echo "=== symbol metadata ==="
+find "$mt4" -type f \( -iname 'symbols.raw' -o -iname 'symbols.sel' -o -iname 'symgroups.raw' \) -printf '%p %s bytes\n' 2>/dev/null | sort || true
+echo "=== EURUSD metadata hits ==="
+while IFS= read -r f; do
+  if grep -a -q 'EURUSD' "$f" 2>/dev/null; then echo "EURUSD in $f"; fi
+done < <(find "$mt4" -type f \( -iname 'symbols.raw' -o -iname 'symbols.sel' -o -iname 'symgroups.raw' \) -print 2>/dev/null | sort)
+echo "=== Expert before terminal ==="
+ls -l "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4" || true
 
 cfg="$(winepath -w "$mt4/p0_5.ini")"
 echo "strategy tester config: $cfg"
@@ -55,7 +68,7 @@ trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
 set +e
-timeout 300 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
+timeout 120 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
@@ -71,6 +84,8 @@ if [[ -n "$report" && -f "$report" ]]; then cp "$report" "$output_dir/strategy-t
 find "$mt4/tester" -type f -name '*.log' -exec cp {} "$output_dir/" \; 2>/dev/null || true
 find "$mt4/logs" -type f -name '*.log' -exec cp {} "$output_dir/" \; 2>/dev/null || true
 
+echo "=== Expert after terminal ==="
+ls -l "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4" || true
 echo "=== tester/runtime files ==="
 find "$mt4/tester" -maxdepth 3 -type f -printf '%p %s bytes\n' 2>/dev/null | sort || true
 echo "=== tester journals (tail) ==="
