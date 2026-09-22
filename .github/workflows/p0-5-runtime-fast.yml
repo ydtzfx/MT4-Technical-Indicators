@@ -1,0 +1,111 @@
+name: P0.5 Runtime Fast Path
+
+on:
+  push:
+    branches: [fix/p0-correctness]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  runtime-release:
+    name: Runtime / Fast Path Release Gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+
+      - name: Prove production code unchanged since verified CI
+        shell: bash
+        run: |
+          BASE=c2dd820b7406c66f1a3dc520be378817c8527db8
+          git cat-file -e "$BASE^{commit}"
+          if ! git diff --quiet "$BASE"..HEAD -- '*.mq4' '*.mqh'; then
+            echo "Production MQL4 changed since verified CI base $BASE" >&2
+            git diff --name-only "$BASE"..HEAD -- '*.mq4' '*.mqh'
+            exit 1
+          fi
+          echo "Production MQL4 unchanged since verified 201/201 CI base: $BASE"
+
+      - name: Download verified CI gate evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          github-token: ${{ github.token }}
+          run-id: '35680096988'
+          name: p0-5-required-gate-e7508cb8a6320e97e431fd6f3ddd94763ab7c9bc
+          path: fast/ci
+
+      - name: Compile runtime dependencies
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            Trend/MA_Safe.mq4
+            Oscillators/RSI_Safe.mq4
+            Oscillators/MACD_Safe.mq4
+            Oscillators/Stochastic_Safe.mq4
+            Trend/Ichimoku_Safe.mq4
+            Custom/MTF_RSI_Safe.mq4
+            Custom/Backtest_Safe.mq4
+            Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '8'
+          report-dir: artifacts/p0-5/runtime-deps
+          include: '.'
+
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
+
+      - name: Build deterministic multi-timeframe history
+        run: |
+          mkdir -p artifacts/p0-5/runtime-history
+          python Tools/ci/p05_history.py \
+            --synthetic \
+            --m1-bars 120000 \
+            --out artifacts/p0-5/runtime-history/generated
+
+      - name: Run real MT4 Strategy Tester
+        id: tester
+        continue-on-error: true
+        uses: ./.github/actions/mt4-runtime
+        with:
+          history-dir: artifacts/p0-5/runtime-history/generated
+          output-dir: artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
+
+      - name: Programmatic runtime verdict
+        run: |
+          python Tools/ci/p05_verify.py runtime \
+            --csv artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv \
+            --out artifacts/p0-5/runtime/verdict
+
+      - name: Programmatic release verdict
+        run: |
+          python Tools/ci/p05_verify.py release-gate \
+            --ci fast/ci \
+            --runtime artifacts/p0-5/runtime/verdict \
+            --out artifacts/p0-5/release
+
+      - name: Publish summaries
+        if: always()
+        shell: bash
+        run: |
+          [ -f artifacts/p0-5/runtime/verdict/runtime-report.md ] && cat artifacts/p0-5/runtime/verdict/runtime-report.md >> "$GITHUB_STEP_SUMMARY"
+          [ -f artifacts/p0-5/release/release-gate.md ] && cat artifacts/p0-5/release/release-gate.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload runtime and release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-fast-${{ github.sha }}
+          path: |
+            artifacts/p0-5/runtime
+            artifacts/p0-5/release
+          if-no-files-found: error
+          retention-days: 30
