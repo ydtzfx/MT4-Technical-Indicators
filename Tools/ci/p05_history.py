@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Derive a deterministic multi-timeframe MT4 HST fixture from the locked EURUSD H4 snapshot."""
 from __future__ import annotations
-import argparse, json, math, struct
+import argparse, json, math, struct, time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -109,19 +109,67 @@ def write_hst(path:Path,version:int,header:bytearray,period:int,order:str,bars:l
             payload.extend(struct.pack("<iddddd",int(b.time),b.open,a1,a2,b.close,float(b.volume)))
     path.write_bytes(bytes(h)+bytes(payload))
 
+
+def synthetic_header(symbol:str="EURUSD",digits:int=5,version:int=401):
+    h=bytearray(HEADER_SIZE)
+    struct.pack_into("<i",h,0,version)
+    copyright_text=b"P0.5 deterministic CI history"
+    h[4:4+len(copyright_text)]=copyright_text
+    sym=symbol.encode("ascii")[:11]
+    h[68:68+len(sym)]=sym
+    struct.pack_into("<i",h,80,1)
+    struct.pack_into("<i",h,84,digits)
+    struct.pack_into("<i",h,88,int(time.time()))
+    struct.pack_into("<i",h,92,0)
+    return h
+
+def generate_synthetic_m1(count:int=120000,start:int=1704067200):
+    out=[]
+    price=1.10000
+    for i in range(count):
+        t=start+i*60
+        slow=0.00035*math.sin(i/720.0)
+        fast=0.00008*math.sin(i/37.0)
+        drift=0.000000004*i
+        target=1.10000+slow+fast+drift
+        o=price
+        c=target
+        wiggle=0.00003+0.00002*(0.5+0.5*math.sin(i/13.0))
+        hi=max(o,c)+wiggle
+        lo=min(o,c)-wiggle
+        volume=80+(i%70)
+        out.append(Bar(t,o,lo,hi,c,volume,10,0))
+        price=c
+    return out
+
 def main():
     ap=argparse.ArgumentParser()
-    ap.add_argument("source",type=Path)
+    ap.add_argument("source",type=Path,nargs="?")
     ap.add_argument("--out",type=Path,required=True)
     ap.add_argument("--source-bars",type=int,default=500)
+    ap.add_argument("--synthetic",action="store_true")
+    ap.add_argument("--m1-bars",type=int,default=120000)
     args=ap.parse_args()
-    version,symbol,period,digits,header,order,bars=read_hst(args.source)
-    if period!=240: raise SystemExit(f"expected H4/240 source, got {period}")
-    bars=bars[-min(args.source_bars,len(bars)):]
-    if len(bars)<100: raise SystemExit(f"need >=100 H4 bars, got {len(bars)}")
-    m1=expand_h4(bars)
+
+    if args.synthetic:
+        version=401; symbol="EURUSD"; digits=5; order="low-high"
+        header=synthetic_header(symbol,digits,version)
+        m1=generate_synthetic_m1(args.m1_bars)
+        source_period="synthetic-M1"
+        source_bars=len(m1)
+    else:
+        if args.source is None:
+            raise SystemExit("source HST required unless --synthetic is used")
+        version,symbol,period,digits,header,order,bars=read_hst(args.source)
+        if period!=240: raise SystemExit(f"expected H4/240 source, got {period}")
+        bars=bars[-min(args.source_bars,len(bars)):]
+        if len(bars)<100: raise SystemExit(f"need >=100 H4 bars, got {len(bars)}")
+        m1=expand_h4(bars)
+        source_period=period
+        source_bars=len(bars)
+
     args.out.mkdir(parents=True,exist_ok=True)
-    manifest={"version":version,"symbol":symbol,"digits":digits,"source_period":period,"source_bars":len(bars),"field_order":order,"files":{}}
+    manifest={"version":version,"symbol":symbol,"digits":digits,"source_period":source_period,"source_bars":source_bars,"field_order":order,"files":{}}
     for p in PERIODS:
         series=m1 if p==1 else aggregate(m1,p)
         dest=args.out/f"{symbol}{p}.hst"
