@@ -152,7 +152,7 @@ def main():
     args=ap.parse_args()
 
     if args.synthetic:
-        version=401; symbol="EURUSD"; digits=5; order="low-high"
+        version=401; symbol="EURUSD"; digits=5; order="high-low"
         header=synthetic_header(symbol,digits,version)
         m1=generate_synthetic_m1(args.m1_bars)
         source_period="synthetic-M1"
