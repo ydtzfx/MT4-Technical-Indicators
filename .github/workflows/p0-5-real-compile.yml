@@ -187,10 +187,29 @@ jobs:
       - name: Run real MT4 Strategy Tester
         id: tester
         continue-on-error: true
-        uses: ./.github/actions/mt4-runtime
-        with:
-          history-dir: artifacts/p0-5/runtime-history/generated
-          output-dir: artifacts/p0-5/runtime/raw
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ea31337/ea-tester:EURUSD-2018-DS"
+          mkdir -p artifacts/p0-5/runtime/raw
+          docker pull "$image"
+          runtime_digest="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
+          printf '{"image":"%s","repo_digest":"%s"}\n' "$image" "$runtime_digest"             > artifacts/p0-5/runtime/raw/runtime-image.json
+
+          runtime_start='
+            set -e
+            ind="$TERMINAL_DIR/$MQL_DIR/Indicators"
+            mkdir -p "$ind/Trend" "$ind/Oscillators" "$ind/Custom"
+            cp /opt/project/Trend/MA_Safe.ex4 "$ind/Trend/"
+            cp /opt/project/Trend/Ichimoku_Safe.ex4 "$ind/Trend/"
+            cp /opt/project/Oscillators/RSI_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Oscillators/MACD_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Oscillators/Stochastic_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Custom/MTF_RSI_Safe.ex4 "$ind/Custom/"
+            cp /opt/project/Custom/Backtest_Safe.ex4 "$ind/Custom/"
+          '
+
+          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             "$image"             run_backtest -4 -v -t               -e /opt/project/Tests/P0_5_NoRepaintProbe.ex4               -p EURUSD -y 2018 -m 1 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
 
       - name: Restore workspace ownership after Strategy Tester
         if: always()
