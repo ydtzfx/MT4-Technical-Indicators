@@ -99,7 +99,7 @@ int start()
 
       // 快EMA
       double fastEMA = prices[histSize - 1];
-      for(int jj = histSize - InpFastEMA; j >= 0; j--)
+      for(j = histSize - InpFastEMA; j >= 0; j--)
       {
          double alpha = 2.0 / (InpFastEMA + 1.0);
          fastEMA = prices[j] * alpha + fastEMA * (1.0 - alpha);
@@ -107,7 +107,7 @@ int start()
 
       // 慢EMA
       double slowEMA = prices[histSize - 1];
-      for(int jjj = histSize - InpSlowEMA; j >= 0; j--)
+      for(j = histSize - InpSlowEMA; j >= 0; j--)
       {
          alpha = 2.0 / (InpSlowEMA + 1.0);
          slowEMA = prices[j] * alpha + slowEMA * (1.0 - alpha);
@@ -123,7 +123,7 @@ int start()
    for(i = limit; i >= 1; i--)
    {
       double sigSum = 0.0;
-      for(int jjjj = 0; j < InpSignalSMA; j++)
+      for(j = 0; j < InpSignalSMA; j++)
          sigSum += osmaBuffer[i + j];
       double signalLine = sigSum / InpSignalSMA;
       osmaBuffer[i] = osmaBuffer[i] - signalLine;  // 变成真正的OsMA

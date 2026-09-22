@@ -1,0 +1,13 @@
+name: Locked MT4 Strategy Tester
+description: Run the real MT4 terminal Strategy Tester against deterministic HST fixtures.
+inputs:
+  history-dir:
+    required: true
+  output-dir:
+    required: true
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - ${{ inputs.history-dir }}
+    - ${{ inputs.output-dir }}

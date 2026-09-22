@@ -121,14 +121,14 @@ int start()
 
       // 计算SMA（中轨）
       double sum = 0.0;
-      for(int jj = 0; j < InpBBPeriod; j++)
+      for(j = 0; j < InpBBPeriod; j++)
          sum += prices[j];
       double sma = sum / InpBBPeriod;
       middleBand[i] = sma;
 
       // 计算标准差
       double sumSqDiff = 0.0;
-      for(int jjj = 0; j < InpBBPeriod; j++)
+      for(j = 0; j < InpBBPeriod; j++)
       {
          double diff = prices[j] - sma;
          sumSqDiff += diff * diff;
@@ -162,7 +162,7 @@ int start()
 
          // 带宽挤压检测
          bool isSqueeze = true;
-         for(int jjjj=1;j<=20;j++) {
+         for(j=1;j<=20;j++) {
             if(bandwidthBuffer[i] > bandwidthBuffer[i+j]) { isSqueeze = false; break; }
          }
          bool tightSqueeze = (isSqueeze && bandwidthBuffer[i] < 2.0);

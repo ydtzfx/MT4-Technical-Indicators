@@ -52,7 +52,7 @@ int start() {
    for(i=limit;i>=1;i--){rvi[i]=SafeDivide(eNum[i],eDen[i],0);buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;}
    double aS=2.0/5;
    for(i=limit;i>=1;i--){
-      double e=rvi[i+5];for(int jj=4;j>=0;j--)e=rvi[i+j]*aS+e*(1-aS);signal[i]=e;
+      double e=rvi[i+5];for(j=4;j>=0;j--)e=rvi[i+j]*aS+e*(1-aS);signal[i]=e;
    }
    for(i=limit;i>=1;i--){
       double gap=MathAbs(rvi[i]-signal[i]);

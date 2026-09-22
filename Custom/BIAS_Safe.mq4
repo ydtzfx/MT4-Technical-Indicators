@@ -165,7 +165,7 @@ int start()
    {
       double p0[];
       ArrayResize(p0, maxPeriod * 3);
-      for(int jj = 0; j < maxPeriod * 3; j++)
+      for(j = 0; j < maxPeriod * 3; j++)
          p0[j] = iClose(_Symbol, _Period, j);
       double m1 = CalculateMA(p0, InpBIAS1, InpMAMethod, 0);
       double m2 = CalculateMA(p0, InpBIAS2, InpMAMethod, 0);

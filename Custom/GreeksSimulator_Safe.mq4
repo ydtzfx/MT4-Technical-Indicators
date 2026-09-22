@@ -32,7 +32,7 @@ int start(){
       }
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=2;i++){
+   for(i=limit;i>=2;i--){
       if(delta[i+1]<0.3&&delta[i]>0.3)buySignal[i]=0.25;     // Delta突破=方向确认
       if(delta[i+1]>0.7&&delta[i]<0.7)sellSignal[i]=0.75;    // Delta回落=方向减弱
    }

@@ -119,6 +119,16 @@ int start()
       // 计算MA
       maBuffer[i] = CalculateMA(prices, InpMAPeriod, InpMAMethod, 0);
 
+      // 计算长周期MA（如果启用）
+      if(InpMA2Period > 0)
+      {
+         double prices2[];
+         ArrayResize(prices2, InpMA2Period * 2);
+         for(j = 0; j < InpMA2Period * 2; j++)
+            prices2[j] = GetPriceByType(i + j, InpPriceType);
+         ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
+      }
+
       // 信号判断：检测收盘价与MA的交叉（使用 bar[i] 和 bar[i+1] 的收盘价）
       if(InpShowSignals)
       {
@@ -150,15 +160,6 @@ int start()
             }
          }
       }
-      // 计算长周期MA（如果启用）
-      if(InpMA2Period > 0)
-      {
-         double prices2[];
-         ArrayResize(prices2, InpMA2Period * 2);
-         for(int jj = 0; j < InpMA2Period * 2; j++)
-            prices2[j] = GetPriceByType(i + j, InpPriceType);
-         ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
-      }
    }
 
    // --- 第2步：刷新 bar[0]（仅显示，不生成信号）---
@@ -166,7 +167,7 @@ int start()
    {
       double prices0[];
       ArrayResize(prices0, InpMAPeriod * 2);
-      for(int jjj = 0; j < InpMAPeriod * 2; j++)
+      for(j = 0; j < InpMAPeriod * 2; j++)
          prices0[j] = GetPriceByType(j, InpPriceType);
       maBuffer[0] = CalculateMA(prices0, InpMAPeriod, InpMAMethod, 0);
       ma2Buffer[0] = (InpMA2Period > 0) ? ma2Buffer[1] : 0;

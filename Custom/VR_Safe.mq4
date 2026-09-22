@@ -148,7 +148,7 @@ int start()
    if(Bars > 0)
    {
       double u0 = 0.0, d0 = 0.0, p0 = 0.0;
-      for(int jj = 0; j < InpVRPeriod; j++)
+      for(j = 0; j < InpVRPeriod; j++)
       {
          double cc = iClose(_Symbol, _Period, j);
          double cp = iClose(_Symbol, _Period, j + 1);

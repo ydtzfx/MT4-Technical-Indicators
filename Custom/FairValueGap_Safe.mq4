@@ -61,7 +61,7 @@ int start() {
 
    // 检测回补：价格回踩FVG区域
    for(i=limit;i>=5;i--){
-      for(int jj=3;j<20;j++){ // 检查近期的FVG
+      for(j=3;j<20;j++){ // 检查近期的FVG
          int fvgBar=i+j;
          if(bullFVG[fvgBar]!=EMPTY_VALUE){
             double gapTop=iLow(_Symbol,_Period,fvgBar),gapBot=iHigh(_Symbol,_Period,fvgBar+2);

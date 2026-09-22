@@ -112,21 +112,34 @@ int start()
    if(limit > Bars - 2) limit = Bars - InpSenkou * 2;
    if(limit < 0) limit = 0;
 
-   // 先初始化全部为空值
-   for(int i = limit + InpSenkou; i >= -InpKijun; i--)
+   // 仅首次全量计算时清空投影/历史缓冲；增量重算必须保留已确认历史值。
+   if(counted_bars == 0)
    {
-      if(i >= 0)
+      for(int i = limit + InpSenkou; i >= -InpKijun; i--)
       {
-         tenkanBuffer[i] = EMPTY_VALUE;
-         kijunBuffer[i]  = EMPTY_VALUE;
-         chikouBuffer[i] = EMPTY_VALUE;
-         buySignal[i]    = EMPTY_VALUE;
-         sellSignal[i]   = EMPTY_VALUE;
-         strongBuy[i]    = EMPTY_VALUE;
-         strongSell[i]   = EMPTY_VALUE;
+         if(i >= 0)
+         {
+            tenkanBuffer[i] = EMPTY_VALUE;
+            kijunBuffer[i]  = EMPTY_VALUE;
+            chikouBuffer[i] = EMPTY_VALUE;
+            buySignal[i]    = EMPTY_VALUE;
+            sellSignal[i]   = EMPTY_VALUE;
+            strongBuy[i]    = EMPTY_VALUE;
+            strongSell[i]   = EMPTY_VALUE;
+         }
+         senkouABuffer[i + InpKijun] = EMPTY_VALUE;
+         senkouBBuffer[i + InpKijun] = EMPTY_VALUE;
       }
-      senkouABuffer[i + InpKijun] = EMPTY_VALUE;
-      senkouBBuffer[i + InpKijun] = EMPTY_VALUE;
+   }
+   else
+   {
+      for(i = limit; i >= 0; i--)
+      {
+         buySignal[i]  = EMPTY_VALUE;
+         sellSignal[i] = EMPTY_VALUE;
+         strongBuy[i]  = EMPTY_VALUE;
+         strongSell[i] = EMPTY_VALUE;
+      }
    }
 
    for(i = limit; i >= 0; i--)
@@ -151,7 +164,7 @@ int start()
       {
          double highestK = iHigh(_Symbol, _Period, i);
          double lowestK  = iLow(_Symbol, _Period, i);
-         for(int jj = i; j < i + InpKijun; j++)
+         for(j = i; j < i + InpKijun; j++)
          {
             h = iHigh(_Symbol, _Period, j);
             l = iLow(_Symbol, _Period, j);
@@ -172,7 +185,7 @@ int start()
       {
          double highestS = iHigh(_Symbol, _Period, i);
          double lowestS  = iLow(_Symbol, _Period, i);
-         for(int jjj = i; j < i + InpSenkou; j++)
+         for(j = i; j < i + InpSenkou; j++)
          {
             h = iHigh(_Symbol, _Period, j);
             l = iLow(_Symbol, _Period, j);

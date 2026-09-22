@@ -90,12 +90,21 @@ int start()
    if(limit > Bars - 2) limit = Bars - InpKPeriod * 3;
    if(limit < 0) limit = 0;
 
-   // 计算原始%K
+   // 计算依赖工作区。%D 会读取 limit 之外的 %K，%K 又会读取后续 rawK；
+   // 因此增量重算必须补齐依赖范围，不能读取本轮刚初始化为 0 的 rawK。
+   int kWorkLimit = limit + InpDPeriod * 2;
+   int maxKWork = Bars - InpKPeriod - InpSlowing;
+   if(kWorkLimit > maxKWork) kWorkLimit = maxKWork;
+   if(kWorkLimit < limit) kWorkLimit = limit;
+   int rawWorkLimit = kWorkLimit + InpSlowing - 1;
+   int maxRawWork = Bars - InpKPeriod;
+   if(rawWorkLimit > maxRawWork) rawWorkLimit = maxRawWork;
+
    double rawK[];
    ArrayResize(rawK, Bars);
    ArrayInitialize(rawK, 0.0);
 
-   for(int i = limit; i >= 0; i--)
+   for(int i = rawWorkLimit; i >= 0; i--)
    {
       double highest = iHigh(_Symbol, _Period, i);
       double lowest  = iLow(_Symbol, _Period, i);
@@ -112,11 +121,11 @@ int start()
       rawK[i] = (MathAbs(range) < 0.00000001) ? 50.0 : 100.0 * (close - lowest) / range;
    }
 
-   // 平滑%K
-   for(i = limit; i >= 0; i--)
+   // 平滑%K：覆盖 %D 本轮需要读取的完整依赖区
+   for(i = kWorkLimit; i >= 0; i--)
    {
       double sum = 0.0;
-      for(int jj = 0; j < InpSlowing; j++)
+      for(j = 0; j < InpSlowing; j++)
       {
          if(i + j < ArraySize(rawK))
             sum += rawK[i + j];
@@ -129,7 +138,7 @@ int start()
    {
       double kPrices[];
       ArrayResize(kPrices, InpDPeriod * 2);
-      for(int jjj = 0; j < InpDPeriod * 2; j++)
+      for(j = 0; j < InpDPeriod * 2; j++)
          kPrices[j] = kBuffer[i + j];
 
       dBuffer[i] = CalculateMA(kPrices, InpDPeriod, InpMAMethod, 0);

@@ -131,25 +131,34 @@ $c -match "0 error"  # True = success
 
 ## MQL4 Gotchas
 
-### C89 Function-Scope Variables (CRITICAL)
-MQL4 uses C89 scoping rules: variables declared anywhere in a function body (including inside `for` loops and `{ }` blocks) are scoped to the entire function. **Never declare the same variable name twice in the same function.**
+### Loop Variable Scope in This Repository (CRITICAL)
+
+This project intentionally compiles **without `#property strict`** for MT4 compatibility. The real P0.5 MetaEditor gate shows that, in this compatibility mode, redeclaring the same loop variable inside one function can fail with `'j' - variable already defined`, even though current MQL4 language documentation describes block scope.
+
+Use a declaration-once/reuse pattern inside each function:
 
 ```mql4
-// WRONG — MQL4 treats both i as same scope:
-int start() {
-    for (int i = 0; i < 10; i++) { ... }
-    for (int i = 5; i < 15; i++) { ... }  // ERROR: 'i' already defined
-}
+// VALID for this repository's non-strict compatibility target:
+for(int j = 0; j < 34; j++) { ... }
+for(j = 0; j < 5; j++) { ... }
 
-// RIGHT — declare once at function top, reuse:
-int start() {
-    int i;
-    for (i = 0; i < 10; i++) { ... }
-    for (i = 5; i < 15; i++) { ... }
-}
+// INVALID: duplicate declaration under the verified non-strict compiler:
+for(int j = 0; j < 34; j++) { ... }
+for(int j = 0; j < 5; j++) { ... }
+
+// INVALID: declaration/control variable mismatch:
+for(int jj = 0; j < 10; j++) { ... }
+
+// INVALID: descending condition with increment:
+for(int i = limit; i >= 1; i++) { ... }
 ```
 
-This applies to ALL variable names including `j`, `jj`, `jjj`, `h`, `l`, `c`, `v`, `s`, `atr`, etc. The project uses `ii`, `iii`, `iiii`, `jj`, `jjj`, `jjjj`, `jjjjj`, `jjjjjj`, `jjjjjjj` as distinct names to avoid conflicts across nested loops within the same function.
+**Loop safety rules:**
+- Within a function, declare a loop variable once and reuse it in later loops when the same name is needed.
+- The initializer, condition, increment/decrement, and loop body must use the same intended control variable.
+- For descending loops such as `i >= 1`, use `i--`; for ascending loops such as `i <= end`, use `i++`.
+- Do not rename only the declaration. If a loop variable is renamed, update every reference belonging to that loop.
+- P0.5 MetaEditor compilation is the source of truth for compatibility; static assumptions alone are insufficient.
 
 ### No C-Style Pointer Arrays
 MQL4 does NOT support `double *arr[] = {buf1, buf2, ...}`. Each buffer must be individually declared and bound with SetIndexBuffer. Files that originally used pointer arrays (GuppyMMA, MTF_RSI, CandlePatternScanner, RainbowMA) have been rewritten with individual buffer declarations.

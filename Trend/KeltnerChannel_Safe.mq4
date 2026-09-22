@@ -42,16 +42,16 @@ int start() {
    for(int i=limit;i>=1;i--) {
       double prices[50];for(int j=0;j<InpMAPeriod*2;j++)prices[j]=GetPriceByType(i+j,InpPriceType);
       double ema=prices[InpMAPeriod*2-1];double alpha=2.0/(InpMAPeriod+1);
-      for(int jj=InpMAPeriod*2-2;j>=0;j--)ema=prices[j]*alpha+ema*(1-alpha);
+      for(j=InpMAPeriod*2-2;j>=0;j--)ema=prices[j]*alpha+ema*(1-alpha);
       middle[i]=ema;
-      double trSum=0;for(int jjj=0;j<InpATRPeriod;j++){trSum+=GetTrueRange(_Symbol,_Period,i+j);}
+      double trSum=0;for(j=0;j<InpATRPeriod;j++){trSum+=GetTrueRange(_Symbol,_Period,i+j);}
       double atr=trSum/InpATRPeriod;
       upper[i]=ema+InpMultiplier*atr;lower[i]=ema-InpMultiplier*atr;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
    if(InpShowSignals) for(i=limit;i>=1;i--) {
       double c=iClose(_Symbol,_Period,i),c1=iClose(_Symbol,_Period,i+1);
-      atr=0;for(int jjjj=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      atr=0;for(j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
       bool wideChannel = (upper[i]-lower[i] > atr*3); // 宽通道=强趋势环境
       // 强买：宽通道中突破上轨
       if(c1<=upper[i+1]&&c>upper[i]&&wideChannel)strongBuy[i]=iLow(_Symbol,_Period,i)-8*Point;

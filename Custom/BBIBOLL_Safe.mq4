@@ -51,12 +51,12 @@ int start() {
       double ma12=CalculateMA(prices,12,MA_SMA,0),ma24=CalculateMA(prices,24,MA_SMA,0);
       bbi[i]=(ma3+ma6+ma12+ma24)/4.0;
       // 计算BBI值序列的标准差
-      double bbiVals[30];for(int jj=0;j<InpBBIPeriod;j++){
+      double bbiVals[30];for(j=0;j<InpBBIPeriod;j++){
          double p3=CalculateMA(prices,3,MA_SMA,j),p6=CalculateMA(prices,6,MA_SMA,j);
          double p12=CalculateMA(prices,12,MA_SMA,j),p24=CalculateMA(prices,24,MA_SMA,j);
          bbiVals[j]=(p3+p6+p12+p24)/4.0;
       }
-      double sdSum=0;for(int jjj=0;j<InpBBIPeriod;j++)sdSum+=(bbiVals[j]-bbi[i])*(bbiVals[j]-bbi[i]);
+      double sdSum=0;for(j=0;j<InpBBIPeriod;j++)sdSum+=(bbiVals[j]-bbi[i])*(bbiVals[j]-bbi[i]);
       double stdDev=MathSqrt(sdSum/InpBBIPeriod);
       upper[i]=bbi[i]+InpK*stdDev;lower[i]=bbi[i]-InpK*stdDev;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;

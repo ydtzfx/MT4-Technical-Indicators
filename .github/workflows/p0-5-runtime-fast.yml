@@ -1,0 +1,140 @@
+name: P0.5 Runtime Fast Path
+
+on:
+  push:
+    branches: [fix/p0-correctness]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  runtime-release:
+    name: Runtime / Fast Path Release Gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+
+      - name: Prove production code unchanged since verified CI
+        shell: bash
+        run: |
+          BASE=c2dd820b7406c66f1a3dc520be378817c8527db8
+          git cat-file -e "$BASE^{commit}"
+          if ! git diff --quiet "$BASE"..HEAD -- BillWilliams Custom Oscillators Templates Trend Volume Include; then
+            echo "Production MQL4 changed since verified CI base $BASE" >&2
+            git diff --name-only "$BASE"..HEAD -- BillWilliams Custom Oscillators Templates Trend Volume Include
+            exit 1
+          fi
+          echo "Production MQL4 unchanged since verified 201/201 CI base: $BASE"
+
+      - name: Download verified CI gate evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          github-token: ${{ github.token }}
+          run-id: '35680096988'
+          name: p0-5-required-gate-e7508cb8a6320e97e431fd6f3ddd94763ab7c9bc
+          path: fast/ci
+
+      - name: Compile runtime dependencies
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            Trend/MA_Safe.mq4
+            Oscillators/RSI_Safe.mq4
+            Oscillators/MACD_Safe.mq4
+            Oscillators/Stochastic_Safe.mq4
+            Trend/Ichimoku_Safe.mq4
+            Custom/MTF_RSI_Safe.mq4
+            Custom/Backtest_Safe.mq4
+            Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '8'
+          report-dir: artifacts/p0-5/runtime-deps
+          include: '.'
+
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
+
+      - name: Fetch fixed FXT/HST runtime fixture
+        run: |
+          mkdir -p artifacts/p0-5/runtime-history
+          python Tools/ci/p05_fetch_fixture.py \
+            --out artifacts/p0-5/runtime-history/generated
+
+      - name: Run real MT4 Strategy Tester
+        id: tester
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ea31337/ea-tester:EURUSD-2018-DS"
+          mkdir -p artifacts/p0-5/runtime/raw
+          docker pull "$image"
+          runtime_digest="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
+          printf '{"image":"%s","repo_digest":"%s"}\n' "$image" "$runtime_digest"             > artifacts/p0-5/runtime/raw/runtime-image.json
+
+          runtime_start='
+            set -e
+            ind="$TERMINAL_DIR/$MQL_DIR/Indicators"
+            exp="$TERMINAL_DIR/$MQL_DIR/Experts"
+            mkdir -p "$ind/Trend" "$ind/Oscillators" "$ind/Custom" "$exp"
+            cp /opt/project/Trend/MA_Safe.ex4 "$ind/Trend/"
+            cp /opt/project/Trend/Ichimoku_Safe.ex4 "$ind/Trend/"
+            cp /opt/project/Oscillators/RSI_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Oscillators/MACD_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Oscillators/Stochastic_Safe.ex4 "$ind/Oscillators/"
+            cp /opt/project/Custom/MTF_RSI_Safe.ex4 "$ind/Custom/"
+            cp /opt/project/Custom/Backtest_Safe.ex4 "$ind/Custom/"
+            cp /opt/project/Tests/P0_5_NoRepaintProbe.ex4 "$exp/"
+          '
+
+          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             "$image"             run_backtest -v -t               -e P0_5_NoRepaintProbe               -p EURUSD -y 2018 -m 1 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
+
+      - name: Show raw no-repaint summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv ]; then
+            tail -n 5 artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv
+          else
+            echo "p0_5_no_repaint.csv missing"
+          fi
+
+      - name: Programmatic runtime verdict
+        run: |
+          python Tools/ci/p05_verify.py runtime \
+            --csv artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv \
+            --out artifacts/p0-5/runtime/verdict
+
+      - name: Programmatic release verdict
+        run: |
+          python Tools/ci/p05_verify.py release-gate \
+            --ci fast/ci \
+            --runtime artifacts/p0-5/runtime/verdict \
+            --out artifacts/p0-5/release
+
+      - name: Publish summaries
+        if: always()
+        shell: bash
+        run: |
+          [ -f artifacts/p0-5/runtime/verdict/runtime-report.md ] && cat artifacts/p0-5/runtime/verdict/runtime-report.md >> "$GITHUB_STEP_SUMMARY"
+          [ -f artifacts/p0-5/release/release-gate.md ] && cat artifacts/p0-5/release/release-gate.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload runtime and release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-fast-${{ github.sha }}
+          path: |
+            artifacts/p0-5/runtime
+            artifacts/p0-5/release
+          if-no-files-found: error
+          retention-days: 30

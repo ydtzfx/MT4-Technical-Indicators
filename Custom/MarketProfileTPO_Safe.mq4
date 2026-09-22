@@ -42,7 +42,7 @@ int start() {
 
       // 统计每个价格水平的TPO
       int tpo[];ArrayResize(tpo,InpLevels);ArrayInitialize(tpo,0);
-      for(int jj=0;j<InpTPOBars;j++){
+      for(j=0;j<InpTPOBars;j++){
          h=iHigh(_Symbol,_Period,i+j);l=iLow(_Symbol,_Period,i+j);
          int hi=(int)((h-ll)/step),li=(int)((l-ll)/step);
          hi=MathMax(0,MathMin(InpLevels-1,hi));li=MathMax(0,MathMin(InpLevels-1,li));

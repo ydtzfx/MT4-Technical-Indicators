@@ -42,7 +42,7 @@ int start() {
       else{
          // 自适应Q：波动大时增大过程噪声
          double atr=0;for(int j=0;j<5;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=5;
-         double longATR=0;for(int jj=0;j<50;j++)longATR+=GetTrueRange(_Symbol,_Period,i+j);longATR/=50;
+         double longATR=0;for(j=0;j<50;j++)longATR+=GetTrueRange(_Symbol,_Period,i+j);longATR/=50;
          double qAdapt=InpQ*MathMax(0.5,MathMin(3.0,atr/longATR));
 
          // 预测

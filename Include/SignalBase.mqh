@@ -70,7 +70,7 @@ void InitMultiBuffers(int totalBuffers, double &buffers[][],
 //| 设置信号值 — 核心函数                                              |
 //| barIndex: K线索引                                                  |
 //| signal: 信号值                                                     |
-//| 规则：barIndex == 0 时将 signal 视为临时值（显示用）               |
+//| 规则：STRICT 模式下 barIndex == 0 时强制为空，不允许生成信号       |
 //|        barIndex >= 1 时将 signal 永久写入缓冲区                   |
 //+------------------------------------------------------------------+
 void SetSignalValue(double &buffer[], int barIndex, double signal,
@@ -79,9 +79,8 @@ void SetSignalValue(double &buffer[], int barIndex, double signal,
    // 严格模式：bar[0] 不写入信号值（避免未来函数）
    if(mode == SIGNAL_MODE_STRICT && barIndex == 0)
    {
-      // bar[0] 只更新显示值，不固化
-      // 实际在 start() 中 bar[0] 会在每次tick被重新计算
-      buffer[0] = signal;
+      // 严格模式下 bar[0] 永远不承载信号值
+      buffer[0] = EMPTY_VALUE;
       return;
    }
 
@@ -124,13 +123,13 @@ void SetArrowSignal(double &buyBuffer[], double &sellBuffer[],
 //|                                                                  |
 //| 使用示例：                                                        |
 //|   int limit = Bars - IndicatorCounted();                         |
-//|   for(int ii = limit - 1; i >= 1; i--) {                          |
+//|   for(int i = limit - 1; i >= 1; i--) {                          |
 //|       // 计算信号                                                  |
 //|       double signal = CalculateMySignal(i);                       |
 //|       SetSignalValue(signalBuffer, i, signal);                   |
 //|   }                                                              |
-//|   // 仅刷新 bar[0] 显示值，不修改信号                              |
-//|   signalBuffer[0] = CalculateMySignal(0);                         |
+//|   // 严格模式下 bar[0] 永远为空，不生成交易信号                    |
+//|   signalBuffer[0] = EMPTY_VALUE;                                  |
 //+------------------------------------------------------------------+
 void FillSignalBuffer(double &buffer[], int limit,
                       double &prices[], int priceCount)
@@ -138,7 +137,7 @@ void FillSignalBuffer(double &buffer[], int limit,
    // limit 从 IndicatorCounted() 推导:
    // limit = Bars - IndicatorCounted();
    // 循环从 limit-1 向下到 1
-   for(int iii = limit - 1; i >= 1; i--)
+   for(int i = limit - 1; i >= 1; i--)
    {
       // 由调用方在外部实现具体计算逻辑
       // 此函数仅作为模式参考保留
@@ -258,7 +257,7 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    double indMin    = indicatorBuffer[idx];
    double indMin2   = indicatorBuffer[idx];
 
-   for(int iiii = idx; i < idx + lookback; i++)
+   for(int i = idx; i < idx + lookback; i++)
    {
       double p = iClose(_Symbol, _Period, i);
       if(p < priceMin) priceMin = p;
@@ -270,7 +269,7 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    int lowCount = 0;
    double priceLows[3], indAtLows[3];
 
-   for(iiiii = idx + 1; i < idx + lookback * 2 && lowCount < 3; i++)
+   for(i = idx + 1; i < idx + lookback * 2 && lowCount < 3; i++)
    {
       bool isLocalLow = true;
       double lowP = iLow(_Symbol, _Period, i);
@@ -298,11 +297,11 @@ ENUM_TRADE_SIGNAL DetectDivergence(double &indicatorBuffer[], int barIndex,
    int highCount = 0;
    double priceHighs[3], indAtHighs[3];
 
-   for(iiiii = idx + 1; i < idx + lookback * 2 && highCount < 3; i++)
+   for(i = idx + 1; i < idx + lookback * 2 && highCount < 3; i++)
    {
       bool isLocalHigh = true;
       double highP = iHigh(_Symbol, _Period, i);
-      for(int jj = 1; j <= 2; j++)
+      for(int j = 1; j <= 2; j++)
       {
          if(i + j < Bars && iHigh(_Symbol, _Period, i + j) >= highP) isLocalHigh = false;
          if(i - j >= 1 && iHigh(_Symbol, _Period, i - j) >= highP) isLocalHigh = false;

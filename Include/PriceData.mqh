@@ -95,7 +95,7 @@ double GetLowSignal(string symbol, int timeframe, int shift)
 long GetVolumeSignal(string symbol, int timeframe, int shift)
 {
    int safeShift = (shift < 1) ? 1 : shift;
-   return(iVolume(symbol, timeframe, shift));
+   return(iVolume(symbol, timeframe, safeShift));
 }
 
 //+------------------------------------------------------------------+

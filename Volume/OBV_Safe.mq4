@@ -129,7 +129,7 @@ int start()
       // OBV极值检测（最近30根K线范围）
       double obvMax = obvBuffer[i];
       double obvMin = obvBuffer[i];
-      for(int jj = i; j < i + 30 && j < Bars; j++)
+      for(j = i; j < i + 30 && j < Bars; j++)
       {
          if(obvBuffer[j] > obvMax) obvMax = obvBuffer[j];
          if(obvBuffer[j] < obvMin) obvMin = obvBuffer[j];

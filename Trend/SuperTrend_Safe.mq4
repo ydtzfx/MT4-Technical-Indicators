@@ -62,7 +62,7 @@ int start() {
    }
    // 信号：趋势转换确认(bar[1]+) — 增强分级
    for(i=limit;i>=1;i--) {
-      atr=0;for(int jj=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
+      atr=0;for(j=0;j<InpATRPeriod;j++)atr+=GetTrueRange(_Symbol,_Period,i+j);atr/=InpATRPeriod;
       double dist=MathAbs((upTrend[i]!=EMPTY_VALUE?upTrend[i]:downTrend[i])-iClose(_Symbol,_Period,i));
       bool strongBreak = (dist > atr * InpMultiplier * 0.8); // 价格远离趋势线=趋势强劲
       // 强买：趋势转多 + 大幅突破

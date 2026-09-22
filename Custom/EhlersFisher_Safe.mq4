@@ -30,13 +30,13 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       qComp[i]=0.0962*price[i+1]+0.5769*price[i+3]-0.5769*price[i+5]-0.0962*price[i+7];
       smoothPrice[i]=0.2*iComp[i]+0.8*(i>1?smoothPrice[i+1]:iComp[i]);
    }
-   for(i=limit;i>=1;i++){
+   for(i=limit;i>=1;i--){
       double mn=smoothPrice[i],mx=smoothPrice[i];for(int j=0;j<InpPeriod;j++){if(smoothPrice[i+j]<mn)mn=smoothPrice[i+j];if(smoothPrice[i+j]>mx)mx=smoothPrice[i+j];}
       double rng=mx-mn;double x=rng>0?2*(smoothPrice[i]-mn)/rng-1:0;x=MathMax(-0.999,MathMin(0.999,x));
       fish[i]=0.5*MathLog((1+x)/(1-x));trigger[i]=0.5*fish[i]+0.5*trigger[i+1];
       smooth[i]=fish[i]-fish[i+1];buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;strongBuy[i]=EMPTY_VALUE;strongSell[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=2;i++){
+   for(i=limit;i>=2;i--){
       bool priceUp=iClose(_Symbol,_Period,i)>iClose(_Symbol,_Period,i+2);
       // Strong Buy: 金叉 + 价格向上
       if(fish[i+1]<=trigger[i+1]&&fish[i]>trigger[i]&&smooth[i]>0&&priceUp)strongBuy[i]=fish[i]-0.8;

@@ -38,7 +38,7 @@ int start() {
 
       // 统计触碰次数确认S/R强度
       int touchRes=0,touchSup=0;double resZone=0,supZone=0;
-      for(int jj=1;j<InpLookback;j++){
+      for(j=1;j<InpLookback;j++){
          h=iHigh(_Symbol,_Period,i+j);
          if(MathAbs(h-hh)<(hh*0.002)){touchRes++;resZone+=h;}
          l=iLow(_Symbol,_Period,i+j);

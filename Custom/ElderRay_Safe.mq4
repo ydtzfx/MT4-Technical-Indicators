@@ -35,7 +35,7 @@ int start() {
    for(int i=limit;i>=1;i--){
       double p[50];for(int j=0;j<50;j++)p[j]=iClose(_Symbol,_Period,i+j);
       double ema=p[49];double a=2.0/(InpPeriod+1);
-      for(int jj=48;j>=0;j--)ema=p[j]*a+ema*(1-a);
+      for(j=48;j>=0;j--)ema=p[j]*a+ema*(1-a);
       bull[i]=iHigh(_Symbol,_Period,i)-ema;bear[i]=iLow(_Symbol,_Period,i)-ema;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
       strongBuySignal[i]=EMPTY_VALUE;strongSellSignal[i]=EMPTY_VALUE;

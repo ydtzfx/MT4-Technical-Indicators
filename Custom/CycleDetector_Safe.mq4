@@ -39,10 +39,10 @@ int start() {
       double bestACF=0;int bestLag=2;
       for(int lag=2;lag<=InpMaxPeriod;lag++){
          double mean1=0,mean2=0;
-         for(int jj=0;j<window-lag;j++){mean1+=diff[j];mean2+=diff[j+lag];}
+         for(j=0;j<window-lag;j++){mean1+=diff[j];mean2+=diff[j+lag];}
          mean1/=(window-lag);mean2/=(window-lag);
          double num=0,den1=0,den2=0;
-         for(int jjj=0;j<window-lag;j++){num+=(diff[j]-mean1)*(diff[j+lag]-mean2);den1+=(diff[j]-mean1)*(diff[j]-mean1);den2+=(diff[j+lag]-mean2)*(diff[j+lag]-mean2);}
+         for(j=0;j<window-lag;j++){num+=(diff[j]-mean1)*(diff[j+lag]-mean2);den1+=(diff[j]-mean1)*(diff[j]-mean1);den2+=(diff[j+lag]-mean2)*(diff[j+lag]-mean2);}
          double acf=SafeDivide(num,MathSqrt(den1*den2),0);
          if(acf>bestACF){bestACF=acf;bestLag=lag;}
       }

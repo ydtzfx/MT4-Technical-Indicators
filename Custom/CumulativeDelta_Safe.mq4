@@ -39,7 +39,7 @@ int start() {
       cum+=delta;
       if(i<=limit){cumDelta[i]=cum;barDelta[i]=delta;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;}
    }
-   for(i=limit;i>=1;i++){double s=0;for(int j=0;j<10;j++)s+=cumDelta[i+j];signal[i]=s/10;}
+   for(i=limit;i>=1;i--){double s=0;for(int j=0;j<10;j++)s+=cumDelta[i+j];signal[i]=s/10;}
 
    for(i=limit;i>=3;i--){
       // CumDelta与价格背离

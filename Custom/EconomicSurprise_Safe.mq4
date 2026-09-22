@@ -14,7 +14,7 @@ int init(){SetIndexStyle(0,DRAW_HISTOGRAM,STYLE_SOLID,3);SetIndexBuffer(0,surpri
 int deinit(){return(0);}
 int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Bars-2)limit=Bars-200;if(limit<0)limit=0;
    double avgRange=0;for(int j=0;j<50;j++)avgRange+=iHigh(_Symbol,_Period,limit+50+j)-iLow(_Symbol,_Period,limit+50+j);avgRange/=50;
-   for(int i=limit;i>=1;i++){
+   for(int i=limit;i>=1;i--){
       double gap=iOpen(_Symbol,_Period,i)-iClose(_Symbol,_Period,i+1);
       double range=iHigh(_Symbol,_Period,i)-iLow(_Symbol,_Period,i);
       // 跳空+扩幅 = "超预期"事件
@@ -23,9 +23,9 @@ int start(){int cb=IndicatorCounted();if(cb<0)cb=0;int limit=Bars-cb;if(limit>Ba
       surprise[i]=score;impact[i]=0;buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
    // "冲击衰减"=事后价格是否延续跳空方向
-   for(i=limit;i>=3;i++){
+   for(i=limit;i>=3;i--){
       double dir=surprise[i]>0?1:-1;
-      int persist=0;for(int jj=0;j<5;j++){if((iClose(_Symbol,_Period,i-j)-iClose(_Symbol,_Period,i+1))*dir>0)persist++;}
+      int persist=0;for(j=0;j<5;j++){if((iClose(_Symbol,_Period,i-j)-iClose(_Symbol,_Period,i+1))*dir>0)persist++;}
       impact[i]=persist*20; // 冲击延续度
       if(surprise[i]>30&&impact[i]>60)buySignal[i]=impact[i]-10;  // 正向超预期+持续=强多
       if(surprise[i]<-30&&impact[i]>60)sellSignal[i]=impact[i]+10; // 负向超预期+持续=强空

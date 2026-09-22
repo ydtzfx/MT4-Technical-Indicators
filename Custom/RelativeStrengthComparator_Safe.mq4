@@ -42,7 +42,7 @@ int start() {
       rs[i]=100*(ret1-ret2); // 超额收益
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=1;i++){double s=0;for(int j=0;j<5;j++)s+=rs[i+j];signal[i]=s/5;}
+   for(i=limit;i>=1;i--){double s=0;for(int j=0;j<5;j++)s+=rs[i+j];signal[i]=s/5;}
    for(i=limit;i>=2;i--){
       if(rs[i+1]<0&&rs[i]>0)buySignal[i]=rs[i]-1;      // 超额收益转正
       if(rs[i+1]>0&&rs[i]<0)sellSignal[i]=rs[i]+1;

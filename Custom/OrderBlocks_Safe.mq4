@@ -59,7 +59,7 @@ int start() {
       }
 
       // === 检测看跌订单块 ===
-      bool wasUp=true;for(int jj=1;j<=3;j++)if(iClose(_Symbol,_Period,i+j)<iClose(_Symbol,_Period,i+j+1))wasUp=false;
+      bool wasUp=true;for(j=1;j<=3;j++)if(iClose(_Symbol,_Period,i+j)<iClose(_Symbol,_Period,i+j+1))wasUp=false;
       bool isReversalDn=iClose(_Symbol,_Period,i-1)<iClose(_Symbol,_Period,i)&&iClose(_Symbol,_Period,i-2)<iClose(_Symbol,_Period,i-1);
       if(c>o&&wasUp&&isReversalDn){
          bearOB[i]=h+3*Point;

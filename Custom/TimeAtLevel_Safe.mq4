@@ -39,7 +39,7 @@ int start() {
       double c=iClose(_Symbol,_Period,i);
       // 统计之前有多少连续bar在这个窄幅区间内
       int barsInZone=0;double zoneMid=c;
-      for(int jj=i+1;j<Bars;j++){
+      for(j=i+1;j<Bars;j++){
          double cj=iClose(_Symbol,_Period,j);
          if(MathAbs(cj-zoneMid)<zoneWidth)barsInZone++;
          else break;

@@ -1,0 +1,24 @@
+name: Locked MT4 MetaEditor compile
+description: Compile MQL4 with an immutable, digest-pinned MT4 MetaEditor container and emit auditable reports.
+inputs:
+  paths:
+    description: Newline-separated files, directories, or glob patterns to compile.
+    required: true
+  expected-count:
+    description: Exact number of .mq4 files expected.
+    required: true
+  report-dir:
+    description: Directory for normalized logs and JSON/Markdown reports.
+    required: true
+  include:
+    description: MetaEditor include path.
+    required: false
+    default: .
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - ${{ inputs.paths }}
+    - ${{ inputs.expected-count }}
+    - ${{ inputs.report-dir }}
+    - ${{ inputs.include }}
