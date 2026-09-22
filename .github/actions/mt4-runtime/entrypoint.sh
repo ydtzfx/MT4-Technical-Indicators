@@ -58,10 +58,11 @@ done < <(find "$mt4" -type f \( -iname 'symbols.raw' -o -iname 'symbols.sel' -o 
 echo "=== Expert before terminal ==="
 ls -l "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4" || true
 
-cfg='config\p0_5.ini'
-echo "strategy tester config: $cfg"
+cfg_posix="$mt4/config/p0_5.ini"
+cfg_win="$(winepath -w "$cfg_posix")"
+echo "strategy tester config: $cfg_win"
 echo "=== startup config bytes ==="
-od -An -tx1 -N 96 "$mt4/config/p0_5.ini" || true
+od -An -tx1 -N 96 "$cfg_posix" || true
 
 export DISPLAY=:99
 Xvfb :99 -screen 0 1366x768x24 +extension GLX +extension RANDR +extension RENDER >/tmp/p05-xvfb.log 2>&1 &
@@ -71,7 +72,7 @@ sleep 2
 
 echo "=== launch configured Strategy Tester ==="
 set +e
-timeout 180 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
+timeout 180 bash -c 'wine "$1" /portable "/config:$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg_win"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
