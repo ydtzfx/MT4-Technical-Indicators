@@ -41,8 +41,9 @@ echo "=== injected histories ==="
 ls -lh "$mt4/history/default"/EURUSD*.hst
 
 cfg="$(winepath -w "$mt4/p0_5.ini")"
+echo "strategy tester config: $cfg"
 set +e
-timeout 900 wine "$mt4/terminal.exe" /portable "/config:$cfg"
+timeout 900 wine "$mt4/terminal.exe" /portable "$cfg"
 terminal_rc=$?
 set -e
 echo "terminal exit code: $terminal_rc"
@@ -54,6 +55,20 @@ fi
 report="$(find "$mt4" -type f -name 'p0_5_report*.htm' -print -quit 2>/dev/null || true)"
 if [[ -n "$report" && -f "$report" ]]; then cp "$report" "$output_dir/strategy-tester-report.htm"; fi
 find "$mt4/tester" -type f -name '*.log' -exec cp {} "$output_dir/" \; 2>/dev/null || true
+find "$mt4/logs" -type f -name '*.log' -exec cp {} "$output_dir/" \; 2>/dev/null || true
+
+echo "=== tester/runtime files ==="
+find "$mt4/tester" -maxdepth 3 -type f -printf '%p %s bytes\n' 2>/dev/null | sort || true
+echo "=== tester journals (tail) ==="
+while IFS= read -r log; do
+  echo "--- $log"
+  iconv -f utf-16le -t utf-8 -c "$log" 2>/dev/null | tail -n 80 || tail -n 80 "$log" || true
+done < <(find "$mt4/tester" -type f -name '*.log' -print 2>/dev/null | sort)
+echo "=== terminal journals (tail) ==="
+while IFS= read -r log; do
+  echo "--- $log"
+  iconv -f utf-16le -t utf-8 -c "$log" 2>/dev/null | tail -n 50 || tail -n 50 "$log" || true
+done < <(find "$mt4/logs" -type f -name '*.log' -print 2>/dev/null | sort)
 
 cat > "$output_dir/runtime-execution.json" <<JSON
 {"terminal_exit_code":$terminal_rc,"csv_found":$([[ -f "$output_dir/p0_5_no_repaint.csv" ]] && echo true || echo false),"terminal_sha256":"$(sha256sum "$mt4/terminal.exe" | awk '{print $1}')"}
