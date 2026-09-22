@@ -3,9 +3,10 @@
 //| Closed-bar signal persistence probe for MT4 Strategy Tester.      |
 //+------------------------------------------------------------------+
 #property copyright "P0.5 verification"
-#property version   "1.00"
+#property version   "1.01"
 
 input int InpTrackedBars = 8;
+input int InpMinTransitions = 20;
 input double InpTolerance = 0.00000001;
 
 double prevValues[23][8];
@@ -84,7 +85,7 @@ void Compare()
          {
             violations++;
             if(fileHandle!=INVALID_HANDLE)
-               FileWrite(fileHandle,"VIOLATION",ChannelName(c),TimeToString(iTime(NULL,0,s+1),TIME_DATE|TIME_MINUTES),before,now,"","");
+               FileWrite(fileHandle,"VIOLATION",ChannelName(c),TimeToString(iTime(NULL,0,s+1),TIME_DATE|TIME_MINUTES),before,now,"","","");
          }
       }
    }
@@ -93,7 +94,7 @@ void Compare()
 int init()
 {
    fileHandle=FileOpen("p0_5_no_repaint.csv",FILE_CSV|FILE_WRITE,',');
-   if(fileHandle!=INVALID_HANDLE)FileWrite(fileHandle,"kind","channel","bar_time","before","after","checks","violations");
+   if(fileHandle!=INVALID_HANDLE)FileWrite(fileHandle,"kind","channel","bar_time","before","after","checks","violations","transitions");
    return(0);
 }
 
@@ -101,7 +102,7 @@ int deinit()
 {
    if(fileHandle!=INVALID_HANDLE)
    {
-      FileWrite(fileHandle,"SUMMARY","","","","",checks,violations);
+      FileWrite(fileHandle,"SUMMARY","","","","",checks,violations,transitions);
       FileClose(fileHandle);
    }
    return(0);

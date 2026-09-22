@@ -13,6 +13,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  static:
+    name: Programmatic / Static policy
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Verifier self-test
+        run: python Tools/ci/p05_verify.py selftest
+
+      - name: Run static verification
+        id: static
+        continue-on-error: true
+        run: python Tools/ci/p05_verify.py static --root . --out artifacts/p0-5/static
+
+      - name: Upload static evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-static-report-${{ github.sha }}
+          path: artifacts/p0-5/static
+          if-no-files-found: error
+          retention-days: 30
+
   compile:
     name: Compile / 201 production indicators
     runs-on: ubuntu-24.04
@@ -75,12 +99,18 @@ jobs:
 
   required-gate:
     name: P0.5 / Required Gate
-    needs: [compile, probe]
+    needs: [static, compile, probe]
     if: always()
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout policy lock
+      - name: Checkout verifier
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download static report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-static-report-${{ github.sha }}
+          path: gate/static
 
       - name: Download compile report
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -94,74 +124,27 @@ jobs:
           name: p0-5-probe-report-${{ github.sha }}
           path: gate/probe
 
-      - name: Enforce compiler lock and 201/201
-        shell: python
+      - name: Programmatic CI gate
         run: |
-          import json
-          from pathlib import Path
-
-          lock = json.loads(Path("Tools/ci/mt4-compiler.lock.json").read_text())
-          compile_candidates = list(Path("gate/compile").rglob("compile-report.json"))
-          probe_candidates = list(Path("gate/probe").rglob("compile-report.json"))
-          if len(compile_candidates) != 1:
-              raise SystemExit(f"Expected exactly one compile report, found {len(compile_candidates)}: {compile_candidates}")
-          if len(probe_candidates) != 1:
-              raise SystemExit(f"Expected exactly one probe report, found {len(probe_candidates)}: {probe_candidates}")
-          compile_report = json.loads(compile_candidates[0].read_text())
-          probe_report = json.loads(probe_candidates[0].read_text())
-
-          failures = []
-
-          expected = {
-              "expected_count": 201,
-              "discovered_count": 201,
-              "passed_count": 201,
-              "failed_count": 0,
-              "errors_total": 0,
-              "parser_failures": 0,
-          }
-          for key, value in expected.items():
-              if compile_report.get(key) != value:
-                  failures.append(f"compile {key}: expected {value}, got {compile_report.get(key)}")
-
-          if compile_report.get("status") != "PASS":
-              failures.append(f"compile status: {compile_report.get('status')}")
-
-          if probe_report.get("status") != "PASS":
-              failures.append(f"probe status: {probe_report.get('status')}")
-          if probe_report.get("expected_count") != 1 or probe_report.get("passed_count") != 1:
-              failures.append("no-repaint probe did not compile 1/1")
-          if probe_report.get("errors_total") != 0:
-              failures.append(f"probe errors: {probe_report.get('errors_total')}")
-
-          for report_name, report in [("compile", compile_report), ("probe", probe_report)]:
-              if report.get("compiler_image") != lock["mt4_image"]:
-                  failures.append(f"{report_name} compiler image does not match lock")
-              if report.get("wine_image") != lock["wine_image"]:
-                  failures.append(f"{report_name} wine image does not match lock")
-
-          if compile_report.get("compiler_sha256") != probe_report.get("compiler_sha256"):
-              failures.append("compiler binary SHA256 differs between production and probe jobs")
-
-          summary = [
-              "# P0.5 Required Gate",
-              "",
-              f"- Production compile: **{compile_report.get('passed_count')}/201**",
-              f"- Compile errors: **{compile_report.get('errors_total')}**",
-              f"- Compile warnings: **{compile_report.get('warnings_total')}**",
-              f"- Probe compile: **{probe_report.get('passed_count')}/1**",
-              f"- MetaEditor SHA256: `{compile_report.get('compiler_sha256')}`",
-              f"- Compiler image lock: `{lock['mt4_image']}`",
-          ]
-          Path("gate-summary.md").write_text("\n".join(summary) + "\n")
-
-          if failures:
-              raise SystemExit("P0.5 gate failed:\n- " + "\n- ".join(failures))
+          python Tools/ci/p05_verify.py ci-gate \
+            --compile gate/compile \
+            --probe gate/probe \
+            --static gate/static \
+            --lock Tools/ci/mt4-compiler.lock.json \
+            --out gate/final
 
       - name: Publish gate summary
         if: always()
-        shell: bash
         run: |
-          if [ -f gate-summary.md ]; then
-            cat gate-summary.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f gate/final/ci-gate.md ]; then
+            cat gate/final/ci-gate.md >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Upload final gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: gate/final
+          if-no-files-found: error
+          retention-days: 30
