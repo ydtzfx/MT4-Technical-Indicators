@@ -110,7 +110,7 @@ int deinit()
 
 int start()
 {
-   if(Bars<100)return(0);
+   if(Bars<InpTrackedBars+2)return(0);
    datetime t=iTime(NULL,0,0);
    if(t==0 || t==lastBarTime)return(0);
    lastBarTime=t;
