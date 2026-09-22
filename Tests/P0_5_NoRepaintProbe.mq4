@@ -6,6 +6,7 @@
 #property version   "1.01"
 
 input int InpTrackedBars = 8;
+input int InpWarmupBars = 600;
 input int InpMinTransitions = 20;
 input double InpTolerance = 0.00000001;
 
@@ -116,10 +117,11 @@ void ProcessTick()
    startCalls++;
    if(Bars<minBarsSeen)minBarsSeen=Bars;
    if(Bars>maxBarsSeen)maxBarsSeen=Bars;
-   if(Bars<InpTrackedBars+2)return(0);
+   if(Bars<InpWarmupBars)return;
+   if(Bars<InpTrackedBars+2)return;
    eligibleCalls++;
    datetime t=Time[0];
-   if(t==0 || t==lastBarTime)return(0);
+   if(t==0 || t==lastBarTime)return;
    lastBarTime=t;
    if(initialized)
    {
