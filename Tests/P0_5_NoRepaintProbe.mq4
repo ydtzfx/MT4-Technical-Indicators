@@ -111,8 +111,11 @@ int deinit()
 int start()
 {
    if(Bars<InpTrackedBars+2)return(0);
-   datetime t=iTime(NULL,0,0);
-   if(t==0 || t==lastBarTime)return(0);
+   datetime now=TimeCurrent();
+   int barSeconds=Period()*60;
+   if(now<=0 || barSeconds<=0)return(0);
+   datetime t=now-(now%barSeconds);
+   if(t==lastBarTime)return(0);
    lastBarTime=t;
    if(initialized)
    {
