@@ -133,7 +133,7 @@ int start()
    }
    else
    {
-      for(int i = limit; i >= 0; i--)
+      for(i = limit; i >= 0; i--)
       {
          buySignal[i]  = EMPTY_VALUE;
          sellSignal[i] = EMPTY_VALUE;
