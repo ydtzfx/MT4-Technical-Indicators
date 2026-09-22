@@ -98,6 +98,16 @@ jobs:
         if: always()
         run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
 
+      - name: Show raw no-repaint summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv ]; then
+            tail -n 5 artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv
+          else
+            echo "p0_5_no_repaint.csv missing"
+          fi
+
       - name: Programmatic runtime verdict
         run: |
           python Tools/ci/p05_verify.py runtime \
