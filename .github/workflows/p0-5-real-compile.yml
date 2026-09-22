@@ -97,6 +97,536 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  runtime-discover:
+    name: Runtime / MT4 Strategy Tester capability
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Inspect locked MT4 runtime image
+        shell: bash
+        run: |
+          set -euo pipefail
+          image='docker.io/mhriemers/metatrader-4@sha256:ed6c3abb2188ac178f183e30bd03cb85c7f2bf8abebfdffa70c070ff2fb1ad74'
+          wine_image='docker.io/mhriemers/wine@sha256:88fe77b8ad68b4a3a09a9e858aaee6d33aa07533c99da47c7d88fd76e7edac58'
+          mkdir -p artifacts/p0-5/runtime-capability
+          cid=$(docker create "$image")
+          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          docker export "$cid" | tar -tf - > artifacts/p0-5/runtime-capability/image-files.txt
+          terminal_path=$(grep -Ei 'MetaTrader 4/terminal\.exe    name: P0.5 / Required Gate
+    needs: [static, compile, probe]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download static report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-static-report-${{ github.sha }}
+          path: gate/static
+
+      - name: Download compile report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-compile-report-${{ github.sha }}
+          path: gate/compile
+
+      - name: Download probe report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-probe-report-${{ github.sha }}
+          path: gate/probe
+
+      - name: Programmatic CI gate
+        run: |
+          python Tools/ci/p05_verify.py ci-gate \
+            --compile gate/compile \
+            --probe gate/probe \
+            --static gate/static \
+            --lock Tools/ci/mt4-compiler.lock.json \
+            --out gate/final
+
+      - name: Publish gate summary
+        if: always()
+        run: |
+          if [ -f gate/final/ci-gate.md ]; then
+            cat gate/final/ci-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload final gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: gate/final
+          if-no-files-found: error
+          retention-days: 30
+
+  runtime:
+    name: Runtime / Strategy Tester
+    needs: [required-gate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Compile runtime dependencies
+        id: runtime-compile
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            Trend/MA_Safe.mq4
+            Oscillators/RSI_Safe.mq4
+            Oscillators/MACD_Safe.mq4
+            Oscillators/Stochastic_Safe.mq4
+            Trend/Ichimoku_Safe.mq4
+            Custom/MTF_RSI_Safe.mq4
+            Custom/Backtest_Safe.mq4
+            Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '8'
+          report-dir: artifacts/p0-5/runtime-deps
+          include: '.'
+
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
+
+      - name: Build deterministic multi-timeframe history
+        run: |
+          mkdir -p artifacts/p0-5/runtime-history
+          python Tools/ci/p05_history.py \
+            --synthetic \
+            --m1-bars 120000 \
+            --out artifacts/p0-5/runtime-history/generated
+
+      - name: Run real MT4 Strategy Tester
+        id: tester
+        continue-on-error: true
+        uses: ./.github/actions/mt4-runtime
+        with:
+          history-dir: artifacts/p0-5/runtime-history/generated
+          output-dir: artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
+
+      - name: Programmatic runtime verdict
+        if: always()
+        run: |
+          python Tools/ci/p05_verify.py runtime \
+            --csv artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv \
+            --out artifacts/p0-5/runtime/verdict
+
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: artifacts/p0-5/runtime
+          if-no-files-found: error
+          retention-days: 30
+
+  release-gate:
+    name: P0.5 / Release Gate
+    needs: [required-gate, runtime]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download CI gate evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: release/ci
+
+      - name: Download runtime evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: release/runtime
+
+      - name: Programmatic release verdict
+        run: |
+          python Tools/ci/p05_verify.py release-gate \
+            --ci release/ci \
+            --runtime release/runtime \
+            --out release/final
+
+      - name: Publish release summary
+        if: always()
+        run: |
+          if [ -f release/final/release-gate.md ]; then
+            cat release/final/release-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-release-gate-${{ github.sha }}
+          path: release/final
+          if-no-files-found: error
+          retention-days: 30
+ artifacts/p0-5/runtime-capability/image-files.txt | head -n1 || true)
+          metaeditor_path=$(grep -Ei 'MetaTrader 4/metaeditor\.exe    name: P0.5 / Required Gate
+    needs: [static, compile, probe]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download static report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-static-report-${{ github.sha }}
+          path: gate/static
+
+      - name: Download compile report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-compile-report-${{ github.sha }}
+          path: gate/compile
+
+      - name: Download probe report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-probe-report-${{ github.sha }}
+          path: gate/probe
+
+      - name: Programmatic CI gate
+        run: |
+          python Tools/ci/p05_verify.py ci-gate \
+            --compile gate/compile \
+            --probe gate/probe \
+            --static gate/static \
+            --lock Tools/ci/mt4-compiler.lock.json \
+            --out gate/final
+
+      - name: Publish gate summary
+        if: always()
+        run: |
+          if [ -f gate/final/ci-gate.md ]; then
+            cat gate/final/ci-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload final gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: gate/final
+          if-no-files-found: error
+          retention-days: 30
+
+  runtime:
+    name: Runtime / Strategy Tester
+    needs: [required-gate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Compile runtime dependencies
+        id: runtime-compile
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            Trend/MA_Safe.mq4
+            Oscillators/RSI_Safe.mq4
+            Oscillators/MACD_Safe.mq4
+            Oscillators/Stochastic_Safe.mq4
+            Trend/Ichimoku_Safe.mq4
+            Custom/MTF_RSI_Safe.mq4
+            Custom/Backtest_Safe.mq4
+            Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '8'
+          report-dir: artifacts/p0-5/runtime-deps
+          include: '.'
+
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
+
+      - name: Build deterministic multi-timeframe history
+        run: |
+          mkdir -p artifacts/p0-5/runtime-history
+          python Tools/ci/p05_history.py \
+            --synthetic \
+            --m1-bars 120000 \
+            --out artifacts/p0-5/runtime-history/generated
+
+      - name: Run real MT4 Strategy Tester
+        id: tester
+        continue-on-error: true
+        uses: ./.github/actions/mt4-runtime
+        with:
+          history-dir: artifacts/p0-5/runtime-history/generated
+          output-dir: artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
+
+      - name: Programmatic runtime verdict
+        if: always()
+        run: |
+          python Tools/ci/p05_verify.py runtime \
+            --csv artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv \
+            --out artifacts/p0-5/runtime/verdict
+
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: artifacts/p0-5/runtime
+          if-no-files-found: error
+          retention-days: 30
+
+  release-gate:
+    name: P0.5 / Release Gate
+    needs: [required-gate, runtime]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download CI gate evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: release/ci
+
+      - name: Download runtime evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: release/runtime
+
+      - name: Programmatic release verdict
+        run: |
+          python Tools/ci/p05_verify.py release-gate \
+            --ci release/ci \
+            --runtime release/runtime \
+            --out release/final
+
+      - name: Publish release summary
+        if: always()
+        run: |
+          if [ -f release/final/release-gate.md ]; then
+            cat release/final/release-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-release-gate-${{ github.sha }}
+          path: release/final
+          if-no-files-found: error
+          retention-days: 30
+ artifacts/p0-5/runtime-capability/image-files.txt | head -n1 || true)
+          history_count=$(grep -Eic '/history/.*\.hst    name: P0.5 / Required Gate
+    needs: [static, compile, probe]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download static report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-static-report-${{ github.sha }}
+          path: gate/static
+
+      - name: Download compile report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-compile-report-${{ github.sha }}
+          path: gate/compile
+
+      - name: Download probe report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-probe-report-${{ github.sha }}
+          path: gate/probe
+
+      - name: Programmatic CI gate
+        run: |
+          python Tools/ci/p05_verify.py ci-gate \
+            --compile gate/compile \
+            --probe gate/probe \
+            --static gate/static \
+            --lock Tools/ci/mt4-compiler.lock.json \
+            --out gate/final
+
+      - name: Publish gate summary
+        if: always()
+        run: |
+          if [ -f gate/final/ci-gate.md ]; then
+            cat gate/final/ci-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload final gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: gate/final
+          if-no-files-found: error
+          retention-days: 30
+
+  runtime:
+    name: Runtime / Strategy Tester
+    needs: [required-gate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Compile runtime dependencies
+        id: runtime-compile
+        uses: ./.github/actions/mt4-compile
+        with:
+          paths: |
+            Trend/MA_Safe.mq4
+            Oscillators/RSI_Safe.mq4
+            Oscillators/MACD_Safe.mq4
+            Oscillators/Stochastic_Safe.mq4
+            Trend/Ichimoku_Safe.mq4
+            Custom/MTF_RSI_Safe.mq4
+            Custom/Backtest_Safe.mq4
+            Tests/P0_5_NoRepaintProbe.mq4
+          expected-count: '8'
+          report-dir: artifacts/p0-5/runtime-deps
+          include: '.'
+
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
+
+      - name: Build deterministic multi-timeframe history
+        run: |
+          mkdir -p artifacts/p0-5/runtime-history
+          python Tools/ci/p05_history.py \
+            --synthetic \
+            --m1-bars 120000 \
+            --out artifacts/p0-5/runtime-history/generated
+
+      - name: Run real MT4 Strategy Tester
+        id: tester
+        continue-on-error: true
+        uses: ./.github/actions/mt4-runtime
+        with:
+          history-dir: artifacts/p0-5/runtime-history/generated
+          output-dir: artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
+
+      - name: Programmatic runtime verdict
+        if: always()
+        run: |
+          python Tools/ci/p05_verify.py runtime \
+            --csv artifacts/p0-5/runtime/raw/p0_5_no_repaint.csv \
+            --out artifacts/p0-5/runtime/verdict
+
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: artifacts/p0-5/runtime
+          if-no-files-found: error
+          retention-days: 30
+
+  release-gate:
+    name: P0.5 / Release Gate
+    needs: [required-gate, runtime]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Download CI gate evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-required-gate-${{ github.sha }}
+          path: release/ci
+
+      - name: Download runtime evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: p0-5-runtime-${{ github.sha }}
+          path: release/runtime
+
+      - name: Programmatic release verdict
+        run: |
+          python Tools/ci/p05_verify.py release-gate \
+            --ci release/ci \
+            --runtime release/runtime \
+            --out release/final
+
+      - name: Publish release summary
+        if: always()
+        run: |
+          if [ -f release/final/release-gate.md ]; then
+            cat release/final/release-gate.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-release-gate-${{ github.sha }}
+          path: release/final
+          if-no-files-found: error
+          retention-days: 30
+ artifacts/p0-5/runtime-capability/image-files.txt || true)
+          tester_count=$(grep -Eic '/tester/' artifacts/p0-5/runtime-capability/image-files.txt || true)
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report={
+            "schema":1,
+            "mt4_image":"docker.io/mhriemers/metatrader-4@sha256:ed6c3abb2188ac178f183e30bd03cb85c7f2bf8abebfdffa70c070ff2fb1ad74",
+            "wine_image":"docker.io/mhriemers/wine@sha256:88fe77b8ad68b4a3a09a9e858aaee6d33aa07533c99da47c7d88fd76e7edac58",
+            "terminal_path":os.environ.get("TERMINAL_PATH",""),
+            "metaeditor_path":os.environ.get("METAEDITOR_PATH",""),
+            "history_files":int(os.environ.get("HISTORY_COUNT","0")),
+            "tester_entries":int(os.environ.get("TESTER_COUNT","0")),
+          }
+          report["terminal_available"]=bool(report["terminal_path"])
+          Path("artifacts/p0-5/runtime-capability/capability.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report,indent=2))
+          PY
+        env:
+          TERMINAL_PATH: ${{ env.TERMINAL_PATH }}
+          METAEDITOR_PATH: ${{ env.METAEDITOR_PATH }}
+          HISTORY_COUNT: ${{ env.HISTORY_COUNT }}
+          TESTER_COUNT: ${{ env.TESTER_COUNT }}
+
+      - name: Upload runtime capability evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-5-runtime-capability-${{ github.sha }}
+          path: artifacts/p0-5/runtime-capability
+          if-no-files-found: error
+          retention-days: 30
+
   required-gate:
     name: P0.5 / Required Gate
     needs: [static, compile, probe]
