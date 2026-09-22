@@ -80,7 +80,8 @@ jobs:
           runtime_start='
             set -e
             ind="$TERMINAL_DIR/$MQL_DIR/Indicators"
-            mkdir -p "$ind/Trend" "$ind/Oscillators" "$ind/Custom"
+            exp="$TERMINAL_DIR/$MQL_DIR/Experts"
+            mkdir -p "$ind/Trend" "$ind/Oscillators" "$ind/Custom" "$exp"
             cp /opt/project/Trend/MA_Safe.ex4 "$ind/Trend/"
             cp /opt/project/Trend/Ichimoku_Safe.ex4 "$ind/Trend/"
             cp /opt/project/Oscillators/RSI_Safe.ex4 "$ind/Oscillators/"
@@ -88,9 +89,10 @@ jobs:
             cp /opt/project/Oscillators/Stochastic_Safe.ex4 "$ind/Oscillators/"
             cp /opt/project/Custom/MTF_RSI_Safe.ex4 "$ind/Custom/"
             cp /opt/project/Custom/Backtest_Safe.ex4 "$ind/Custom/"
+            cp /opt/project/Tests/P0_5_NoRepaintProbe.ex4 "$exp/"
           '
 
-          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             "$image"             run_backtest -v -t               -e /opt/project/Tests/P0_5_NoRepaintProbe.ex4               -p EURUSD -y 2018 -m 1 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
+          docker run --rm             -v "$PWD:/opt/project"             -e RUN_ON_START="$runtime_start"             -e BT_TESTMODEL=2             "$image"             run_backtest -v -t               -e P0_5_NoRepaintProbe               -p EURUSD -y 2018 -m 1 -T H1 -S 10               -O /opt/project/artifacts/p0-5/runtime/raw
 
       - name: Restore workspace ownership after Strategy Tester
         if: always()
