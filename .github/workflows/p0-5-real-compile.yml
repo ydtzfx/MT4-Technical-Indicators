@@ -175,20 +175,15 @@ jobs:
           report-dir: artifacts/p0-5/runtime-deps
           include: '.'
 
-      - name: Extract locked EURUSD H4 history snapshot
-        shell: bash
-        run: |
-          set -euo pipefail
-          IMAGE='docker.io/mhriemers/metatrader-4@sha256:ed6c3abb2188ac178f183e30bd03cb85c7f2bf8abebfdffa70c070ff2fb1ad74'
-          mkdir -p artifacts/p0-5/runtime-history
-          cid=$(docker create "$IMAGE")
-          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
-          docker cp "$cid:/root/.wine/drive_c/Program Files/MetaTrader 4/history/default/EURUSD240.hst" artifacts/p0-5/runtime-history/EURUSD240.source.hst
+      - name: Restore workspace ownership after Docker compile
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts .github Tests Trend Oscillators Custom || true
 
       - name: Build deterministic multi-timeframe history
         run: |
+          mkdir -p artifacts/p0-5/runtime-history
           python Tools/ci/p05_history.py \
-            artifacts/p0-5/runtime-history/EURUSD240.source.hst \
+            --synthetic \
+            --m1-bars 120000 \
             --out artifacts/p0-5/runtime-history/generated
 
       - name: Run real MT4 Strategy Tester
@@ -198,6 +193,10 @@ jobs:
         with:
           history-dir: artifacts/p0-5/runtime-history/generated
           output-dir: artifacts/p0-5/runtime/raw
+
+      - name: Restore workspace ownership after Strategy Tester
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" artifacts || true
 
       - name: Programmatic runtime verdict
         if: always()
