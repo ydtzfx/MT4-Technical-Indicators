@@ -42,11 +42,20 @@ ls -lh "$mt4/history/default"/EURUSD*.hst
 
 cfg="$(winepath -w "$mt4/p0_5.ini")"
 echo "strategy tester config: $cfg"
+
+export DISPLAY=:99
+Xvfb :99 -screen 0 1366x768x24 +extension GLX +extension RANDR +extension RENDER >/tmp/p05-xvfb.log 2>&1 &
+xvfb_pid=$!
+trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
+sleep 2
+
 set +e
-timeout 900 wine "$mt4/terminal.exe" /portable "$cfg"
+timeout 900 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
 set -e
-echo "terminal exit code: $terminal_rc"
+echo "terminal/wineserver exit code: $terminal_rc"
+echo "=== Xvfb log ==="
+tail -n 100 /tmp/p05-xvfb.log || true
 
 csv="$(find "$mt4" /root/.wine -type f -name 'p0_5_no_repaint.csv' -print -quit 2>/dev/null || true)"
 if [[ -n "$csv" && -f "$csv" ]]; then
