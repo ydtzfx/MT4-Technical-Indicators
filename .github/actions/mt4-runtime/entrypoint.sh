@@ -55,7 +55,7 @@ trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
 set +e
-timeout 300 bash -c 'wine "$1" /portable "/config:$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
+timeout 300 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
