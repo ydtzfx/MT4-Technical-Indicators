@@ -67,7 +67,7 @@ int start() {
       avgRR[i]=wins>0?sumRR/wins:0;
       buySignal[i]=EMPTY_VALUE;sellSignal[i]=EMPTY_VALUE;
    }
-   for(i=limit;i>=2;i--){
+   for(i=limit;i>=1;i--){
       if(winRate[i+1]<40&&winRate[i]>55)buySignal[i]=winRate[i]-5;  // 系统胜率回升=信号
       if(winRate[i+1]>70&&winRate[i]<55)sellSignal[i]=winRate[i]+5; // 系统胜率回落
    }

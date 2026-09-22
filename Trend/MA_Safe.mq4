@@ -119,6 +119,16 @@ int start()
       // 计算MA
       maBuffer[i] = CalculateMA(prices, InpMAPeriod, InpMAMethod, 0);
 
+      // 计算长周期MA（如果启用）
+      if(InpMA2Period > 0)
+      {
+         double prices2[];
+         ArrayResize(prices2, InpMA2Period * 2);
+         for(j = 0; j < InpMA2Period * 2; j++)
+            prices2[j] = GetPriceByType(i + j, InpPriceType);
+         ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
+      }
+
       // 信号判断：检测收盘价与MA的交叉（使用 bar[i] 和 bar[i+1] 的收盘价）
       if(InpShowSignals)
       {
@@ -149,15 +159,6 @@ int start()
                   strongSell[i] = iHigh(_Symbol, _Period, i) + 10.0 * _Point;
             }
          }
-      }
-      // 计算长周期MA（如果启用）
-      if(InpMA2Period > 0)
-      {
-         double prices2[];
-         ArrayResize(prices2, InpMA2Period * 2);
-         for(j = 0; j < InpMA2Period * 2; j++)
-            prices2[j] = GetPriceByType(i + j, InpPriceType);
-         ma2Buffer[i] = CalculateMA(prices2, InpMA2Period, InpMAMethod, 0);
       }
    }
 
