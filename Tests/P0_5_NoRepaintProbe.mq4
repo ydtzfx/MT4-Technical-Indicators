@@ -15,6 +15,10 @@ datetime lastBarTime=0;
 int checks=0;
 int violations=0;
 int transitions=0;
+int startCalls=0;
+int eligibleCalls=0;
+int minBarsSeen=2147483647;
+int maxBarsSeen=0;
 int fileHandle=INVALID_HANDLE;
 
 string ChannelName(int c)
@@ -94,7 +98,7 @@ void Compare()
 int init()
 {
    fileHandle=FileOpen("p0_5_no_repaint.csv",FILE_CSV|FILE_WRITE,',');
-   if(fileHandle!=INVALID_HANDLE)FileWrite(fileHandle,"kind","channel","bar_time","before","after","checks","violations","transitions");
+   if(fileHandle!=INVALID_HANDLE)FileWrite(fileHandle,"kind","channel","bar_time","before","after","checks","violations","transitions","start_calls","eligible_calls","min_bars","max_bars");
    return(0);
 }
 
@@ -102,7 +106,7 @@ int deinit()
 {
    if(fileHandle!=INVALID_HANDLE)
    {
-      FileWrite(fileHandle,"SUMMARY","","","","",checks,violations,transitions);
+      FileWrite(fileHandle,"SUMMARY","","","","",checks,violations,transitions,startCalls,eligibleCalls,minBarsSeen,maxBarsSeen);
       FileClose(fileHandle);
    }
    return(0);
@@ -110,12 +114,13 @@ int deinit()
 
 int start()
 {
+   startCalls++;
+   if(Bars<minBarsSeen)minBarsSeen=Bars;
+   if(Bars>maxBarsSeen)maxBarsSeen=Bars;
    if(Bars<InpTrackedBars+2)return(0);
-   datetime now=TimeCurrent();
-   int barSeconds=Period()*60;
-   if(now<=0 || barSeconds<=0)return(0);
-   datetime t=now-(now%barSeconds);
-   if(t==lastBarTime)return(0);
+   eligibleCalls++;
+   datetime t=Time[0];
+   if(t==0 || t==lastBarTime)return(0);
    lastBarTime=t;
    if(initialized)
    {
