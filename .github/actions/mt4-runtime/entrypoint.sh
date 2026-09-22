@@ -72,7 +72,7 @@ sleep 2
 
 echo "=== launch configured Strategy Tester ==="
 set +e
-timeout 180 bash -c 'wine "$1" /portable "/config:$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg_win"
+timeout 180 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg_win"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
