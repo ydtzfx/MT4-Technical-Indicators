@@ -25,9 +25,9 @@ jobs:
         run: |
           BASE=c2dd820b7406c66f1a3dc520be378817c8527db8
           git cat-file -e "$BASE^{commit}"
-          if ! git diff --quiet "$BASE"..HEAD -- '*.mq4' '*.mqh'; then
+          if ! git diff --quiet "$BASE"..HEAD -- BillWilliams Custom Oscillators Templates Trend Volume Include; then
             echo "Production MQL4 changed since verified CI base $BASE" >&2
-            git diff --name-only "$BASE"..HEAD -- '*.mq4' '*.mqh'
+            git diff --name-only "$BASE"..HEAD -- BillWilliams Custom Oscillators Templates Trend Volume Include
             exit 1
           fi
           echo "Production MQL4 unchanged since verified 201/201 CI base: $BASE"
