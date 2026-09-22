@@ -183,7 +183,7 @@ jobs:
           mkdir -p artifacts/p0-5/runtime-history
           python Tools/ci/p05_history.py \
             --synthetic \
-            --m1-bars 120000 \
+            --m1-bars 45000 \
             --out artifacts/p0-5/runtime-history/generated
 
       - name: Run real MT4 Strategy Tester

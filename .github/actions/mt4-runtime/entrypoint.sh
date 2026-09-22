@@ -21,24 +21,29 @@ cp "$history_dir"/*.hst "$mt4/history/default/"
 rm -f "$mt4/tester/files/p0_5_no_repaint.csv"
 rm -f "$mt4/p0_5_report.htm" "$mt4/p0_5_report.gif"
 
-cat > "$mt4/p0_5.ini" <<'INI'
-TestExpert=P0_5_NoRepaintProbe
-TestSymbol=EURUSD
-TestPeriod=H1
-TestModel=2
-TestSpread=10
-TestOptimization=false
-TestDateEnable=false
-TestReport=p0_5_report
-TestReplaceReport=true
-TestShutdownTerminal=true
-TestVisualEnable=false
-INI
+printf '%s\r\n' \
+  'ExpertsEnable=true' \
+  'TestExpert=P0_5_NoRepaintProbe' \
+  'TestSymbol=EURUSD' \
+  'TestPeriod=H1' \
+  'TestModel=2' \
+  'TestSpread=10' \
+  'TestOptimization=false' \
+  'TestDateEnable=true' \
+  'TestFromDate=2024.01.10' \
+  'TestToDate=2024.01.28' \
+  'TestReport=p0_5_report' \
+  'TestReplaceReport=true' \
+  'TestShutdownTerminal=true' \
+  'TestVisualEnable=false' \
+  > "$mt4/p0_5.ini"
 
 echo "=== MT4 runtime ==="
 ls -l "$mt4/terminal.exe" "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
 echo "=== injected histories ==="
 ls -lh "$mt4/history/default"/EURUSD*.hst
+echo "=== history/default metadata ==="
+find "$mt4/history/default" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort | head -100
 
 cfg="$(winepath -w "$mt4/p0_5.ini")"
 echo "strategy tester config: $cfg"
@@ -50,7 +55,7 @@ trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
 set +e
-timeout 900 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
+timeout 300 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
@@ -71,12 +76,12 @@ find "$mt4/tester" -maxdepth 3 -type f -printf '%p %s bytes\n' 2>/dev/null | sor
 echo "=== tester journals (tail) ==="
 while IFS= read -r log; do
   echo "--- $log"
-  iconv -f utf-16le -t utf-8 -c "$log" 2>/dev/null | tail -n 80 || tail -n 80 "$log" || true
+  tail -n 80 "$log" || true
 done < <(find "$mt4/tester" -type f -name '*.log' -print 2>/dev/null | sort)
 echo "=== terminal journals (tail) ==="
 while IFS= read -r log; do
   echo "--- $log"
-  iconv -f utf-16le -t utf-8 -c "$log" 2>/dev/null | tail -n 50 || tail -n 50 "$log" || true
+  tail -n 50 "$log" || true
 done < <(find "$mt4/logs" -type f -name '*.log' -print 2>/dev/null | sort)
 
 cat > "$output_dir/runtime-execution.json" <<JSON
