@@ -612,12 +612,6 @@ jobs:
           Path("artifacts/p0-5/runtime-capability/capability.json").write_text(json.dumps(report,indent=2)+"\n")
           print(json.dumps(report,indent=2))
           PY
-        env:
-          TERMINAL_PATH: ${{ env.TERMINAL_PATH }}
-          METAEDITOR_PATH: ${{ env.METAEDITOR_PATH }}
-          HISTORY_COUNT: ${{ env.HISTORY_COUNT }}
-          TESTER_COUNT: ${{ env.TESTER_COUNT }}
-
       - name: Upload runtime capability evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
