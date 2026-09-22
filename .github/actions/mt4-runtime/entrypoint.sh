@@ -6,7 +6,7 @@ mt4="/root/.wine/drive_c/Program Files/MetaTrader 4"
 
 mkdir -p "$output_dir" \
   "$mt4/MQL4/Indicators/Trend" "$mt4/MQL4/Indicators/Oscillators" "$mt4/MQL4/Indicators/Custom" \
-  "$mt4/MQL4/Experts" "$mt4/history/default" "$mt4/tester/files"
+  "$mt4/MQL4/Experts" "$mt4/history/default" "$mt4/tester/files" "$mt4/config"
 
 cp /github/workspace/Trend/MA_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
 cp /github/workspace/Oscillators/RSI_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
@@ -41,7 +41,7 @@ printf '%s\r\n' \
   'TestReplaceReport=true' \
   'TestShutdownTerminal=true' \
   'TestVisualEnable=false' \
-  > "$mt4/p0_5.ini"
+  > "$mt4/config/p0_5.ini"
 
 echo "=== MT4 runtime ==="
 ls -l "$mt4/terminal.exe" "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
@@ -58,8 +58,10 @@ done < <(find "$mt4" -type f \( -iname 'symbols.raw' -o -iname 'symbols.sel' -o 
 echo "=== Expert before terminal ==="
 ls -l "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4" || true
 
-cfg="$(winepath -w "$mt4/p0_5.ini")"
+cfg='config\\p0_5.ini'
 echo "strategy tester config: $cfg"
+echo "=== startup config bytes ==="
+od -An -tx1 -N 96 "$mt4/config/p0_5.ini" || true
 
 export DISPLAY=:99
 Xvfb :99 -screen 0 1366x768x24 +extension GLX +extension RANDR +extension RENDER >/tmp/p05-xvfb.log 2>&1 &
@@ -67,27 +69,9 @@ xvfb_pid=$!
 trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
-echo "=== bootstrap terminal first-run state ==="
-set +e
-timeout 35 bash -c 'wine "$1" /portable >/tmp/p05-bootstrap-wine.log 2>&1 & pid=$!; sleep 20; kill "$pid" >/dev/null 2>&1 || true; wineserver -k >/dev/null 2>&1 || true; wineserver -w >/dev/null 2>&1 || true' _ "$mt4/terminal.exe"
-bootstrap_rc=$?
-set -e
-echo "bootstrap exit code: $bootstrap_rc"
-tail -n 100 /tmp/p05-bootstrap-wine.log || true
-
-# First launch may migrate/update MQL4. Reassert deterministic test assets afterwards.
-cp /github/workspace/Trend/MA_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
-cp /github/workspace/Oscillators/RSI_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
-cp /github/workspace/Oscillators/MACD_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
-cp /github/workspace/Oscillators/Stochastic_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
-cp /github/workspace/Trend/Ichimoku_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
-cp /github/workspace/Custom/MTF_RSI_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
-cp /github/workspace/Custom/Backtest_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
-cp /github/workspace/Tests/P0_5_NoRepaintProbe.ex4 "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
-
 echo "=== launch configured Strategy Tester ==="
 set +e
-timeout 120 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
+timeout 180 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
 set -e
 echo "terminal/wineserver exit code: $terminal_rc"
