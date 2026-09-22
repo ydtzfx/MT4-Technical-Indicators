@@ -145,7 +145,7 @@ def targeted_checks(root: Path, findings: list[dict[str, Any]]) -> None:
         add_finding(findings, Path("Include/SignalBase.mqh"), "strict-bar0-contract", 1, "STRICT bar[0] must be EMPTY_VALUE")
 
     price = text("Include/PriceData.mqh")
-    block = re.search(r"double\s+GetVolumeSignal\s*\([^)]*\)\s*\{(.*?)\}", price, re.S)
+    block = re.search(r"(?:long|double)\s+GetVolumeSignal\s*\([^)]*\)\s*\{(.*?)\}", price, re.S)
     if not block or "iVolume(symbol, timeframe, safeShift)" not in block.group(1):
         add_finding(findings, Path("Include/PriceData.mqh"), "safe-volume-shift", 1, "GetVolumeSignal() must use safeShift")
 
