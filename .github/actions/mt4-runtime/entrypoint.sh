@@ -6,7 +6,7 @@ mt4="/root/.wine/drive_c/Program Files/MetaTrader 4"
 
 mkdir -p "$output_dir" \
   "$mt4/MQL4/Indicators/Trend" "$mt4/MQL4/Indicators/Oscillators" "$mt4/MQL4/Indicators/Custom" \
-  "$mt4/MQL4/Experts" "$mt4/history/default" "$mt4/tester/files" "$mt4/config"
+  "$mt4/MQL4/Experts" "$mt4/history/default" "$mt4/tester/history" "$mt4/tester/files" "$mt4/config"
 
 cp /github/workspace/Trend/MA_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
 cp /github/workspace/Oscillators/RSI_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
@@ -17,6 +17,7 @@ cp /github/workspace/Custom/MTF_RSI_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
 cp /github/workspace/Custom/Backtest_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
 cp /github/workspace/Tests/P0_5_NoRepaintProbe.ex4 "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
 cp "$history_dir"/*.hst "$mt4/history/default/"
+cp "$history_dir"/*.fxt "$mt4/tester/history/"
 # Also inject deterministic history into every preconfigured broker/server history directory.
 while IFS= read -r server_dir; do
   [[ "$server_dir" == "$mt4/history/default" ]] && continue
@@ -35,8 +36,8 @@ printf '%s\r\n' \
   'TestSpread=10' \
   'TestOptimization=false' \
   'TestDateEnable=true' \
-  'TestFromDate=2024.01.10' \
-  'TestToDate=2024.01.28' \
+  'TestFromDate=2019.01.10' \
+  'TestToDate=2019.01.28' \
   'TestReport=p0_5_report' \
   'TestReplaceReport=true' \
   'TestShutdownTerminal=true' \
@@ -47,6 +48,8 @@ echo "=== MT4 runtime ==="
 ls -l "$mt4/terminal.exe" "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
 echo "=== injected histories ==="
 ls -lh "$mt4/history/default"/EURUSD*.hst
+echo "=== injected tester FXT ==="
+ls -lh "$mt4/tester/history"/EURUSD*.fxt
 echo "=== history/server layout ==="
 find "$mt4/history" -maxdepth 2 -type f -printf '%p %s bytes\n' 2>/dev/null | sort | head -200
 echo "=== symbol metadata ==="
