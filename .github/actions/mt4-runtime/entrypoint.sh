@@ -67,6 +67,25 @@ xvfb_pid=$!
 trap 'kill "$xvfb_pid" >/dev/null 2>&1 || true' EXIT
 sleep 2
 
+echo "=== bootstrap terminal first-run state ==="
+set +e
+timeout 35 bash -c 'wine "$1" /portable >/tmp/p05-bootstrap-wine.log 2>&1 & pid=$!; sleep 20; kill "$pid" >/dev/null 2>&1 || true; wineserver -k >/dev/null 2>&1 || true; wineserver -w >/dev/null 2>&1 || true' _ "$mt4/terminal.exe"
+bootstrap_rc=$?
+set -e
+echo "bootstrap exit code: $bootstrap_rc"
+tail -n 100 /tmp/p05-bootstrap-wine.log || true
+
+# First launch may migrate/update MQL4. Reassert deterministic test assets afterwards.
+cp /github/workspace/Trend/MA_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
+cp /github/workspace/Oscillators/RSI_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
+cp /github/workspace/Oscillators/MACD_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
+cp /github/workspace/Oscillators/Stochastic_Safe.ex4 "$mt4/MQL4/Indicators/Oscillators/"
+cp /github/workspace/Trend/Ichimoku_Safe.ex4 "$mt4/MQL4/Indicators/Trend/"
+cp /github/workspace/Custom/MTF_RSI_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
+cp /github/workspace/Custom/Backtest_Safe.ex4 "$mt4/MQL4/Indicators/Custom/"
+cp /github/workspace/Tests/P0_5_NoRepaintProbe.ex4 "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4"
+
+echo "=== launch configured Strategy Tester ==="
 set +e
 timeout 120 bash -c 'wine "$1" /portable "$2" & wineserver -w' _ "$mt4/terminal.exe" "$cfg"
 terminal_rc=$?
