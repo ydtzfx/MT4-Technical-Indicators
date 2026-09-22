@@ -58,7 +58,7 @@ done < <(find "$mt4" -type f \( -iname 'symbols.raw' -o -iname 'symbols.sel' -o 
 echo "=== Expert before terminal ==="
 ls -l "$mt4/MQL4/Experts/P0_5_NoRepaintProbe.ex4" || true
 
-cfg='config\\p0_5.ini'
+cfg='config\p0_5.ini'
 echo "strategy tester config: $cfg"
 echo "=== startup config bytes ==="
 od -An -tx1 -N 96 "$mt4/config/p0_5.ini" || true
